@@ -144,6 +144,7 @@
     <ClCompile Include="LoadFNT.cpp" />
     <ClCompile Include="LoadTGA.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="Render.cpp" />
     <ClCompile Include="RenderSystem.cpp" />
     <ClCompile Include="Scene.cpp" />
@@ -172,6 +173,7 @@
     <ClInclude Include="InputEvents.h" />
     <ClInclude Include="LoadFNT.h" />
     <ClInclude Include="LoadTGA.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="Render.h" />
     <ClInclude Include="RenderSystem.h" />
     <ClInclude Include="Scene.h" />

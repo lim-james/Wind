@@ -82,7 +82,7 @@ void RenderSystem::Update(const float& dt) {
 			batches[c->texture].push_back({
 				c->uvRect,
 				c->tint,
-				c->GetParent()->GetComponent<Transform>()->GetLocalTransform()
+				c->GetParent()->GetComponent<Transform>()->GetWorldTransform()
 			});
 		}
 

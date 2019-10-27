@@ -1,5 +1,7 @@
 #include "Transform.h"
 
+#include "Entity.h"
+
 #include <Math/Math.hpp>
 #include <Math/MatrixTransform.hpp>
 #include <Events/EventsManager.h>
@@ -51,6 +53,20 @@ const vec3f& Transform::GetLocalRight() const {
 mat4f Transform::GetLocalTransform() const {
 	mat4f result;
 	Math::SetToTransform(result, translation, rotation, scale);
+	return result;
+}
+
+mat4f Transform::GetWorldTransform() const {
+	vec3f position = translation;
+
+	auto p = parent->GetParent();
+	while (p) {
+		position += p->GetComponent<Transform>()->translation;
+		p = p->GetParent();
+	}
+
+	mat4f result;
+	Math::SetToTransform(result, position, rotation, scale);
 	return result;
 }
 

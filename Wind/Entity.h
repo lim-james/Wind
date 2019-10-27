@@ -11,6 +11,9 @@
 
 class Entity {
 
+	Entity* parent;
+	std::vector<Entity*> children;
+
 	bool used;
 	bool staticEntity;
 
@@ -28,6 +31,15 @@ public:
 
 	virtual void Initialize();
 	void Destroy();
+
+	Entity* const GetParent() const;
+	virtual void SetParent(Entity * const entity);
+
+	void AddChild(Entity* const entity);
+	void RemoveChild(Entity* const entity);
+
+	void ClearChildren();
+	std::vector<Entity*>& GetChildren();
 
 	void SetActive(const bool& state);
 
