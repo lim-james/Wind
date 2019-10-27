@@ -6,7 +6,7 @@
 
 namespace Events {
 
-	struct KeyInput : public Event {
+	struct KeyInput : Event {
 		const int key;
 		const int scancode;
 		const int action;
@@ -21,7 +21,7 @@ namespace Events {
 
 	typedef AnyType<char> TextInput;
 
-	struct CursorPositionInput : public Event {
+	struct CursorPositionInput : Event {
 		const vec2f position;
 		const vec2f offset;
 
@@ -30,7 +30,7 @@ namespace Events {
 			, offset(offset) {}
 	};
 
-	struct MouseButtonInput : public Event {
+	struct MouseButtonInput : Event {
 		const int button;
 		const int action;
 		const int mods;
@@ -43,7 +43,7 @@ namespace Events {
 
 	typedef AnyType<vec2f> ScrollInput;
 
-	struct InputMode : public Event {
+	struct InputMode :Event {
 		const int mode;
 		const int value;
 

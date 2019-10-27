@@ -29,8 +29,7 @@ void Component::SetParent(Entity* const entity) {
 	parent = entity;
 	if (entity) {
 		Events::EventsManager::GetInstance()->Trigger("COMPONENT_ATTACHED", new Events::AnyType<Component*>(this));
-	}
-	else {
+	} else {
 		SetActive(false);
 		Events::EventsManager::GetInstance()->Trigger("COMPONENT_DETACHED", new Events::AnyType<Component*>(this));
 	}

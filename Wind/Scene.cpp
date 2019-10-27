@@ -26,8 +26,8 @@ void Scene::Start() {
 
 }
 
-void Scene::FixedUpdate() {
-
+void Scene::FixedUpdate(const float& dt) {
+	systems->FixedUpdate(dt);
 }
 
 void Scene::Update(const float& dt) {

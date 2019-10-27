@@ -35,6 +35,7 @@ public:
 
 	void Initialize();
 	void Update(const float& t);
+	void FixedUpdate(const float& t);
 
 };
 

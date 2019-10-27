@@ -65,12 +65,10 @@ void InputController::OnEvent(Events::Event* event) {
 		Events::CursorPositionInput* input = new Events::CursorPositionInput(position, offset * sensitivity);
 		Events::EventsManager::GetInstance()->Trigger("CURSOR_POSITION_INPUT", input);
 		cursorPosition = position;
-	}
-	else if (event->name == "CURSOR_SENSITIVITY") {
+	} else if (event->name == "CURSOR_SENSITIVITY") {
 		const auto input = static_cast<Events::AnyType<float>*>(event);
 		sensitivity = input->data;
-	}
-	else if (event->name == "INPUT_MODE_CHANGE") {
+	} else if (event->name == "INPUT_MODE_CHANGE") {
 		const auto input = static_cast<Events::InputMode*>(event);
 		glfwSetInputMode(context, input->mode, input->value);
 	}

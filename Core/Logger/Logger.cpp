@@ -20,7 +20,7 @@ namespace Console {
 		logs << ' ';
 	}
 
-	Logger::Logger(const char* tag, const Color& color, const char* file, const char* function, const long& line) {
+	Logger::Logger(const char* tag, const WORD& color, const char* file, const char* function, const long& line) {
 #ifndef _DEBUG
 		return;
 #endif

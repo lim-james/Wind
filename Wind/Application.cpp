@@ -62,6 +62,8 @@ void Application::Run() {
 
 	current->Awake();
 
+	float t = 0.f;
+
 	while (!context->ShouldClose()) {
 		glfwPollEvents();
 
@@ -72,6 +74,12 @@ void Application::Run() {
 		std::string title = "FPS : ";
 		title += std::to_string(FPS);
 		context->SetTitle(title.c_str());
+
+		t += dt;
+		if (t >= FRAMERATE) {
+			current->FixedUpdate(t);
+			t = 0.f;
+		}
 
 		current->Update(dt);
 
@@ -101,14 +109,11 @@ void Application::OnEvent(Events::Event* event) {
 			Events::EventsManager::GetInstance()->Trigger("EXIT");
 			return;
 		}
-	}
-	else if (event->name == "CURSOR_POSITION_INPUT") {
+	} else if (event->name == "CURSOR_POSITION_INPUT") {
 		Events::CursorPositionInput* input = static_cast<Events::CursorPositionInput*>(event);
-	}
-	else if (event->name == "MOUSE_BUTTON_INPUT") {
+	} else if (event->name == "MOUSE_BUTTON_INPUT") {
 		Events::MouseButtonInput* input = static_cast<Events::MouseButtonInput*>(event);
-	}
-	else if (event->name == "SCROLL_INPUT") {
+	} else if (event->name == "SCROLL_INPUT") {
 		Events::ScrollInput* input = static_cast<Events::ScrollInput*>(event);
 	}
 }
@@ -119,8 +124,7 @@ void Application::OnTimerEvent(Events::Event* event) {
 
 	if (event->name == "TIMER_START") {
 		timers[timer->data].Start();
-	}
-	else if (event->name == "TIMER_STOP") {
+	} else if (event->name == "TIMER_STOP") {
 		timers[timer->data].Update();
 		Console::Log << "[TIMER] " << timer->data << " : " << timers[timer->data].GetElapsedTime() << '\n';
 	}

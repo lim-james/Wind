@@ -9,6 +9,7 @@ public:
 
 	virtual void Initialize();
 	virtual void Update(const float& t) = 0;
+	virtual void FixedUpdate(const float& t) = 0;
 
 };
 

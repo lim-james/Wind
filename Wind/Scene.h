@@ -24,7 +24,7 @@ public:
 	virtual void Start();
 
 	// updates every fixed timestep
-	virtual void FixedUpdate();
+	virtual void FixedUpdate(const float& dt);
 	// updates every frame
 	virtual void Update(const float& dt);
 

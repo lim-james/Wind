@@ -33,7 +33,12 @@ void Render::SetTilemapSize(const int& width, const int& height) {
 }
 
 void Render::SetCellRect(const int& x, const int& y, const int& width, const int& height) {
-	cellRect.Set(x, y, width, height);
+	cellRect.Set(
+		static_cast<float>(x), 
+		static_cast<float>(y), 
+		static_cast<float>(width), 
+		static_cast<float>(height)
+	);
 
 	uvRect = cellRect * vec4f(tilemapUnit, tilemapUnit);
 }

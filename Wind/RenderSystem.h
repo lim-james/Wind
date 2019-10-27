@@ -4,6 +4,7 @@
 #include "System.h"
 #include "Render.h"
 #include "Camera.h"
+#include "Text.h"
 #include "Shader.h"
 
 #include <Events/Event.h>
@@ -24,6 +25,8 @@ class RenderSystem : public System {
 	std::vector<Camera*> cameras;
 	std::vector<Render*> components;
 
+	std::map<Font*, std::vector<Text*>> textBatches;
+
 	static const unsigned INSTANCE_LAYOUT_LOCATION = 2;
 	static unsigned instanceBuffer;
 		
@@ -39,6 +42,7 @@ public:
 	~RenderSystem() override;
 
 	void Update(const float& dt) override;
+	void FixedUpdate(const float& dt) override;
 
 private:
 
@@ -46,6 +50,9 @@ private:
 	void CameraDepthHandler(Events::Event* event);
 
 	void RenderActiveHandler(Events::Event* event);
+
+	void TextActiveHandler(Events::Event* event);
+	void TextFontHandler(Events::Event* event);
 
 	void GenerateQuad();
 
