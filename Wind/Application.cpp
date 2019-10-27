@@ -58,7 +58,7 @@ void Application::Run() {
 	timer.Start();
 
 	Events::EventsManager::GetInstance()->Trigger("CURSOR_SENSITIVITY", new Events::AnyType<float>(0.1f));
-	Events::EventsManager::GetInstance()->Trigger("INPUT_MODE_CHANGE", new Events::InputMode(GLFW_CURSOR, GLFW_CURSOR_DISABLED));
+	//Events::EventsManager::GetInstance()->Trigger("INPUT_MODE_CHANGE", new Events::InputMode(GLFW_CURSOR, GLFW_CURSOR_DISABLED));
 
 	current->Awake();
 
@@ -69,11 +69,6 @@ void Application::Run() {
 
 		const float et = static_cast<float>(timer.GetElapsedTime());
 		const float dt = static_cast<float>(timer.GetDeltaTime());
-		const int FPS = static_cast<int>(1.f / dt);
-
-		std::string title = "FPS : ";
-		title += std::to_string(FPS);
-		context->SetTitle(title.c_str());
 
 		t += dt;
 		if (t >= FRAMERATE) {

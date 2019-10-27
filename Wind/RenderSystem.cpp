@@ -117,8 +117,10 @@ void RenderSystem::Update(const float& dt) {
 			for (; i >= INSTANCE_LAYOUT_LOCATION; --i)
 				glVertexAttribDivisor(i, 1);
 
+			const auto tex = batchPair.first;
 			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, batchPair.first);
+			glBindTexture(GL_TEXTURE_2D, tex);
+			mainShader->SetInt("useTex", tex);
 			glDrawArraysInstanced(GL_TRIANGLES, 0, 6, count);
 		}
 
@@ -132,8 +134,11 @@ void RenderSystem::Update(const float& dt) {
 			auto& font = textPair.first;
 			if (font == nullptr) continue;
 
+			const auto tex = font->texture;
 			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, font->texture);
+			glBindTexture(GL_TEXTURE_2D, tex);
+			textShader->SetInt("useTex", tex);
+
 			glBindVertexArray(font->VAO);
 
 			for (auto& text : textPair.second) {

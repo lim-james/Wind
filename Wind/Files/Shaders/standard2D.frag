@@ -7,8 +7,12 @@ in VS_OUT {
 	vec4 color;
 } vs_out;
 
+uniform bool useTex;
 uniform sampler2D tex;
 
 void main() {
-	color = texture(tex, vs_out.texCoord) * vs_out.color;	
+	if (useTex)
+		color = texture(tex, vs_out.texCoord) * vs_out.color;	
+	else
+		color = vs_out.color;	
 }

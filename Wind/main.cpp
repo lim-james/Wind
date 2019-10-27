@@ -7,7 +7,7 @@
 int main() {
 	Application app;
 
-	app.Initialize(1600, 900, "", false);
+	app.Initialize(1600, 900, "Wind", false);
 	app.Run();
 	app.Exit();
 
