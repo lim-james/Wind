@@ -156,6 +156,7 @@
     <ClCompile Include="SystemsManager.cpp" />
     <ClCompile Include="Text.cpp" />
     <ClCompile Include="Transform.cpp" />
+    <ClCompile Include="UILabel.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -185,6 +186,7 @@
     <ClInclude Include="SystemsManager.h" />
     <ClInclude Include="Text.h" />
     <ClInclude Include="Transform.h" />
+    <ClInclude Include="UILabel.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

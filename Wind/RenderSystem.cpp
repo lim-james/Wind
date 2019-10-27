@@ -180,19 +180,20 @@ void RenderSystem::Update(const float& dt) {
 				}
 				size.y *= font->lineHeight * text->lineSpacing * text->scale;
 
+				const vec3f translation = transform->GetWorldTranslate();
 				vec3f position(0.f);
-				position.x = transform->translation.x - lineOffset[0];
+				position.x = translation.x - lineOffset[0];
 
 				switch (text->verticalAlignment)
 				{
 				case ALIGN_MIDDLE:
-					position.y = transform->translation.y + size.y * 0.5f;
+					position.y = translation.y + size.y * 0.5f;
 					break;
 				case ALIGN_BOTTOM:
-					position.y = transform->translation.y - transform->scale.y * 0.5f + size.y;
+					position.y = translation.y - transform->scale.y * 0.5f + size.y;
 					break;
 				default:
-					position.y = transform->translation.y + transform->scale.y * 0.5f;
+					position.y = translation.y + transform->scale.y * 0.5f;
 					break;
 				}
 
@@ -203,7 +204,7 @@ void RenderSystem::Update(const float& dt) {
 					switch (c) {
 					case '\n':
 						position.y -= font->lineHeight * text->lineSpacing * text->scale;
-						position.x = transform->translation.x - lineOffset[++lineNumer];
+						position.x = translation.x - lineOffset[++lineNumer];
 						break;
 					default:
 						const auto& character = font->characters[c];
