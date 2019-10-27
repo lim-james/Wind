@@ -1,0 +1,49 @@
+#ifndef PARTICLE_EMITTER_H
+#define PARTICLE_EMITTER_H
+
+#include "Component.h"
+
+#include <Math/Vectors.hpp>
+
+struct ParticleEmitter : Component {
+
+	float age;
+	float duration;
+
+	float lifetime;
+	float lifetimeRange;
+
+	vec3f angle;
+	vec3f angleRange;
+
+	float speed;
+	float speedRange;
+
+	vec3f positionRange;
+
+	vec3f gravity;
+
+	// acceleration towards center
+	float accelRad;
+	float accelRadRange;
+
+	vec3f startSize;
+	vec3f startSizeRange;
+
+	vec3f endSize;
+	vec3f endSizeRange;
+
+	vec4f startColor;
+	vec4f startColorRange;
+
+	vec4f endColor;
+	vec4f endColorRange;
+
+	ParticleEmitter();
+
+	void Initialize() override;
+	void SetActive(const bool& state) override;
+
+};
+
+#endif
