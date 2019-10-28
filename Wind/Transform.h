@@ -23,7 +23,7 @@ struct Transform : Component {
 	const vec3f& GetLocalFront() const;
 	const vec3f& GetLocalRight() const;
 
-	vec3f GetWorldTranslate() const;
+	vec3f GetWorldTranslation() const;
 
 	mat4f GetLocalTransform() const;
 	mat4f GetWorldTransform() const;

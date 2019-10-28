@@ -10,6 +10,10 @@ struct ParticleEmitter : Component {
 	float age;
 	float duration;
 
+	float spawnInterval;
+	float spawnTimer;
+	unsigned burstAmount;
+
 	float lifetime;
 	float lifetimeRange;
 
@@ -19,6 +23,7 @@ struct ParticleEmitter : Component {
 	float speed;
 	float speedRange;
 
+	vec3f offset;
 	vec3f positionRange;
 
 	vec3f gravity;
@@ -32,6 +37,8 @@ struct ParticleEmitter : Component {
 
 	vec3f endSize;
 	vec3f endSizeRange;
+
+	unsigned texture;
 
 	vec4f startColor;
 	vec4f startColorRange;

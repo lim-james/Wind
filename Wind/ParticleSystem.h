@@ -3,13 +3,15 @@
 
 #include "System.h"
 #include "ParticleEmitter.h"
+#include "Particle.h"
 
 #include <Events/Event.h>
 #include <vector>
+#include <map>
 
 class ParticleSystem : public System {
 	
-	std::vector<ParticleEmitter*> emitters;
+	std::map<ParticleEmitter*, std::vector<Entity*>> particleGroups;
 
 public:
 

@@ -5,12 +5,16 @@
 ParticleEmitter::ParticleEmitter() 
 	: age(0.f)
 	, duration(-1.f) 
-	, lifetime(5.f) 
+	, spawnInterval(0.f)
+	, spawnTimer(0.f)
+	, burstAmount(1)
+	, lifetime(1.f) 
 	, lifetimeRange(0.f)
 	, angle(0.f) 
 	, angleRange(0.f)
 	, speed(1.f)
 	, speedRange(0.f) 
+	, offset(0.f)
 	, positionRange(0.f)
 	, gravity(0.f)
 	, accelRad(0.f)
@@ -19,6 +23,7 @@ ParticleEmitter::ParticleEmitter()
 	, startSizeRange(0.f)
 	, endSize(1.f)
 	, endSizeRange(0.f)
+	, texture(0)
 	, startColor(1.f)
 	, startColorRange(0.f)
 	, endColor(1.f)
@@ -27,9 +32,14 @@ ParticleEmitter::ParticleEmitter()
 void ParticleEmitter::Initialize() {
 	Component::Initialize();
 
+	age = 0.f;
 	duration = -1.f;
 
-	lifetime = 5.f;
+	spawnInterval = 0.f;
+	spawnTimer = 0.f;
+	burstAmount = 1;
+
+	lifetime = 1.f;
 	lifetimeRange = 0.f;
 
 	angle.Set(0.f);
@@ -38,6 +48,7 @@ void ParticleEmitter::Initialize() {
 	speed = 1.f;
 	speedRange = 0.f;
 
+	offset.Set(0.f);
 	positionRange.Set(0.f);
 
 	gravity.Set(0.f);
@@ -50,6 +61,8 @@ void ParticleEmitter::Initialize() {
 
 	endSize.Set(1.f);
 	endSizeRange.Set(0.f);
+
+	texture = 0;
 
 	startColor.Set(1.f);
 	startColorRange.Set(0.f);

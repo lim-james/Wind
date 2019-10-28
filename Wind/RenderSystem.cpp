@@ -180,7 +180,7 @@ void RenderSystem::Update(const float& dt) {
 				}
 				size.y *= font->lineHeight * text->lineSpacing * text->scale;
 
-				const vec3f translation = transform->GetWorldTranslate();
+				const vec3f translation = transform->GetWorldTranslation();
 				vec3f position(0.f);
 				position.x = translation.x - lineOffset[0];
 

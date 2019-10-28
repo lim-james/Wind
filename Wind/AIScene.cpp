@@ -6,14 +6,18 @@
 #include "CameraObject.h"
 #include "Player.h"
 #include "UILabel.h"
+#include "ParticleObject.h"
 // components
 #include "Transform.h"
 #include "Render.h"
 #include "Text.h"
 #include "Camera.h"
+#include "Particle.h"
+#include "ParticleEmitter.h"
 #include "Script.h"
 // systems
 #include "RenderSystem.h"
+#include "ParticleSystem.h"
 #include "ScriptSystem.h"
 // Utils
 #include "LoadTGA.h"
@@ -24,6 +28,8 @@ AIScene::AIScene() {
 	components->Subscribe<Render>(10, 1);
 	components->Subscribe<Text>(10, 1);
 	components->Subscribe<Camera>(1, 1);
+	components->Subscribe<ParticleEmitter>(10, 1);
+	components->Subscribe<Particle>(100, 1);
 	components->Subscribe<Script>(10, 1);
 	
 	entities->Subscribe<Sprite>(10, 1);
@@ -31,14 +37,16 @@ AIScene::AIScene() {
 	entities->Subscribe<CameraObject>(1, 1);
 	entities->Subscribe<Player>(1, 1);
 	entities->Subscribe<UILabel>(10, 1);
+	entities->Subscribe<ParticleObject>(10, 1);
 
 	systems->Subscribe<RenderSystem>();
+	systems->Subscribe<ParticleSystem>();
 	systems->Subscribe<ScriptSystem>();
 }
 
 void AIScene::Awake() {
 	auto cam = entities->Create<CameraObject>();
-	cam->GetComponent<Camera>()->clearColor.Set(1.f);
+	cam->GetComponent<Camera>()->clearColor.Set(0.f);
 
 	// most performant : 500 - 700 FPS
 	auto fps = entities->Create<FPSLabel>();
@@ -53,6 +61,22 @@ void AIScene::Awake() {
 	auto player = entities->Create<Player>();
 	player->GetComponent<Transform>()->scale.Set(0.5f);
 	player->GetComponent<Render>()->tint.Set(1.f, 0.f, 0.f, 1.f);
+	player->GetComponent<ParticleEmitter>()->offset.z = -1.f;
+	//player->GetComponent<ParticleEmitter>()->duration = 0.5f;
+	//player->GetComponent<ParticleEmitter>()->burstAmount = 5;
+	player->GetComponent<ParticleEmitter>()->spawnInterval = 0.01f;
+	player->GetComponent<ParticleEmitter>()->lifetime = 5.f;
+	player->GetComponent<ParticleEmitter>()->angleRange.z = 180.f;
+	player->GetComponent<ParticleEmitter>()->speed = 5.f;
+	player->GetComponent<ParticleEmitter>()->accelRad = -50.f;
+	player->GetComponent<ParticleEmitter>()->accelRadRange = 10.f;
+	player->GetComponent<ParticleEmitter>()->startSize.Set(0.1f);
+	player->GetComponent<ParticleEmitter>()->endSize.Set(0.f);
+	player->GetComponent<ParticleEmitter>()->startColor.Set(1.f, 1.f, 0.f, 1.f);
+	player->GetComponent<ParticleEmitter>()->startColorRange.Set(.1f, .1f, 0.f, 0.f);
+	player->GetComponent<ParticleEmitter>()->endColor.Set(1.f, 0.f, 0.f, 0.5f);
+	player->GetComponent<ParticleEmitter>()->endColorRange.Set(0.1f, 0., 0.f, 0.5f);
+	//player->GetComponent<ParticleEmitter>()->gravity.Set(0.f, -9.8f, 0.f);
 
 	auto healthBar = entities->Create<Sprite>();
 	healthBar->GetComponent<Transform>()->translation.Set(0.f, 1.f, 0.f);

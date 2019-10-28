@@ -23,7 +23,8 @@ void Entity::Initialize() {
 void Entity::Destroy() {
 	used = false;
 	ClearChildren();
-	parent->RemoveChild(this);
+	if (parent)
+		parent->RemoveChild(this);
 	SetActive(false);
 
 	Events::EventsManager::GetInstance()->Trigger("ENTITY_DESTROY", new Events::AnyType<Entity*>(this));

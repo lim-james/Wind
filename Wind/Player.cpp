@@ -2,6 +2,7 @@
 
 // Components
 #include "Transform.h"
+#include "ParticleEmitter.h"
 #include "Script.h"
 // Events
 #include "InputEvents.h"
@@ -15,6 +16,7 @@ Player::Player() {
 
 void Player::Build() {
 	Sprite::Build();
+	AddComponent<ParticleEmitter>();
 	AddComponent<Script>();
 }
 

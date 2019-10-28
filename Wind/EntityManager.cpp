@@ -1,9 +1,12 @@
 #include "EntityManager.h"
 
+#include "EntityEvents.h"
+
 #include <Events/EventsManager.h>	
 
 EntityManager::EntityManager(ComponentsManager* manager)
 	: componentsManager(manager) {
+	Events::EventsManager::GetInstance()->Subscribe("CREATE_ENTITY", &EntityManager::OnCreate, this);
 	Events::EventsManager::GetInstance()->Subscribe("ENTITY_USED", &EntityManager::OnUsed, this);
 	Events::EventsManager::GetInstance()->Subscribe("ENTITY_DESTROY", &EntityManager::OnDestroy, this);
 }
@@ -29,6 +32,23 @@ void EntityManager::Initialize() {
 			c->Initialize();
 		}
 	}
+}
+
+void EntityManager::AddEntity(const unsigned& hash, Entity* entity) {
+	entity->componentsManager = componentsManager;
+	entity->Build();
+
+	typeMap[entity] = hash;
+	pools[hash].push_back(entity);
+	unused[hash].push_back(entity);
+}
+
+void EntityManager::OnCreate(Events::Event* event) {
+	Events::CreateEntity* entityEvent = static_cast<Events::CreateEntity*>(event);
+	auto entity = entityEvent->entity;
+	AddEntity(entityEvent->hash, entity);
+	entity->Initialize();
+	entity->Use();
 }
 
 void EntityManager::OnUsed(Events::Event* event) {

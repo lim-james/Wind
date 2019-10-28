@@ -50,7 +50,7 @@ const vec3f& Transform::GetLocalRight() const {
 	return axes.x;
 }
 
-vec3f Transform::GetWorldTranslate() const {
+vec3f Transform::GetWorldTranslation() const {
 	vec3f result = translation;
 
 	auto p = parent->GetParent();
@@ -70,7 +70,7 @@ mat4f Transform::GetLocalTransform() const {
 
 mat4f Transform::GetWorldTransform() const {
 	mat4f result;
-	Math::SetToTransform(result, GetWorldTranslate(), rotation, scale);
+	Math::SetToTransform(result, GetWorldTranslation(), rotation, scale);
 	return result;
 }
 
