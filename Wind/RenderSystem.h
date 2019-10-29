@@ -13,17 +13,19 @@
 #include <map>
 
 struct Instance {
+	Render* component;
 	vec4f uvRect;
 	vec4f tint;
 	mat4f model;
 };
+
+bool operator==(const Instance& lhs, const Instance& rhs);
 
 typedef std::map<unsigned, std::vector<Instance>> Batches;
 
 class RenderSystem : public System {
 	
 	std::vector<Camera*> cameras;
-	std::vector<Render*> components;
 
 	std::map<Font*, std::vector<Text*>> textBatches;
 
@@ -50,6 +52,7 @@ private:
 	void CameraDepthHandler(Events::Event* event);
 
 	void RenderActiveHandler(Events::Event* event);
+	void TextureChangeHandler(Events::Event* event);
 
 	void TextActiveHandler(Events::Event* event);
 	void TextFontHandler(Events::Event* event);

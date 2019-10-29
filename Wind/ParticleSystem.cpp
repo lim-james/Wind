@@ -56,7 +56,7 @@ void ParticleSystem::Update(const float& dt) {
 		
 		if (emitter->duration > 0) {
 			if (emitter->age > emitter->duration) {
-				if (group.empty())
+				if (emitter->loop && group.empty())
 					emitter->age = 0.f;
 				else
 					continue;

@@ -17,10 +17,8 @@ struct Script : Component {
 	std::function<void()> destroy;
 
 	Script();
-	~Script() override;
 
 	void Initialize() override;
-
 	void SetActive(const bool& state) override;
 
 };

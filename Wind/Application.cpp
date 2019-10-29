@@ -4,6 +4,7 @@
 #include "LoadFNT.h"
 // Scenes
 #include "AIScene.h"
+#include "TestScene.h"
 
 // external
 #include <Events/EventsManager.h>

@@ -1,4 +1,4 @@
-#include "AIScene.h"
+#include "TestScene.h"
 
 // game objects
 #include "Sprite.h"
@@ -7,7 +7,6 @@
 #include "Player.h"
 #include "UILabel.h"
 #include "ParticleObject.h"
-#include "AISprite.h"
 // components
 #include "Transform.h"
 #include "Render.h"
@@ -15,74 +14,52 @@
 #include "Camera.h"
 #include "Particle.h"
 #include "ParticleEmitter.h"
-#include "Collider.h"
 #include "Script.h"
 // systems
 #include "RenderSystem.h"
 #include "ParticleSystem.h"
-#include "ColliderSystem.h"
 #include "ScriptSystem.h"
 // Utils
 #include "LoadTGA.h"
 #include "LoadFNT.h"
 
-#include "InputEvents.h"
-
-#include <Math/Random.hpp>
-#include <Events/EventsManager.h>
-#include <GLFW/glfw3.h>
-
-AIScene::AIScene() {
+TestScene::TestScene() {
 	components->Subscribe<Transform>(10, 1);
 	components->Subscribe<Render>(10, 1);
 	components->Subscribe<Text>(10, 1);
 	components->Subscribe<Camera>(1, 1);
 	components->Subscribe<ParticleEmitter>(10, 1);
 	components->Subscribe<Particle>(100, 1);
-	components->Subscribe<Collider>(10, 1);
 	components->Subscribe<Script>(10, 1);
-
+	
 	entities->Subscribe<Sprite>(10, 1);
 	entities->Subscribe<FPSLabel>(1, 1);
 	entities->Subscribe<CameraObject>(1, 1);
 	entities->Subscribe<Player>(1, 1);
 	entities->Subscribe<UILabel>(10, 1);
 	entities->Subscribe<ParticleObject>(10, 1);
-	// AI objects
-	entities->Subscribe<AISprite>(10, 1);
 
 	systems->Subscribe<RenderSystem>();
 	systems->Subscribe<ParticleSystem>();
-	systems->Subscribe<ColliderSystem>();
 	systems->Subscribe<ScriptSystem>();
-
-	mapHalfSize = 10;
-
-	Events::EventsManager::GetInstance()->Subscribe("KEY_INPUT", &AIScene::KeyHandler, this);
 }
 
-void AIScene::Awake() {
+void TestScene::Awake() {
 	auto cam = entities->Create<CameraObject>();
 	cam->GetComponent<Camera>()->clearColor.Set(0.f);
-	cam->GetComponent<Camera>()->SetSize(static_cast<float>(mapHalfSize));
-
-	auto grid = entities->Create<Sprite>();
-	grid->GetComponent<Transform>()->scale.Set(2.f * static_cast<float>(mapHalfSize));
-	grid->GetComponent<Render>()->SetTexture(Load::TGA("Files/Textures/grid20.tga"));
 
 	// most performant : 500 - 700 FPS
 	auto fps = entities->Create<FPSLabel>();
-	fps->GetComponent<Transform>()->translation.Set(15.f, 0.f, 0.f);
-	fps->GetComponent<Transform>()->scale.Set(4.f);
-	fps->GetComponent<Render>()->tint.Set(0.01f);
+	fps->GetComponent<Transform>()->translation.Set(5.f, 0.f, 0.f);
+	fps->GetComponent<Render>()->tint.Set(0.f, 0.f, 0.f, 1.f);
 	fps->GetComponent<Text>()->SetFont(Load::FNT("Files/Fonts/Microsoft.fnt", "Files/Fonts/Microsoft.tga"));
 	fps->GetComponent<Text>()->text = "60";
-	//fps->GetComponent<Text>()->scale = 0.25f;
+	fps->GetComponent<Text>()->scale = 0.25f;
 	fps->GetComponent<Text>()->paragraphAlignment = PARAGRAPH_RIGHT;
 	fps->GetComponent<Text>()->verticalAlignment = ALIGN_BOTTOM;
 
 	auto player = entities->Create<Player>();
-	player->GetComponent<Transform>()->translation.Set(0.5f, 0.5f, 0.f);
+	player->GetComponent<Transform>()->scale.Set(0.5f);
 	player->GetComponent<Render>()->tint.Set(1.f, 0.f, 0.f, 1.f);
 	player->GetComponent<ParticleEmitter>()->offset.z = -1.f;
 	player->GetComponent<ParticleEmitter>()->duration = 0.5f;
@@ -102,37 +79,26 @@ void AIScene::Awake() {
 	player->GetComponent<ParticleEmitter>()->endColorRange.Set(0.1f, 0., 0.f, 0.5f);
 	//player->GetComponent<ParticleEmitter>()->gravity.Set(0.f, -9.8f, 0.f);
 
-	for (unsigned i = 0; i < 10; ++i) {
-		vec2f position(
-			Math::RandMinMax(-mapHalfSize, mapHalfSize),
-			Math::RandMinMax(-mapHalfSize, mapHalfSize)
-		);
-		position += vec2f(0.5f);
+	auto healthBar = entities->Create<Sprite>();
+	healthBar->GetComponent<Transform>()->translation.Set(0.f, 1.f, 0.f);
+	healthBar->GetComponent<Transform>()->scale.Set(1.f, 0.2f, 1.f);
+	healthBar->GetComponent<Render>()->tint.Set(0.f, 1.f, 0.f, 1.f);
+	healthBar->SetParent(player);
 
-		auto food = entities->Create<AISprite>();
-		food->tag = "FOOD";
-		food->GetComponent<Transform>()->translation.Set(position, 0.f);
-		food->GetComponent<Transform>()->scale.Set(0.8f);
-		food->SetTarget(vec3f(position, 0.f));
-		food->GetComponent<Render>()->tint.Set(1.f, 0.5f, 0.f, 1.f);
-	}
-}
+	auto statsView = entities->Create<Sprite>();
+	statsView->GetComponent<Transform>()->translation.Set(3.f, 0.f, 0.f);
+	statsView->GetComponent<Transform>()->scale.Set(2.f, 3.f, 1.f);
+	statsView->GetComponent<Render>()->tint.Set(vec3f(0.1f), 0.8f);
+	statsView->SetParent(player);
 
-void AIScene::KeyHandler(Events::Event* event) {
-	auto input = static_cast<Events::KeyInput*>(event);food
+	auto title = entities->Create<UILabel>();
+	title->GetComponent<Transform>()->translation.Set(0.f, 1.f, 0.f);
+	title->GetComponent<Transform>()->scale.Set(1.5f, 1.f, 1.f);
+	title->GetComponent<Text>()->SetFont(Load::FNT("Files/Fonts/Microsoft.fnt", "Files/Fonts/Microsoft.tga"));
+	title->GetComponent<Text>()->text = "Player";
+	title->GetComponent<Text>()->scale = 0.25f;
+	title->GetComponent<Text>()->paragraphAlignment = PARAGRAPH_LEFT;
+	title->GetComponent<Text>()->verticalAlignment = ALIGN_MIDDLE;
+	title->SetParent(statsView);
 
-	if (input->key == GLFW_KEY_SPACE && input->action == GLFW_RELEASE) {
-		vec2f position(
-			Math::RandMinMax(-mapHalfSize, mapHalfSize),
-			Math::RandMinMax(-mapHalfSize, mapHalfSize)
-		);
-		position += vec2f(0.5f);
-
-		auto fish = entities->Create<AISprite>();
-		fish->tag = "FISH";
-		fish->GetComponent<Transform>()->translation.Set(position, 0.f);
-		fish->GetComponent<Transform>()->scale.Set(0.8f);
-		fish->SetTarget(vec3f(position, 0.f));
-		fish->GetComponent<Render>()->tint.Set(0.f, 0.f, 1.f, 1.f);
-	}
 }

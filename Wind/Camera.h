@@ -11,8 +11,6 @@ struct Camera : Component {
 
 	vec4f clearColor;
 
-	float size;
-
 	float nearPlane;
 	float farPlane;
 
@@ -23,6 +21,8 @@ struct Camera : Component {
 
 	void SetActive(const bool& state) override;
 
+	void SetSize(const float& value);
+
 	void SetDepth(const float& value);
 
 	mat4f GetProjectionMatrix() const;
@@ -31,6 +31,8 @@ struct Camera : Component {
 	const vec4f& GetViewport() const;
 
 private:
+
+	float size;
 
 	float depth;
 	vec4f viewportRect;

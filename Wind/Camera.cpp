@@ -53,6 +53,11 @@ void Camera::SetActive(const bool& state) {
 	Events::EventsManager::GetInstance()->Trigger("CAMERA_ACTIVE", new Events::AnyType<Camera*>(this));
 }
 
+void Camera::SetSize(const float& value) {
+	size = value;
+	UpdateViewport();
+}
+
 void Camera::SetDepth(const float& value) {
 	depth = value;
 	Events::EventsManager::GetInstance()->Trigger("CAMERA_DEPTH", new Events::AnyType<Camera*>(this));

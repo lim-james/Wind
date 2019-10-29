@@ -7,10 +7,6 @@ Script::Script() {
 	fixedUpdate = update = [](const float&) {};
 }
 
-Script::~Script() {
-
-}
-
 void Script::Initialize() {
 	Component::Initialize();
 

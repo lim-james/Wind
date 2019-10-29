@@ -34,6 +34,8 @@ void Player::Update(const float& dt) {
 		GetComponent<Transform>()->translation.x -= 10.f * dt;
 	if (keyInputs[GLFW_KEY_D] == GLFW_PRESS)
 		GetComponent<Transform>()->translation.x += 10.f * dt;
+	if (keyInputs[GLFW_KEY_SPACE] == GLFW_PRESS)
+		GetComponent<ParticleEmitter>()->age = 0.f;
 }
 
 void Player::KeyHandler(Events::Event* event) {

@@ -8,8 +8,8 @@ public:
 	virtual ~System();
 
 	virtual void Initialize();
-	virtual void Update(const float& t) = 0;
-	virtual void FixedUpdate(const float& t) = 0;
+	virtual void Update(const float& dt) = 0;
+	virtual void FixedUpdate(const float& dt) = 0;
 
 };
 

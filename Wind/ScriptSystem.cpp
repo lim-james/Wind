@@ -18,26 +18,24 @@ void ScriptSystem::Initialize() {
 	}
 }
 
-void ScriptSystem::Update(const float& t) {
-	for (auto& c : components) {
-		c->update(t);
-	}
+void ScriptSystem::Update(const float& dt) {
+	for (auto& c : components)
+		c->update(dt);
 }
 
-void ScriptSystem::FixedUpdate(const float& t) {
-	for (auto& c : components) {
-		c->fixedUpdate(t);
-	}
+void ScriptSystem::FixedUpdate(const float& dt) {
+	for (auto& c : components)
+		c->fixedUpdate(dt);
 }
 
 void ScriptSystem::ActiveHandler(Events::Event* event) {
-	const auto component = static_cast<Events::AnyType<Script*>*>(event)->data;
+	const auto c = static_cast<Events::AnyType<Script*>*>(event)->data;
 
-	if (component->IsActive()) {
-		component->awake();
-		components.push_back(component);
+	if (c->IsActive()) {
+		c->awake();
+		components.push_back(c);
 	} else {
-		component->destroy();
-		components.erase(vfind(components, component));
+		c->destroy();
+		components.erase(vfind(components, c));
 	}
 }

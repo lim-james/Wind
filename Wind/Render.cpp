@@ -25,6 +25,16 @@ void Render::SetActive(const bool& state) {
 	Events::EventsManager::GetInstance()->Trigger("RENDER_ACTIVE", new Events::AnyType<Render*>(this));
 }
 
+const unsigned& Render::GetTexture() const {
+	return texture;
+}
+
+void Render::SetTexture(const unsigned& _texture) {
+	auto event = new Events::TextureChange(texture, this);
+	texture = _texture;
+	Events::EventsManager::GetInstance()->Trigger("TEXTURE_CHANGE", event);
+}
+
 void Render::SetTilemapSize(const int& width, const int& height) {
 	tilemapUnit.x = 1.f / static_cast<float>(width);
 	tilemapUnit.y = 1.f / static_cast<float>(height);

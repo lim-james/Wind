@@ -14,6 +14,7 @@ struct ParticleEmitter : Component {
 	float spawnTimer;
 	unsigned burstAmount;
 
+	bool loop;
 	float lifetime;
 	float lifetimeRange;
 

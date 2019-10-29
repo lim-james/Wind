@@ -1,23 +1,22 @@
-#ifndef SCRIPT_SYSTEM_H
-#define SCRIPT_SYSTEM_H
+#ifndef COLLIDER_SYSTEM_H
+#define COLLIDER_SYSTEM_H
 
 #include "System.h"
-#include "Script.h"
+#include "Collider.h"
 
 #include <Events/Event.h>
 
 #include <vector>
 
-class ScriptSystem : public System {
+class ColliderSystem : public System {
 
-	std::vector<Script*> components;
+	std::vector<Collider*> components;
 
 public:
 
-	ScriptSystem();
-	~ScriptSystem() override;
+	ColliderSystem();
+	~ColliderSystem() override;
 
-	void Initialize() override;
 	void Update(const float& dt) override;
 	void FixedUpdate(const float& dt) override;
 

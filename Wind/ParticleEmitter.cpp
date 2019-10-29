@@ -8,6 +8,7 @@ ParticleEmitter::ParticleEmitter()
 	, spawnInterval(0.f)
 	, spawnTimer(0.f)
 	, burstAmount(1)
+	, loop(false)
 	, lifetime(1.f) 
 	, lifetimeRange(0.f)
 	, angle(0.f) 
@@ -39,6 +40,7 @@ void ParticleEmitter::Initialize() {
 	spawnTimer = 0.f;
 	burstAmount = 1;
 
+	loop = false;
 	lifetime = 1.f;
 	lifetimeRange = 0.f;
 

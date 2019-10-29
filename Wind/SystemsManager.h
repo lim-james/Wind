@@ -34,8 +34,8 @@ public:
 	}
 
 	void Initialize();
-	void Update(const float& t);
-	void FixedUpdate(const float& t);
+	void Update(const float& dt);
+	void FixedUpdate(const float& dt);
 
 };
 

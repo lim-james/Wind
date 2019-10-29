@@ -1,7 +1,6 @@
 #version 330 core
 
 layout(location = 0) in vec2 inPosition;
-layout(location = 1) in vec2 inTexCoord;
 
 // instanced
 layout(location = 2) in vec4 iRect; // Rect of UV in tilemap
@@ -18,6 +17,6 @@ uniform mat4 view;
 
 void main() {
 	gl_Position = projection * view * iModel * vec4(inPosition, 0.f, 1.f);
-	vs_out.texCoord = inTexCoord * iRect.zw + iRect.xy;
+	vs_out.texCoord = (inPosition + vec2(0.5)) * iRect.zw + iRect.xy;
 	vs_out.color = iTint;
 }

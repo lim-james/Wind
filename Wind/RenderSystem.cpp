@@ -11,11 +11,16 @@
 unsigned RenderSystem::instanceBuffer = 0;
 unsigned RenderSystem::quadVAO = 0;
 
+bool operator==(const Instance& lhs, const Instance& rhs) {
+	return lhs.component == rhs.component;
+}
+
 RenderSystem::RenderSystem() {
 
 	Events::EventsManager::GetInstance()->Subscribe("CAMERA_ACTIVE", &RenderSystem::CameraActiveHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("CAMERA_DEPTH", &RenderSystem::CameraDepthHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("RENDER_ACTIVE", &RenderSystem::RenderActiveHandler, this);
+	Events::EventsManager::GetInstance()->Subscribe("TEXTURE_CHANGE", &RenderSystem::TextureChangeHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("TEXT_ACTIVE", &RenderSystem::TextActiveHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("TEXT_FONT", &RenderSystem::TextFontHandler, this);
 
@@ -43,8 +48,6 @@ RenderSystem::RenderSystem() {
 }
 
 RenderSystem::~RenderSystem() {
-	components.clear();
-
 	delete mainShader;
 	delete textShader;
 }
@@ -76,18 +79,15 @@ void RenderSystem::Update(const float& dt) {
 		mainShader->SetMatrix4("projection", projection);
 		mainShader->SetMatrix4("view", lookAt);
 
-		batches.clear();
-
-		for (auto& c : components) {
-			batches[c->texture].push_back({
-				c->uvRect,
-				c->tint,
-				c->GetParent()->GetComponent<Transform>()->GetWorldTransform()
-			});
-		}
-
 		for (auto& batchPair : batches) {
 			auto& batch = batchPair.second;
+
+			for (auto& instance : batch) {
+				auto& c = instance.component;
+				instance.uvRect = c->uvRect;
+				instance.tint = c->tint;
+				instance.model = c->GetParent()->GetComponent<Transform>()->GetWorldTransform();
+			}
 
 			const unsigned count = batch.size();
 			const unsigned unit = 4 * sizeof(float);
@@ -98,7 +98,7 @@ void RenderSystem::Update(const float& dt) {
 
 			unsigned i, offset;
 			i = INSTANCE_LAYOUT_LOCATION;
-			offset = 0;
+			offset = sizeof(Render*);
 
 			// rect	
 			glEnableVertexAttribArray(i);
@@ -268,10 +268,31 @@ void RenderSystem::RenderActiveHandler(Events::Event* event) {
 	auto& c = static_cast<Events::AnyType<Render*>*>(event)->data;
 
 	if (c->IsActive()) {
-		components.push_back(c);
+		batches[c->GetTexture()].push_back({
+			c,
+			c->uvRect,
+			c->tint
+		});
 	} else {
-		components.erase(vfind(components, c));
+		auto& list = batches[c->GetTexture()];
+		const Instance i = { c };
+		list.erase(vfind(list, i));
 	}
+}
+
+void RenderSystem::TextureChangeHandler(Events::Event* event) {
+	auto changeEvent = static_cast<Events::TextureChange*>(event);
+	auto& c = changeEvent->component;
+
+	auto& previous = batches[changeEvent->previous];
+	const Instance i = { c };
+	previous.erase(vfind(previous, i));
+
+	batches[c->GetTexture()].push_back({
+		c,
+		c->uvRect,
+		c->tint
+	});
 }
 
 void RenderSystem::TextActiveHandler(Events::Event* event) {
@@ -308,13 +329,13 @@ void RenderSystem::TextFontHandler(Events::Event* event) {
 
 void RenderSystem::GenerateQuad() {
 	float quadVertices[] = {
-		-0.5f,  0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.0f, 0.0f,
-		 0.5f, -0.5f,  1.0f, 0.0f,
+		-0.5f,  0.5f,
+		-0.5f, -0.5f,  
+		 0.5f, -0.5f, 
 
-		-0.5f,  0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f,  1.0f, 1.0f
+		-0.5f,  0.5f,
+		 0.5f, -0.5f,  
+		 0.5f,  0.5f, 
 	};
 
 	unsigned VBO;
@@ -324,7 +345,5 @@ void RenderSystem::GenerateQuad() {
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(vec2f), (void*)0);
 }

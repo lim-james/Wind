@@ -132,6 +132,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AIScene.cpp" />
+    <ClCompile Include="AISprite.cpp" />
+    <ClCompile Include="Collider.cpp" />
+    <ClCompile Include="ColliderSystem.cpp" />
+    <ClCompile Include="SharkSprite.cpp" />
+    <ClCompile Include="TestScene.cpp" />
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CameraObject.cpp" />
@@ -165,6 +170,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIScene.h" />
+    <ClInclude Include="AISprite.h" />
+    <ClInclude Include="Collider.h" />
+    <ClInclude Include="ColliderSystem.h" />
+    <ClInclude Include="SharkSprite.h" />
+    <ClInclude Include="TestScene.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraObject.h" />
