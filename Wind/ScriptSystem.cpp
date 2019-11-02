@@ -7,10 +7,6 @@ ScriptSystem::ScriptSystem() {
 	Events::EventsManager::GetInstance()->Subscribe("SCRIPT_ACTIVE", &ScriptSystem::ActiveHandler, this);
 }
 
-ScriptSystem::~ScriptSystem() {
-	components.clear();
-}
-
 void ScriptSystem::Initialize() {
 	for (auto& c : components) {
 		c->reset();

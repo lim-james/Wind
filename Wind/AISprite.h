@@ -4,6 +4,7 @@
 #include "Entity.h"
 
 #include <Math/Vectors.hpp>
+#include <Events/Event.h>
 
 class AISprite : public Entity {
 
@@ -13,6 +14,8 @@ protected:
 	float speed;
 
 public:
+
+	AISprite();
 
 	virtual void Build();
 	virtual void Initialize();
@@ -26,6 +29,8 @@ protected:
 	void Update(const float& dt);
 
 	void OnCollisionEnter(Entity * const target);
+
+	void EventHandler(Events::Event* event);
 
 };
 

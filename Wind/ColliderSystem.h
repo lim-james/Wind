@@ -6,10 +6,12 @@
 
 #include <Events/Event.h>
 
+#include <map>
 #include <vector>
 
 class ColliderSystem : public System {
 
+	std::map<Collider*, std::map<Collider*, bool>> history;
 	std::vector<Collider*> components;
 
 public:
@@ -23,6 +25,7 @@ public:
 private:
 
 	void ActiveHandler(Events::Event* event);
+
 };
 
 #endif

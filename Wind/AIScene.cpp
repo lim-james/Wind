@@ -22,6 +22,7 @@
 #include "ParticleSystem.h"
 #include "ColliderSystem.h"
 #include "ScriptSystem.h"
+#include "StateSystem.h"
 // Utils
 #include "LoadTGA.h"
 #include "LoadFNT.h"
@@ -41,6 +42,7 @@ AIScene::AIScene() {
 	components->Subscribe<Particle>(100, 1);
 	components->Subscribe<Collider>(10, 1);
 	components->Subscribe<Script>(10, 1);
+	components->Subscribe<StateMachine>(10, 1);
 
 	entities->Subscribe<Sprite>(10, 1);
 	entities->Subscribe<FPSLabel>(1, 1);
@@ -55,10 +57,11 @@ AIScene::AIScene() {
 	systems->Subscribe<ParticleSystem>();
 	systems->Subscribe<ColliderSystem>();
 	systems->Subscribe<ScriptSystem>();
+	systems->Subscribe<StateSystem>();
 
 	mapHalfSize = 10;
 
-	Events::EventsManager::GetInstance()->Subscribe("KEY_INPUT", &AIScene::KeyHandler, this);
+	//Events::EventsManager::GetInstance()->Subscribe("KEY_INPUT", &AIScene::KeyHandler, this);
 }
 
 void AIScene::Awake() {
@@ -66,9 +69,9 @@ void AIScene::Awake() {
 	cam->GetComponent<Camera>()->clearColor.Set(0.f);
 	cam->GetComponent<Camera>()->SetSize(static_cast<float>(mapHalfSize));
 
-	auto grid = entities->Create<Sprite>();
-	grid->GetComponent<Transform>()->scale.Set(2.f * static_cast<float>(mapHalfSize));
-	grid->GetComponent<Render>()->SetTexture(Load::TGA("Files/Textures/grid20.tga"));
+	//auto grid = entities->Create<Sprite>();
+	//grid->GetComponent<Transform>()->scale.Set(2.f * static_cast<float>(mapHalfSize));
+	//grid->GetComponent<Render>()->SetTexture(Load::TGA("Files/Textures/grid20.tga"));
 
 	// most performant : 500 - 700 FPS
 	auto fps = entities->Create<FPSLabel>();
@@ -84,28 +87,29 @@ void AIScene::Awake() {
 	auto player = entities->Create<Player>();
 	player->GetComponent<Transform>()->translation.Set(0.5f, 0.5f, 0.f);
 	player->GetComponent<Render>()->tint.Set(1.f, 0.f, 0.f, 1.f);
-	player->GetComponent<ParticleEmitter>()->offset.z = -1.f;
+	player->GetComponent<ParticleEmitter>()->offset.z = -0.1f;
 	player->GetComponent<ParticleEmitter>()->duration = 0.5f;
 	player->GetComponent<ParticleEmitter>()->burstAmount = 5;
 	player->GetComponent<ParticleEmitter>()->spawnInterval = 0.01f;
-	player->GetComponent<ParticleEmitter>()->lifetime = 1.f;
+	player->GetComponent<ParticleEmitter>()->lifetime = 3.f;
 	player->GetComponent<ParticleEmitter>()->angleRange.z = 180.f;
-	player->GetComponent<ParticleEmitter>()->speed = 5.f;
+	player->GetComponent<ParticleEmitter>()->speed = 30.f;
 	player->GetComponent<ParticleEmitter>()->accelRad = -50.f;
 	player->GetComponent<ParticleEmitter>()->accelRadRange = 10.f;
-	player->GetComponent<ParticleEmitter>()->positionRange.Set(2.f);
-	player->GetComponent<ParticleEmitter>()->startSize.Set(0.1f);
+	//player->GetComponent<ParticleEmitter>()->positionRange.Set(2.f);
+	player->GetComponent<ParticleEmitter>()->startSize.Set(1.f);
 	player->GetComponent<ParticleEmitter>()->endSize.Set(0.f);
-	player->GetComponent<ParticleEmitter>()->startColor.Set(1.f, 1.f, 0.f, 1.f);
-	player->GetComponent<ParticleEmitter>()->startColorRange.Set(.1f, .1f, 0.f, 0.f);
-	player->GetComponent<ParticleEmitter>()->endColor.Set(1.f, 0.f, 0.f, 0.5f);
-	player->GetComponent<ParticleEmitter>()->endColorRange.Set(0.1f, 0., 0.f, 0.5f);
+	player->GetComponent<ParticleEmitter>()->endColor.Set(0.f);
+	//player->GetComponent<ParticleEmitter>()->startColor.Set(1.f, 1.f, 0.f, 1.f);
+	//player->GetComponent<ParticleEmitter>()->startColorRange.Set(.1f, .1f, 0.f, 0.f);
+	//player->GetComponent<ParticleEmitter>()->endColor.Set(1.f, 0.f, 0.f, 0.5f);
+	//player->GetComponent<ParticleEmitter>()->endColorRange.Set(0.1f, 0., 0.f, 0.5f);
 	//player->GetComponent<ParticleEmitter>()->gravity.Set(0.f, -9.8f, 0.f);
 
 	for (unsigned i = 0; i < 10; ++i) {
 		vec2f position(
-			Math::RandMinMax(-mapHalfSize, mapHalfSize),
-			Math::RandMinMax(-mapHalfSize, mapHalfSize)
+			static_cast<float>(Math::RandMinMax(-mapHalfSize, mapHalfSize)),
+			static_cast<float>(Math::RandMinMax(-mapHalfSize, mapHalfSize))
 		);
 		position += vec2f(0.5f);
 
@@ -119,12 +123,12 @@ void AIScene::Awake() {
 }
 
 void AIScene::KeyHandler(Events::Event* event) {
-	auto input = static_cast<Events::KeyInput*>(event);food
+	auto input = static_cast<Events::KeyInput*>(event);
 
 	if (input->key == GLFW_KEY_SPACE && input->action == GLFW_RELEASE) {
 		vec2f position(
-			Math::RandMinMax(-mapHalfSize, mapHalfSize),
-			Math::RandMinMax(-mapHalfSize, mapHalfSize)
+			static_cast<float>(Math::RandMinMax(-mapHalfSize, mapHalfSize)),
+			static_cast<float>(Math::RandMinMax(-mapHalfSize, mapHalfSize))
 		);
 		position += vec2f(0.5f);
 

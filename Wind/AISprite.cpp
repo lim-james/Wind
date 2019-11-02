@@ -4,15 +4,24 @@
 #include "Render.h"
 #include "Collider.h"
 #include "Script.h"
+#include "StateMachine.h"
+
+#include "TestState.h"
 
 #include <Math/Math.hpp>
 #include <Math/Random.hpp>
+#include <Events/EventsManager.h>
+
+AISprite::AISprite() {
+	Events::EventsManager::GetInstance()->Subscribe("AI_STATE_CHANGE", &AISprite::EventHandler, this);
+}
 
 void AISprite::Build() {
 	AddComponent<Transform>();
 	AddComponent<Render>();
 	AddComponent<Collider>();
 	AddComponent<Script>();
+	AddComponent<StateMachine>();
 }
 
 void AISprite::Initialize() {
@@ -21,7 +30,7 @@ void AISprite::Initialize() {
 	speed = 1.f;
 
 	GetComponent<Script>()->update = std::bind(&AISprite::Update, this, std::placeholders::_1);
-	GetComponent<Collider>()->onCollisionEnter = std::bind(&AISprite::OnCollisionEnter, this, std::placeholders::_1);
+	GetComponent<StateMachine>()->queuedState = new States::LeftState;
 }
 
 void AISprite::SetTarget(const vec3f& value) {
@@ -62,6 +71,8 @@ void AISprite::Update(const float& dt) {
 }
 
 void AISprite::OnCollisionEnter(Entity * const target) {
-	if (tag != target->tag)
-		std::cout << "Collided with " << target->tag << '\n'; 
+}
+
+void AISprite::EventHandler(Events::Event* event) {
+	GetComponent<StateMachine>()->queuedState = new States::StopState;
 }

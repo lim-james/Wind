@@ -16,7 +16,6 @@ bool operator==(const Instance& lhs, const Instance& rhs) {
 }
 
 RenderSystem::RenderSystem() {
-
 	Events::EventsManager::GetInstance()->Subscribe("CAMERA_ACTIVE", &RenderSystem::CameraActiveHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("CAMERA_DEPTH", &RenderSystem::CameraDepthHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("RENDER_ACTIVE", &RenderSystem::RenderActiveHandler, this);
@@ -132,7 +131,7 @@ void RenderSystem::Update(const float& dt) {
 		
 		for (auto& textPair : textBatches) {
 			auto& font = textPair.first;
-			if (font == nullptr) continue;
+			if (!font) continue;
 
 			const auto tex = font->texture;
 			glActiveTexture(GL_TEXTURE0);
@@ -298,7 +297,7 @@ void RenderSystem::TextureChangeHandler(Events::Event* event) {
 void RenderSystem::TextActiveHandler(Events::Event* event) {
 	auto& c = static_cast<Events::AnyType<Text*>*>(event)->data;
 	const auto font = c->GetFont();
-	if (font == nullptr) return;
+	if (!font) return;
 
 	auto& textList = textBatches[font];
 
@@ -315,9 +314,9 @@ void RenderSystem::TextFontHandler(Events::Event* event) {
 	auto previous = change->previous;
 	auto current = c->GetFont();
 	
-	if (previous == nullptr) {
+	if (!previous) {
 		textBatches[current].push_back(c);
-	} else if (current == nullptr) {
+	} else if (!current) {
 		auto& textList = textBatches[previous];
 		textList.erase(vfind(textList, c));
 	} else {

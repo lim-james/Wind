@@ -30,7 +30,7 @@ public:
 
 	template<typename SystemType>
 	SystemType* const Get() {
-		return dynamic_cast<SystemType*>(systems[indexof(SystemType)]);
+		return static_cast<SystemType*>(systems[indexof(SystemType)]);
 	}
 
 	void Initialize();

@@ -85,7 +85,7 @@ ComponentType* const ComponentsManager::Fetch() {
 	if (unused[hash].empty())
 		Expand<ComponentType>();
 
-	return dynamic_cast<ComponentType * const>(*unused[hash].begin());
+	return static_cast<ComponentType * const>(*unused[hash].begin());
 }
 
 template<typename ComponentType>

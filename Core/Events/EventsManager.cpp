@@ -16,17 +16,17 @@ namespace Events {
 	}
 
 	void EventsManager::Trigger(const std::string& name) {
-		for (auto& callback : emptyCallbacks[name])
-			callback();
+		for (auto& callbackPair : emptyCallbacks[name])
+			callbackPair.second();
 	}
 
-	void EventsManager::Trigger(const std::string& name, Event* event) {
-		for (auto& callback : emptyCallbacks[name])
-			callback();
+	void EventsManager::Trigger(const std::string& name, Event* const event) {
+		for (auto& callbackPair : emptyCallbacks[name])
+			callbackPair.second();
 
 		event->name = name;
-		for (auto& callback : eventCallbacks[name])
-			callback(event);
+		for (auto& callbackPair : eventCallbacks[name])
+			callbackPair.second(event);
 
 		delete event;
 	}

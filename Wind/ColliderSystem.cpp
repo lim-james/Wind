@@ -43,8 +43,20 @@ void ColliderSystem::FixedUpdate(const float& dt) {
 				|| max1.x < min2.x  // left
 				|| min1.y < max2.y  // top
 				|| max1.y > min2.y)) { // down
-				c1->onCollisionEnter(p2);
-				c2->onCollisionEnter(p1);
+				if (history[c1][c2] && history[c2][c1]) {
+					c1->OnCollisionStay(p2);
+					c2->OnCollisionStay(p1);
+				} else {
+					c1->OnCollisionEnter(p2);
+					c2->OnCollisionEnter(p1);
+					history[c1][c2] = history[c2][c1] = true;
+				}
+			} else {
+				if (history[c1][c2] || history[c2][c1]) {
+					c1->OnCollisionExit(p2);
+					c2->OnCollisionExit(p1);
+					history[c1][c2] = history[c2][c1] = false;
+				} 
 			}
 		}
 	}
@@ -53,8 +65,12 @@ void ColliderSystem::FixedUpdate(const float& dt) {
 void ColliderSystem::ActiveHandler(Events::Event* event) {
 	const auto c = static_cast<Events::AnyType<Collider*>*>(event)->data;
 
-	if (c->IsActive())
+	if (c->IsActive()) {
 		components.push_back(c);
-	else
+	} else {
 		components.erase(vfind(components, c));
+		for (auto& pair : history[c]) {
+			pair.second = false;
+		}
+	}
 }

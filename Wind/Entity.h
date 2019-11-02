@@ -75,7 +75,7 @@ void Entity::AddComponent() {
 
 template<typename ComponentType>
 ComponentType* const Entity::GetComponent() {
-	return dynamic_cast<ComponentType * const>(components[indexof(ComponentType)]);
+	return static_cast<ComponentType * const>(components[indexof(ComponentType)]);
 }
 
 #endif

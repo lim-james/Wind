@@ -20,6 +20,11 @@ private:
 
 	void Update(const float& dt);
 	void KeyHandler(Events::Event* event);
+
+	void Enter(Entity* const object);
+	void Stay(Entity* const object);
+	void Exit(Entity* const object);
+
 };
 
 #endif

@@ -35,17 +35,17 @@ Entity* const Entity::GetParent() const {
 }
 
 void Entity::SetParent(Entity * const entity) {
-	if (parent != nullptr)
+	if (parent)
 		parent->RemoveChild(this);
 
 	parent = entity;
 
-	if (entity != nullptr)
+	if (entity)
 		entity->children.push_back(this);
 }
 
 void Entity::AddChild(Entity* const entity) {
-	if (entity->parent != nullptr) {
+	if (entity->parent) {
 		if (entity->parent == this)
 			return;
 		else
