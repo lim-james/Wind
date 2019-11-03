@@ -10,19 +10,19 @@
 #define BLACK			0
 #define DARK_BLUE		1
 #define DARK_GREEN		2
-#define DARK_CYAN		4
-#define DARK_RED		5
-#define DARK_PINK		6
-#define DARK_YELLOW		7
-#define DARK_BEIGE		8
-#define GREY			9
-#define BLUE			10
-#define GREEN			11
-#define CYAN			12
-#define RED				13
-#define PURPLE			14
-#define YELLOW			15
-#define WHITE			16
+#define DARK_CYAN		3
+#define DARK_RED		4
+#define DARK_PINK		5
+#define DARK_YELLOW		6
+#define DARK_BEIGE		7
+#define GREY			8
+#define BLUE			9
+#define GREEN			10
+#define CYAN			11
+#define RED				12
+#define PURPLE			13
+#define YELLOW			14
+#define WHITE			15
 
 namespace Console {
 
