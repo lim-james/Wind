@@ -18,6 +18,7 @@ public:
 private:
 
 	void KeyHandler(Events::Event* event);
+	void EntityHanlder(Events::Event* event);
 
 };
 

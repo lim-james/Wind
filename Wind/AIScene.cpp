@@ -28,6 +28,7 @@
 #include "LoadFNT.h"
 
 #include "InputEvents.h"
+#include "EntityEvents.h"
 
 #include <Math/Random.hpp>
 #include <Events/EventsManager.h>
@@ -62,6 +63,7 @@ AIScene::AIScene() {
 	mapHalfSize = 10;
 
 	Events::EventsManager::GetInstance()->Subscribe("KEY_INPUT", &AIScene::KeyHandler, this);
+	Events::EventsManager::GetInstance()->Subscribe("NEAREST_ENTITY_WITH_TAG", &AIScene::EntityHanlder, this);
 }
 
 void AIScene::Awake() {
@@ -138,5 +140,23 @@ void AIScene::KeyHandler(Events::Event* event) {
 		fish->GetComponent<Transform>()->scale.Set(0.8f);
 		fish->SetTarget(vec3f(position, 0.f));
 		fish->GetComponent<Render>()->tint.Set(0.f, 0.f, 1.f, 1.f);
+	}
+}
+
+void AIScene::EntityHanlder(Events::Event* event) {
+	auto entityEvent = static_cast<Events::NearestEntityWithTag*>(event);
+	const auto items = entities->GetEntitiesWithTag(entityEvent->tag);
+	
+	float len = -1.f;
+
+	for (const auto& list : items) {
+		for (const auto& entity : list.second) {
+			const auto d = entityEvent->position - entity->GetComponent<Transform>()->GetWorldTranslation();
+			const float currentLength = Math::LengthSquared(d);
+			if (len < 0 || len > currentLength) {
+				len = currentLength;
+				*entityEvent->entityRef = entity;
+			} 		
+		}
 	}
 }

@@ -49,12 +49,15 @@ void EntityManager::Initialize() {
 	}
 }
 
+const std::map<unsigned, std::vector<Entity*>>& EntityManager::GetEntitiesWithTag(const std::string& tag) {
+	return used[tag];
+}
+
 void EntityManager::AddEntity(const unsigned& hash, Entity* entity) {
 	entity->componentsManager = componentsManager;
 	entity->Build();
 
 	typeMap[entity] = hash;
-	used[hash][entity->GetTag()].push_back(entity);
 	unused[hash].push_back(entity);
 }
 
@@ -71,14 +74,14 @@ void EntityManager::OnUsed(Events::Event* event) {
 	const auto hash = typeMap[entity];
 	auto& unusedGroup = unused[hash];
 
-	used[hash][entity->GetTag()].push_back(entity);
+	used[entity->GetTag()][hash].push_back(entity);
 	unusedGroup.erase(vfind(unusedGroup, entity));
 }
 
 void EntityManager::OnDestroy(Events::Event* event) {
 	const auto& entity = static_cast<Events::AnyType<Entity*>*>(event)->data;
 	const auto hash = typeMap[entity];
-	auto& usedGroup = used[hash][entity->tag];
+	auto& usedGroup = used[entity->GetTag()][hash];
 
 	usedGroup.erase(vfind(usedGroup, entity));
 	unused[hash].push_back(entity);
@@ -88,9 +91,8 @@ void EntityManager::TagChangeHandler(Events::Event* event) {
 	auto changeEvent = static_cast<Events::TagChange*>(event);
 	auto entity = changeEvent->entity;
 	const auto hash = typeMap[entity];
-	auto& usedGroup = used[hash];
 
-	auto& previous = usedGroup[changeEvent->previous];
+	auto& previous = used[changeEvent->previous][hash];
 	previous.erase(vfind(previous, entity));
-	usedGroup[entity->tag].push_back(entity);
+	used[entity->GetTag()][hash].push_back(entity);
 }

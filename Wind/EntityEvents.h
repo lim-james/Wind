@@ -1,6 +1,7 @@
 #include "Entity.h"
 
 #include <Events/Event.h>
+#include <Math/Vectors.hpp>
 #include <MACROS.h>
 
 namespace Events {
@@ -21,5 +22,18 @@ namespace Events {
 			new EntityType
 		) {}
 	};
+
+	struct NearestEntityWithTag : Event {
+		Entity ** const entityRef;
+		const std::string tag;
+
+		const vec3f position;
+
+		NearestEntityWithTag(Entity ** const entityRef, const std::string& tag, const vec3f& position)
+			: entityRef(entityRef)
+			, tag(tag) 
+			, position(position) {}
+	};
+
 
 }
