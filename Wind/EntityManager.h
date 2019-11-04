@@ -14,7 +14,8 @@ class EntityManager {
 	std::map<Entity*, unsigned> typeMap;
 	std::map<unsigned, unsigned> expandSizes;
 
-	std::map<unsigned, std::vector<Entity*>> pools;
+	// pools
+	std::map<unsigned, std::map<std::string, std::vector<Entity*>>> used;
 	std::map<unsigned, std::vector<Entity*>> unused;
 
 public:
@@ -51,18 +52,24 @@ private:
 	void OnUsed(Events::Event* event);
 	void OnDestroy(Events::Event* event);
 
+	void TagChangeHandler(Events::Event* event);
+
 };
 
 
 template<typename EntityType>
 void EntityManager::Initialize() {
-	for (const auto& c : pools[hashof(EntityType)])
+	for (const auto& sets : used[hashof(EntityType)])
+		for (const auto& c : sets.second)
+			c->Initialize();
+
+	for (const auto& c : unused[hashof(EntityType)])
 		c->Initialize();
 }
 
 template<typename EntityType>
 const bool EntityManager::Has() const {
-	return pools.find(hashof(EntityType)) != pools.end();
+	return unused.find(hashof(EntityType)) != unused.end();
 }
 
 template<typename EntityType>
@@ -73,7 +80,6 @@ void EntityManager::Subscribe(int start, const unsigned& expand) {
 
 	expandSizes[hash] = expand;
 
-	pools[hash].reserve(start);
 	unused[hash].reserve(start);
 
 	while (--start >= 0)

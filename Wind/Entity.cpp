@@ -30,6 +30,16 @@ void Entity::Destroy() {
 	Events::EventsManager::GetInstance()->Trigger("ENTITY_DESTROY", new Events::AnyType<Entity*>(this));
 }
 
+const std::string& Entity::GetTag() const {
+	return tag;
+}
+
+void Entity::SetTag(const std::string& _tag) {
+	auto event = new Events::TagChange(tag, this);
+	tag = _tag;
+	Events::EventsManager::GetInstance()->Trigger("TAG_CHANGE", event);
+}
+
 Entity* const Entity::GetParent() const {
 	return parent;
 }

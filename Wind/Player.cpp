@@ -51,15 +51,15 @@ void Player::KeyHandler(Events::Event* event) {
 }
 
 void Player::Enter(Entity* const object) {
-	Console::Log << "Enter : " << object->tag << '\n';
-	if (object->tag == "FOOD")
+	Console::Log << "Enter : " << object->GetTag() << '\n';
+	if (object->GetTag() == "FOOD")
 		Events::EventsManager::GetInstance()->TriggerContext("AI_STATE_CHANGE", object, new Events::Event); 
 }
 
 void Player::Stay(Entity* const object) {
-	Console::Log << "Stay : " << object->tag << '\n';
+	Console::Log << "Stay : " << object->GetTag() << '\n';
 }
 
 void Player::Exit(Entity* const object) {
-	Console::Log << "Exit : " << object->tag << '\n';
+	Console::Log << "Exit : " << object->GetTag() << '\n';
 }

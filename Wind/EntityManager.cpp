@@ -9,27 +9,42 @@ EntityManager::EntityManager(ComponentsManager* manager)
 	Events::EventsManager::GetInstance()->Subscribe("CREATE_ENTITY", &EntityManager::OnCreate, this);
 	Events::EventsManager::GetInstance()->Subscribe("ENTITY_USED", &EntityManager::OnUsed, this);
 	Events::EventsManager::GetInstance()->Subscribe("ENTITY_DESTROY", &EntityManager::OnDestroy, this);
+	Events::EventsManager::GetInstance()->Subscribe("TAG_CHANGE", &EntityManager::TagChangeHandler, this);
 }
 
 EntityManager::~EntityManager() {
 	typeMap.clear();
 	expandSizes.clear();
 
-	for (auto& set : pools) {
-		for (auto& c : set.second) {
-			delete c;
+	for (auto& typeSets : used) {
+		for (auto& tagSets : typeSets.second) {
+			for (auto& entity : tagSets.second) {
+				delete entity;
+			}
 		}
-		set.second.clear();
 	}
+	used.clear();
 
-	pools.clear();
+	for (auto& typeSets : unused) {
+		for (auto& entity : typeSets.second) {
+			delete entity;
+		}
+	}
 	unused.clear();
 }
 
 void EntityManager::Initialize() {
-	for (const auto& set : pools) {
-		for (const auto& c : set.second) {
-			c->Initialize();
+	for (auto& typeSets : used) {
+		for (auto& tagSets : typeSets.second) {
+			for (auto& entity : tagSets.second) {
+				entity->Initialize();
+			}
+		}
+	}
+
+	for (auto& typeSets : unused) {
+		for (auto& entity : typeSets.second) {
+			entity->Initialize();
 		}
 	}
 }
@@ -39,7 +54,7 @@ void EntityManager::AddEntity(const unsigned& hash, Entity* entity) {
 	entity->Build();
 
 	typeMap[entity] = hash;
-	pools[hash].push_back(entity);
+	used[hash][entity->GetTag()].push_back(entity);
 	unused[hash].push_back(entity);
 }
 
@@ -53,12 +68,29 @@ void EntityManager::OnCreate(Events::Event* event) {
 
 void EntityManager::OnUsed(Events::Event* event) {
 	const auto& entity = static_cast<Events::AnyType<Entity*>*>(event)->data;
-	auto& unusedGroup = unused[typeMap[entity]];
+	const auto hash = typeMap[entity];
+	auto& unusedGroup = unused[hash];
 
+	used[hash][entity->GetTag()].push_back(entity);
 	unusedGroup.erase(vfind(unusedGroup, entity));
 }
 
 void EntityManager::OnDestroy(Events::Event* event) {
 	const auto& entity = static_cast<Events::AnyType<Entity*>*>(event)->data;
-	unused[typeMap[entity]].push_back(entity);
+	const auto hash = typeMap[entity];
+	auto& usedGroup = used[hash][entity->tag];
+
+	usedGroup.erase(vfind(usedGroup, entity));
+	unused[hash].push_back(entity);
+}
+
+void EntityManager::TagChangeHandler(Events::Event* event) {
+	auto changeEvent = static_cast<Events::TagChange*>(event);
+	auto entity = changeEvent->entity;
+	const auto hash = typeMap[entity];
+	auto& usedGroup = used[hash];
+
+	auto& previous = usedGroup[changeEvent->previous];
+	previous.erase(vfind(previous, entity));
+	usedGroup[entity->tag].push_back(entity);
 }

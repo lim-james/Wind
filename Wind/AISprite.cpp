@@ -30,7 +30,6 @@ void AISprite::Initialize() {
 	speed = 1.f;
 
 	GetComponent<Script>()->update = std::bind(&AISprite::Update, this, std::placeholders::_1);
-	GetComponent<StateMachine>()->queuedState = new States::LeftState;
 }
 
 void AISprite::SetTarget(const vec3f& value) {
@@ -74,5 +73,5 @@ void AISprite::OnCollisionEnter(Entity * const target) {
 }
 
 void AISprite::EventHandler(Events::Event* event) {
-	GetComponent<StateMachine>()->queuedState = new States::StopState;
+	//GetComponent<StateMachine>()->queuedState = new States::StopState;
 }

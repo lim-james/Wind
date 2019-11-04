@@ -3,13 +3,29 @@
 
 #include "ComponentsManager.h"
 
+#include <Events/Event.h>
 #include <MACROS.h>
 
 #include <map>
 #include <typeindex>
 #include <string>
 
+class Entity;
+
+namespace Events {
+	struct TagChange : Event {
+		const std::string previous;
+		Entity * const entity;
+
+		TagChange(const std::string& previous, Entity * const entity)
+			: previous(previous)
+			, entity(entity) {}
+	};
+}
+
 class Entity {
+
+	std::string tag;
 
 	Entity* parent;
 	std::vector<Entity*> children;
@@ -22,8 +38,6 @@ class Entity {
 
 public:
 
-	std::string tag;
-
 	Entity();
 	virtual ~Entity();
 
@@ -31,6 +45,9 @@ public:
 
 	virtual void Initialize();
 	void Destroy();
+
+	const std::string& GetTag() const;
+	void SetTag(const std::string& _tag);
 
 	Entity* const GetParent() const;
 	virtual void SetParent(Entity * const entity);

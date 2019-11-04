@@ -61,7 +61,7 @@ AIScene::AIScene() {
 
 	mapHalfSize = 10;
 
-	//Events::EventsManager::GetInstance()->Subscribe("KEY_INPUT", &AIScene::KeyHandler, this);
+	Events::EventsManager::GetInstance()->Subscribe("KEY_INPUT", &AIScene::KeyHandler, this);
 }
 
 void AIScene::Awake() {
@@ -69,9 +69,9 @@ void AIScene::Awake() {
 	cam->GetComponent<Camera>()->clearColor.Set(0.f);
 	cam->GetComponent<Camera>()->SetSize(static_cast<float>(mapHalfSize));
 
-	//auto grid = entities->Create<Sprite>();
-	//grid->GetComponent<Transform>()->scale.Set(2.f * static_cast<float>(mapHalfSize));
-	//grid->GetComponent<Render>()->SetTexture(Load::TGA("Files/Textures/grid20.tga"));
+	auto grid = entities->Create<Sprite>();
+	grid->GetComponent<Transform>()->scale.Set(2.f * static_cast<float>(mapHalfSize));
+	grid->GetComponent<Render>()->SetTexture(Load::TGA("Files/Textures/grid20.tga"));
 
 	// most performant : 500 - 700 FPS
 	auto fps = entities->Create<FPSLabel>();
@@ -114,7 +114,7 @@ void AIScene::Awake() {
 		position += vec2f(0.5f);
 
 		auto food = entities->Create<AISprite>();
-		food->tag = "FOOD";
+		food->SetTag("FOOD");
 		food->GetComponent<Transform>()->translation.Set(position, 0.f);
 		food->GetComponent<Transform>()->scale.Set(0.8f);
 		food->SetTarget(vec3f(position, 0.f));
@@ -133,7 +133,7 @@ void AIScene::KeyHandler(Events::Event* event) {
 		position += vec2f(0.5f);
 
 		auto fish = entities->Create<AISprite>();
-		fish->tag = "FISH";
+		fish->SetTag("FISH");
 		fish->GetComponent<Transform>()->translation.Set(position, 0.f);
 		fish->GetComponent<Transform>()->scale.Set(0.8f);
 		fish->SetTarget(vec3f(position, 0.f));
