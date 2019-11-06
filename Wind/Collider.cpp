@@ -13,7 +13,7 @@ void Collider::Initialize() {
 
 void Collider::SetActive(const bool& state) {
 	Component::SetActive(state);
-	Events::EventsManager::GetInstance()->Trigger("COLLIDER_ACTIVE", new Events::AnyType<Collider*>(this));
+	Events::EventsManager::GetInstance()->Queue("COLLIDER_ACTIVE", new Events::AnyType<Collider*>(this));
 }
 
 void Collider::OnCollisionEnter(Entity* const object) const {

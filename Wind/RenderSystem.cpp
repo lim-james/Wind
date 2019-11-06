@@ -10,6 +10,7 @@
 
 unsigned RenderSystem::instanceBuffer = 0;
 unsigned RenderSystem::quadVAO = 0;
+unsigned RenderSystem::lineVAO = 0;
 
 bool operator==(const Instance& lhs, const Instance& rhs) {
 	return lhs.component == rhs.component;
@@ -20,6 +21,7 @@ RenderSystem::RenderSystem() {
 	Events::EventsManager::GetInstance()->Subscribe("CAMERA_DEPTH", &RenderSystem::CameraDepthHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("RENDER_ACTIVE", &RenderSystem::RenderActiveHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("TEXTURE_CHANGE", &RenderSystem::TextureChangeHandler, this);
+	Events::EventsManager::GetInstance()->Subscribe("DRAW_LINE", &RenderSystem::DrawLineHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("TEXT_ACTIVE", &RenderSystem::TextActiveHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("TEXT_FONT", &RenderSystem::TextFontHandler, this);
 
@@ -37,17 +39,27 @@ RenderSystem::RenderSystem() {
 	if (quadVAO == 0)
 		GenerateQuad();
 
+	if (lineVAO == 0)
+		GenerateLine();
+
 	mainShader = new Shader("Files/Shaders/standard2D.vert", "Files/Shaders/standard2D.frag");
 	mainShader->Use();
 	mainShader->SetInt("tex", 0);
 
+	lineShader = new Shader("Files/Shaders/line.vert", "Files/Shaders/standard2D.frag");
+	lineShader->Use();
+	lineShader->SetInt("tex", 0);
+
 	textShader = new Shader("Files/Shaders/text.vert", "Files/Shaders/standard2D.frag");
 	textShader->Use();
 	textShader->SetInt("tex", 0);
+
+	lines.push_back({ vec2f(0.f), vec2f(1.f), vec4f(0.f, 1.f, 0.f, 1.f) });
 }
 
 RenderSystem::~RenderSystem() {
 	delete mainShader;
+	delete lineShader;
 	delete textShader;
 }
 
@@ -124,6 +136,39 @@ void RenderSystem::Update(const float& dt) {
 		}
 
 		glDisable(GL_DEPTH_TEST);
+
+		const unsigned count = lines.size();
+		if (count) {
+			glLineWidth(cam->size * .5f);
+
+			glBindVertexArray(lineVAO);
+			lineShader->Use();
+			lineShader->SetMatrix4("projection", projection);
+			lineShader->SetMatrix4("view", lookAt);
+
+			const unsigned stride = sizeof(Line);
+
+			glBindBuffer(GL_ARRAY_BUFFER, instanceBuffer);
+			glBufferData(GL_ARRAY_BUFFER, count * stride, &lines[0], GL_STATIC_DRAW);
+
+			// offset	
+			glEnableVertexAttribArray(1);
+			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, 0);
+			glVertexAttribDivisor(1, 1);
+			// length	
+			glEnableVertexAttribArray(2);
+			glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (void*)sizeof(vec2f));
+			glVertexAttribDivisor(2, 1);
+			// tint	
+			glEnableVertexAttribArray(3);
+			glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, stride, (void*)sizeof(vec4f));
+			glVertexAttribDivisor(3, 1);
+
+			lineShader->SetInt("useTex", 0);
+			glDrawArraysInstanced(GL_LINES, 0, 2, count);
+
+			lines.clear();
+		}
 
 		textShader->Use();
 		textShader->SetMatrix4("projection", projection);
@@ -294,6 +339,12 @@ void RenderSystem::TextureChangeHandler(Events::Event* event) {
 	});
 }
 
+void RenderSystem::DrawLineHandler(Events::Event* event) {	
+	lines.push_back(
+		static_cast<Events::AnyType<Line>*>(event)->data
+	);
+}
+
 void RenderSystem::TextActiveHandler(Events::Event* event) {
 	auto& c = static_cast<Events::AnyType<Text*>*>(event)->data;
 	const auto font = c->GetFont();
@@ -343,6 +394,22 @@ void RenderSystem::GenerateQuad() {
 	glBindVertexArray(quadVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(vec2f), (void*)0);
+}
+
+void RenderSystem::GenerateLine() {
+	float lineVertices[] = {
+		0.f, 0.f,
+		1.f, 1.f
+	};
+
+	unsigned VBO;
+	glGenVertexArrays(1, &lineVAO);
+	glGenBuffers(1, &VBO);
+	glBindVertexArray(lineVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(lineVertices), &lineVertices, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(vec2f), (void*)0);
 }

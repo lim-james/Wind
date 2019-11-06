@@ -23,6 +23,8 @@
 #include "ColliderSystem.h"
 #include "ScriptSystem.h"
 #include "StateSystem.h"
+// States
+#include "FishStates.h"
 // Utils
 #include "LoadTGA.h"
 #include "LoadFNT.h"
@@ -63,7 +65,8 @@ AIScene::AIScene() {
 	mapHalfSize = 10;
 
 	Events::EventsManager::GetInstance()->Subscribe("KEY_INPUT", &AIScene::KeyHandler, this);
-	Events::EventsManager::GetInstance()->Subscribe("NEAREST_ENTITY_WITH_TAG", &AIScene::EntityHanlder, this);
+	Events::EventsManager::GetInstance()->Subscribe("NEAREST_ENTITY_WITH_TAG", &AIScene::NearestEntityHanlder, this);
+	Events::EventsManager::GetInstance()->Subscribe("FIRST_ENTITY_WITH_TAG", &AIScene::FirstEntityHanlder, this);
 }
 
 void AIScene::Awake() {
@@ -86,64 +89,58 @@ void AIScene::Awake() {
 	fps->GetComponent<Text>()->paragraphAlignment = PARAGRAPH_RIGHT;
 	fps->GetComponent<Text>()->verticalAlignment = ALIGN_BOTTOM;
 
-	auto player = entities->Create<Player>();
-	player->GetComponent<Transform>()->translation.Set(0.5f, 0.5f, 0.f);
-	player->GetComponent<Render>()->tint.Set(1.f, 0.f, 0.f, 1.f);
-	player->GetComponent<ParticleEmitter>()->offset.z = -0.1f;
-	player->GetComponent<ParticleEmitter>()->duration = 0.5f;
-	player->GetComponent<ParticleEmitter>()->burstAmount = 5;
-	player->GetComponent<ParticleEmitter>()->spawnInterval = 0.01f;
-	player->GetComponent<ParticleEmitter>()->lifetime = 3.f;
-	player->GetComponent<ParticleEmitter>()->angleRange.z = 180.f;
-	player->GetComponent<ParticleEmitter>()->speed = 30.f;
-	player->GetComponent<ParticleEmitter>()->accelRad = -50.f;
-	player->GetComponent<ParticleEmitter>()->accelRadRange = 10.f;
+	//auto player = entities->Create<Player>();
+	//player->GetComponent<Transform>()->translation.Set(0.5f, 0.5f, 0.f);
+	//player->GetComponent<Render>()->tint.Set(1.f, 0.f, 0.f, 1.f);
+	//player->GetComponent<ParticleEmitter>()->offset.z = -0.1f;
+	//player->GetComponent<ParticleEmitter>()->duration = 0.5f;
+	//player->GetComponent<ParticleEmitter>()->burstAmount = 5;
+	//player->GetComponent<ParticleEmitter>()->spawnInterval = 0.01f;
+	//player->GetComponent<ParticleEmitter>()->lifetime = 3.f;
+	//player->GetComponent<ParticleEmitter>()->angleRange.z = 180.f;
+	//player->GetComponent<ParticleEmitter>()->speed = 30.f;
+	//player->GetComponent<ParticleEmitter>()->accelRad = -50.f;
+	//player->GetComponent<ParticleEmitter>()->accelRadRange = 10.f;
 	//player->GetComponent<ParticleEmitter>()->positionRange.Set(2.f);
-	player->GetComponent<ParticleEmitter>()->startSize.Set(1.f);
-	player->GetComponent<ParticleEmitter>()->endSize.Set(0.f);
-	player->GetComponent<ParticleEmitter>()->endColor.Set(0.f);
+	//player->GetComponent<ParticleEmitter>()->startSize.Set(1.f);
+	//player->GetComponent<ParticleEmitter>()->endSize.Set(0.f);
+	//player->GetComponent<ParticleEmitter>()->endColor.Set(0.f);
 	//player->GetComponent<ParticleEmitter>()->startColor.Set(1.f, 1.f, 0.f, 1.f);
 	//player->GetComponent<ParticleEmitter>()->startColorRange.Set(.1f, .1f, 0.f, 0.f);
 	//player->GetComponent<ParticleEmitter>()->endColor.Set(1.f, 0.f, 0.f, 0.5f);
 	//player->GetComponent<ParticleEmitter>()->endColorRange.Set(0.1f, 0., 0.f, 0.5f);
 	//player->GetComponent<ParticleEmitter>()->gravity.Set(0.f, -9.8f, 0.f);
+	
+	SpawnShark();
 
-	for (unsigned i = 0; i < 10; ++i) {
-		vec2f position(
-			static_cast<float>(Math::RandMinMax(-mapHalfSize, mapHalfSize)),
-			static_cast<float>(Math::RandMinMax(-mapHalfSize, mapHalfSize))
-		);
-		position += vec2f(0.5f);
+	for (unsigned i = 0; i < 10; ++i)
+		SpawnFood();
+}
 
-		auto food = entities->Create<AISprite>();
-		food->SetTag("FOOD");
-		food->GetComponent<Transform>()->translation.Set(position, 0.f);
-		food->GetComponent<Transform>()->scale.Set(0.8f);
-		food->SetTarget(vec3f(position, 0.f));
-		food->GetComponent<Render>()->tint.Set(1.f, 0.5f, 0.f, 1.f);
+void AIScene::FixedUpdate(const float& dt) {
+	Scene::FixedUpdate(dt);
+	bounceTime -= dt;
+
+	if (bounceTime <= 0.f) {
+		//SpawnFood();
+		bounceTime = 0.5f;
 	}
+
 }
 
 void AIScene::KeyHandler(Events::Event* event) {
 	auto input = static_cast<Events::KeyInput*>(event);
 
 	if (input->key == GLFW_KEY_SPACE && input->action == GLFW_RELEASE) {
-		vec2f position(
-			static_cast<float>(Math::RandMinMax(-mapHalfSize, mapHalfSize)),
-			static_cast<float>(Math::RandMinMax(-mapHalfSize, mapHalfSize))
-		);
-		position += vec2f(0.5f);
+		SpawnFish();
+	}
 
-		auto fish = entities->Create<AISprite>();
-		fish->SetTag("FISH");
-		fish->GetComponent<Transform>()->translation.Set(position, 0.f);
-		fish->GetComponent<Transform>()->scale.Set(0.8f);
-		fish->SetTarget(vec3f(position, 0.f));
-		fish->GetComponent<Render>()->tint.Set(0.f, 0.f, 1.f, 1.f);
+	if (input->key == GLFW_KEY_P && input->action == GLFW_RELEASE) {
+		SpawnFood();
 	}
 }
 
-void AIScene::EntityHanlder(Events::Event* event) {
+void AIScene::NearestEntityHanlder(Events::Event* event) {
 	auto entityEvent = static_cast<Events::NearestEntityWithTag*>(event);
 	const auto items = entities->GetEntitiesWithTag(entityEvent->tag);
 	
@@ -159,4 +156,64 @@ void AIScene::EntityHanlder(Events::Event* event) {
 			} 		
 		}
 	}
+}
+
+void AIScene::FirstEntityHanlder(Events::Event* event) {
+	auto entityEvent = static_cast<Events::FindEntityWithTag*>(event);
+	const auto entityMap = entities->GetEntitiesWithTag(entityEvent->tag);
+	if (entityMap.size()) {
+		const auto firstSet = (*entityMap.begin()).second;
+		if (firstSet.size()) {
+			*entityEvent->entityRef = firstSet[0];
+		}
+	}
+}
+
+void AIScene::SpawnFood() {
+	vec2f position(
+		static_cast<float>(Math::RandMinMax(-mapHalfSize, mapHalfSize)),
+		static_cast<float>(Math::RandMinMax(-mapHalfSize, mapHalfSize))
+	);
+	position += vec2f(0.5f);
+
+	auto food = entities->Create<AISprite>();
+	food->SetTag("FOOD");
+	food->GetComponent<Transform>()->translation.Set(position, 0.f);
+	food->GetComponent<Transform>()->scale.Set(0.8f);
+	food->SetTarget(vec3f(position, 0.f));
+	food->GetComponent<Render>()->tint.Set(1.f, 0.5f, 0.f, 1.f);
+}
+
+void AIScene::SpawnFish() {
+	vec2f position(
+		static_cast<float>(Math::RandMinMax(-mapHalfSize, mapHalfSize)),
+		static_cast<float>(Math::RandMinMax(-mapHalfSize, mapHalfSize))
+	);
+	position += vec2f(0.5f);
+
+	auto fish = entities->Create<AISprite>();
+	fish->SetTag("FISH");
+	fish->GetComponent<Transform>()->translation.Set(position, 0.f);
+	fish->GetComponent<Transform>()->scale.Set(0.8f);
+	fish->SetTarget(vec3f(position, 0.f));
+	fish->GetComponent<Render>()->tint.Set(0.f, 0.f, 1.f, 1.f);
+
+	fish->energy = 7.f;
+	fish->GetComponent<StateMachine>()->queuedState = new States::FishFull;
+}
+
+void AIScene::SpawnShark() {
+	vec2f position(
+		static_cast<float>(Math::RandMinMax(-mapHalfSize, mapHalfSize)),
+		static_cast<float>(Math::RandMinMax(-mapHalfSize, mapHalfSize))
+	);
+	position += vec2f(0.5f);
+
+	auto shark = entities->Create<AISprite>();
+	shark->SetTag("SHARK");
+	shark->SetSpeed(3.f);
+	shark->GetComponent<Transform>()->translation.Set(position, 0.f);
+	shark->GetComponent<Transform>()->scale.Set(0.8f);
+	shark->SetTarget(vec3f(position, 0.f));
+	shark->GetComponent<Render>()->tint.Set(1.f, 0.f, 0.f, 1.f);
 }

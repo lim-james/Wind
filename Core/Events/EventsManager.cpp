@@ -4,6 +4,13 @@ namespace Events {
 
 	EventsManager* EventsManager::instance = nullptr;
 
+
+	EventsManager::~EventsManager() {
+		for (const auto& queued : queuedEvents)
+			if (queued.event)
+				delete queued.event;
+	}
+
 	EventsManager* EventsManager::GetInstance() {
 		if (!instance)
 			instance = new EventsManager;
@@ -29,6 +36,25 @@ namespace Events {
 			callback(event);
 
 		delete event;
+	}
+
+	void EventsManager::Queue(const std::string& name) {
+		queuedEvents.push_back({ name, nullptr });
+	}
+
+	void EventsManager::Queue(const std::string& name, Event* const event) {
+		queuedEvents.push_back({ name, event });
+	}
+
+	void EventsManager::TriggerQueued() {
+		for (const auto& queued : queuedEvents) {
+			if (queued.event)
+				Trigger(queued.name, queued.event);
+			else
+				Trigger(queued.name);
+		}
+
+		queuedEvents.clear();
 	}
 
 }

@@ -7,7 +7,13 @@ StateSystem::StateSystem() {
 	Events::EventsManager::GetInstance()->Subscribe("STATE_MACHINE_ACTIVE", &StateSystem::ActiveHandler, this);
 }
 
-void StateSystem::Update(const float& dt) {}
+void StateSystem::Update(const float& dt) {
+	for (auto& c : components) {
+		auto entity = c->GetParent();
+		if (c->currentState)
+			c->currentState->Update(entity, dt);
+	}
+}
 
 void StateSystem::FixedUpdate(const float& dt) {
 	for (auto& c : components) {
@@ -22,7 +28,7 @@ void StateSystem::FixedUpdate(const float& dt) {
 		}
 
 		if (c->currentState)
-			c->currentState->Update(entity, dt);
+			c->currentState->FixedUpdate(entity, dt);
 	}
 }
 

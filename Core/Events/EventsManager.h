@@ -21,7 +21,16 @@ namespace Events {
 		std::map<void*, std::map<std::string, std::function<void()>>> emptyContextCallbacks;
 		std::map<void*, std::map<std::string, std::function<void(Event*)>>> eventContextCallbacks;
 
+		struct QueuedEvent {
+			std::string name;
+			Event* event;
+		};
+
+		std::vector<QueuedEvent> queuedEvents;
+
 	public:
+
+		~EventsManager();
 
 		static EventsManager* GetInstance();
 		static void Destroy();
@@ -45,6 +54,11 @@ namespace Events {
 		void TriggerContext(const std::string& name, Context* const context);
 		template<typename Context>
 		void TriggerContext(const std::string& name, Context* const context, Event* const event);
+
+		void Queue(const std::string& name);
+		void Queue(const std::string& name, Event* const event);
+
+		void TriggerQueued();
 
 	};
 

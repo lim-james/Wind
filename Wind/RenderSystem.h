@@ -6,6 +6,7 @@
 #include "Camera.h"
 #include "Text.h"
 #include "Shader.h"
+#include "Line.h"
 
 #include <Events/Event.h>
 
@@ -27,13 +28,17 @@ class RenderSystem : public System {
 	
 	std::vector<Camera*> cameras;
 
+	std::vector<Line> lines;
 	std::map<Font*, std::vector<Text*>> textBatches;
 
 	static const unsigned INSTANCE_LAYOUT_LOCATION = 2;
 	static unsigned instanceBuffer;
 		
 	static unsigned quadVAO;
+	static unsigned lineVAO;
+
 	Shader* mainShader;
+	Shader* lineShader;
 	Shader* textShader;
 
 	Batches batches;
@@ -53,11 +58,13 @@ private:
 
 	void RenderActiveHandler(Events::Event* event);
 	void TextureChangeHandler(Events::Event* event);
+	void DrawLineHandler(Events::Event* event);
 
 	void TextActiveHandler(Events::Event* event);
 	void TextFontHandler(Events::Event* event);
 
 	void GenerateQuad();
+	void GenerateLine();
 
 };
 

@@ -7,6 +7,9 @@
 #include "Script.h"
 // Events
 #include "InputEvents.h"
+#include "EntityEvents.h"
+// Draw line
+#include "Line.h"
 
 #include <Events/EventsManager.h>
 #include <GLFW/glfw3.h>
@@ -43,6 +46,18 @@ void Player::Update(const float& dt) {
 		GetComponent<Transform>()->translation.x += 10.f * dt;
 	if (keyInputs[GLFW_KEY_SPACE] != GLFW_RELEASE)
 		GetComponent<ParticleEmitter>()->age = 0.f;
+
+	const vec3f position = GetComponent<Transform>()->GetWorldTranslation();
+
+	Entity* nearest = nullptr;
+	Events::EventsManager::GetInstance()->Trigger("NEAREST_ENTITY_WITH_TAG", new Events::NearestEntityWithTag(&nearest, "FOOD", position)); 
+
+	if (nearest) {
+		Line line;
+		line.tint.Set(0.f, 1.f, 0.f, 1.f);
+		line.Set(position, nearest->GetComponent<Transform>()->GetWorldTranslation());
+		Events::EventsManager::GetInstance()->Trigger("DRAW_LINE", new Events::AnyType<Line>(line));
+	}
 }
 
 void Player::KeyHandler(Events::Event* event) {

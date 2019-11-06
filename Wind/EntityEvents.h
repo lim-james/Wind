@@ -23,6 +23,15 @@ namespace Events {
 		) {}
 	};
 
+	struct FindEntityWithTag : Event {
+		Entity ** const entityRef;
+		const std::string tag;
+
+		FindEntityWithTag(Entity ** const entityRef, const std::string& tag)
+			: entityRef(entityRef)
+			, tag(tag) {}
+	};
+
 	struct NearestEntityWithTag : Event {
 		Entity ** const entityRef;
 		const std::string tag;

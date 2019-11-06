@@ -35,16 +35,18 @@ void Application::Initialize(const int& width, const int& height, const char* ti
 		Console::Error << glewGetErrorString(err) << '\n';
 	}
 
-	Events::EventsManager::GetInstance()->Subscribe("EXIT", &Window::Close, context);
-	Events::EventsManager::GetInstance()->Subscribe("KEY_INPUT", &Application::OnEvent, this);
-	Events::EventsManager::GetInstance()->Subscribe("TEXT_INPUT", &Application::OnEvent, this);
-	Events::EventsManager::GetInstance()->Subscribe("CURSOR_POSITION_INPUT", &Application::OnEvent, this);
-	Events::EventsManager::GetInstance()->Subscribe("MOUSE_BUTTON_INPUT", &Application::OnEvent, this);
-	Events::EventsManager::GetInstance()->Subscribe("SCROLL_INPUT", &Application::OnEvent, this);
+	auto em = Events::EventsManager::GetInstance();
+
+	em->Subscribe("EXIT", &Window::Close, context);
+	em->Subscribe("KEY_INPUT", &Application::OnEvent, this);
+	em->Subscribe("TEXT_INPUT", &Application::OnEvent, this);
+	em->Subscribe("CURSOR_POSITION_INPUT", &Application::OnEvent, this);
+	em->Subscribe("MOUSE_BUTTON_INPUT", &Application::OnEvent, this);
+	em->Subscribe("SCROLL_INPUT", &Application::OnEvent, this);
 
 #if _DEBUG
-	Events::EventsManager::GetInstance()->Subscribe("TIMER_START", &Application::OnTimerEvent, this);
-	Events::EventsManager::GetInstance()->Subscribe("TIMER_STOP", &Application::OnTimerEvent, this);
+	em->Subscribe("TIMER_START", &Application::OnTimerEvent, this);
+	em->Subscribe("TIMER_STOP", &Application::OnTimerEvent, this);
 #endif
 
 	// turn off vsync
@@ -53,12 +55,15 @@ void Application::Initialize(const int& width, const int& height, const char* ti
 	current = new AIScene;
 
 	context->BroadcastSize();
+	em->TriggerQueued();
 }
 
 void Application::Run() {
 	timer.Start();
 
-	Events::EventsManager::GetInstance()->Trigger("CURSOR_SENSITIVITY", new Events::AnyType<float>(0.1f));
+	auto em = Events::EventsManager::GetInstance();
+
+	em->Trigger("CURSOR_SENSITIVITY", new Events::AnyType<float>(0.1f));
 	//Events::EventsManager::GetInstance()->Trigger("INPUT_MODE_CHANGE", new Events::InputMode(GLFW_CURSOR, GLFW_CURSOR_DISABLED));
 
 	current->Awake();
@@ -81,6 +86,8 @@ void Application::Run() {
 
 		context->SwapBuffers();
 		timer.Update();
+
+		em->TriggerQueued();
 	}
 }
 

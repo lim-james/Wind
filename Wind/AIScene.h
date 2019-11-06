@@ -8,6 +8,7 @@
 class AIScene : public Scene {
 	
 	int mapHalfSize;
+	float bounceTime;
 
 public:
 
@@ -15,10 +16,21 @@ public:
 
 	void Awake() override;
 
+	void FixedUpdate(const float& dt) override;
+	
 private:
 
+	// event handlers
+
 	void KeyHandler(Events::Event* event);
-	void EntityHanlder(Events::Event* event);
+	void NearestEntityHanlder(Events::Event* event);
+	void FirstEntityHanlder(Events::Event* event);
+
+	// helper methods
+
+	void SpawnFood();
+	void SpawnFish();
+	void SpawnShark();
 
 };
 

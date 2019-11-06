@@ -6,13 +6,13 @@
 #include "Script.h"
 #include "StateMachine.h"
 
-#include "TestState.h"
-
 #include <Math/Math.hpp>
 #include <Math/Random.hpp>
 #include <Events/EventsManager.h>
 
 AISprite::AISprite() {
+	interest = nullptr;
+
 	Events::EventsManager::GetInstance()->Subscribe("AI_STATE_CHANGE", &AISprite::EventHandler, this);
 }
 
@@ -29,11 +29,28 @@ void AISprite::Initialize() {
 
 	speed = 1.f;
 
+	GetComponent<Collider>()->BindCollisionEnter(&AISprite::OnCollisionEnter, this);
 	GetComponent<Script>()->update = std::bind(&AISprite::Update, this, std::placeholders::_1);
+}
+
+void AISprite::SetInterest(Entity * const _interest) {
+	interest = _interest;
+}
+
+Entity * const AISprite::GetInterest() const {
+	return interest;
 }
 
 void AISprite::SetTarget(const vec3f& value) {
 	target = value;
+}
+
+const vec3f& AISprite::GetDestination() const {
+	return destination;
+}
+
+void AISprite::SetDestination(const vec3f& _destination) {
+	destination = _destination;
 }
 
 void AISprite::SetSpeed(const float& value) {
@@ -47,6 +64,23 @@ void AISprite::Move(const float& dt) {
 	if (Math::Length(dir) <= speed * dt) {
 		position = target;
 		float random = Math::RandValue();
+
+		if (interest) {
+			const vec3f dir = Math::Normalized(GetDestination() - position);
+			const vec3f fDir = Math::Abs(dir);
+
+			if (Math::LengthSquared(fDir) > 0) {
+				if (random < fDir.x)
+					target.x += dir.x / fDir.x;
+				else
+					target.y += dir.y / fDir.y;
+
+				target.x = Math::Clamp(target.x, -9.5f, 9.5f);
+				target.y = Math::Clamp(target.y, -9.5f, 9.5f);
+
+				return;
+			}
+		}
 
 		if (random < 0.25f)
 			target.x += 1.f;
@@ -70,6 +104,12 @@ void AISprite::Update(const float& dt) {
 }
 
 void AISprite::OnCollisionEnter(Entity * const target) {
+	if (GetTag() == "FISH" && target->GetTag() == "FOOD") {
+		if (target->IsUsed()) {
+			target->Destroy();
+			energy += 5.f;
+		}
+	}
 }
 
 void AISprite::EventHandler(Events::Event* event) {

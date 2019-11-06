@@ -10,17 +10,27 @@ class AISprite : public Entity {
 
 protected:
 
-	vec3f target;
+	Entity* interest;
+	vec3f target, destination;
 	float speed;
 
 public:
+
+	float energy;
 
 	AISprite();
 
 	virtual void Build();
 	virtual void Initialize();
+	
+	void SetInterest(Entity * const _interest);
+	Entity * const GetInterest() const;
 
 	void SetTarget(const vec3f& value);
+
+	const vec3f& GetDestination() const;
+	void SetDestination(const vec3f& _destination);
+
 	void SetSpeed(const float& value);
 
 protected:
