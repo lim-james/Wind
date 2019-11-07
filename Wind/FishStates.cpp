@@ -3,7 +3,7 @@
 #include "AISprite.h"
 #include "Transform.h"
 #include "Render.h"
-#include "StateMachine.h"
+#include "StateContainer.h"
 #include "Line.h"
 #include "EntityEvents.h"
 
@@ -26,7 +26,7 @@ void States::FishTooFull::FixedUpdate(Entity* const target, const float& dt) {
 	target->GetComponent<Render>()->tint.g = aiSprite->energy / 10.f;
 
 	if (aiSprite->energy < 10)
-		target->GetComponent<StateMachine>()->queuedState = new FishFull;
+		target->GetComponent<StateContainer>()->queuedState = "FISH_FULL";
 }
 
 void States::FishTooFull::Exit(Entity* const target) {}
@@ -63,10 +63,10 @@ void States::FishFull::FixedUpdate(Entity* const target, const float& dt) {
 	target->GetComponent<Render>()->tint.g = aiSprite->energy / 10.f;
 
 	if (aiSprite->energy < 5.f) {
-		target->GetComponent<StateMachine>()->queuedState = new FishHungry;
+		target->GetComponent<StateContainer>()->queuedState = "FISH_HUNGRY";
 		return;
 	} else if (aiSprite->energy >= 10.f) {
-		target->GetComponent<StateMachine>()->queuedState = new FishTooFull;
+		target->GetComponent<StateContainer>()->queuedState = "FISH_TOO_FULL";
 		return;
 	}
 
@@ -129,10 +129,10 @@ void States::FishHungry::FixedUpdate(Entity* const target, const float& dt) {
 	target->GetComponent<Render>()->tint.g = aiSprite->energy / 10.f;
 
 	if (aiSprite->energy < 0.f) {
-		target->GetComponent<StateMachine>()->queuedState = new FishDead;
+		target->GetComponent<StateContainer>()->queuedState = "FISH_DEAD";
 		return;
 	} else if (aiSprite->energy >= 5.f) {
-		target->GetComponent<StateMachine>()->queuedState = new FishFull;
+		target->GetComponent<StateContainer>()->queuedState = "FISH_FULL";
 		return;
 	}
 

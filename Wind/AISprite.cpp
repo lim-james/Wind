@@ -4,7 +4,7 @@
 #include "Render.h"
 #include "Collider.h"
 #include "Script.h"
-#include "StateMachine.h"
+#include "StateContainer.h"
 
 #include <Math/Math.hpp>
 #include <Math/Random.hpp>
@@ -21,7 +21,7 @@ void AISprite::Build() {
 	AddComponent<Render>();
 	AddComponent<Collider>();
 	AddComponent<Script>();
-	AddComponent<StateMachine>();
+	AddComponent<StateContainer>();
 }
 
 void AISprite::Initialize() {

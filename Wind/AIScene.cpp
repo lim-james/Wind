@@ -22,7 +22,7 @@
 #include "ParticleSystem.h"
 #include "ColliderSystem.h"
 #include "ScriptSystem.h"
-#include "StateSystem.h"
+#include "StateMachine.h"
 // States
 #include "FishStates.h"
 // Utils
@@ -45,7 +45,7 @@ AIScene::AIScene() {
 	components->Subscribe<Particle>(100, 1);
 	components->Subscribe<Collider>(10, 1);
 	components->Subscribe<Script>(10, 1);
-	components->Subscribe<StateMachine>(10, 1);
+	components->Subscribe<StateContainer>(10, 1);
 
 	entities->Subscribe<Sprite>(10, 1);
 	entities->Subscribe<FPSLabel>(1, 1);
@@ -60,7 +60,12 @@ AIScene::AIScene() {
 	systems->Subscribe<ParticleSystem>();
 	systems->Subscribe<ColliderSystem>();
 	systems->Subscribe<ScriptSystem>();
-	systems->Subscribe<StateSystem>();
+	systems->Subscribe<StateMachine>();
+
+	systems->Get<StateMachine>()->AttachState<States::FishTooFull>("FISH_TOO_FULL");
+	systems->Get<StateMachine>()->AttachState<States::FishFull>("FISH_FULL");
+	systems->Get<StateMachine>()->AttachState<States::FishHungry>("FISH_HUNGRY");
+	systems->Get<StateMachine>()->AttachState<States::FishDead>("FISH_DEAD");
 
 	mapHalfSize = 10;
 
@@ -131,11 +136,11 @@ void AIScene::FixedUpdate(const float& dt) {
 void AIScene::KeyHandler(Events::Event* event) {
 	auto input = static_cast<Events::KeyInput*>(event);
 
-	if (input->key == GLFW_KEY_SPACE && input->action == GLFW_RELEASE) {
+	if (input->key == GLFW_KEY_SPACE && input->action == GLFW_REPEAT) {
 		SpawnFish();
 	}
 
-	if (input->key == GLFW_KEY_P && input->action == GLFW_RELEASE) {
+	if (input->key == GLFW_KEY_P && input->action == GLFW_REPEAT) {
 		SpawnFood();
 	}
 }
@@ -199,7 +204,7 @@ void AIScene::SpawnFish() {
 	fish->GetComponent<Render>()->tint.Set(0.f, 0.f, 1.f, 1.f);
 
 	fish->energy = 7.f;
-	fish->GetComponent<StateMachine>()->queuedState = new States::FishFull;
+	fish->GetComponent<StateContainer>()->queuedState = "FISH_FULL";
 }
 
 void AIScene::SpawnShark() {
