@@ -30,6 +30,13 @@ public:
 
 	virtual void Destroy();
 
+private:
+
+	// event handlers
+
+	void NearestEntityHanlder(Events::Event* event);
+	void FirstEntityHanlder(Events::Event* event);
+
 };
 
 #endif

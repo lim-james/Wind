@@ -70,11 +70,11 @@ AIScene::AIScene() {
 	mapHalfSize = 10;
 
 	Events::EventsManager::GetInstance()->Subscribe("KEY_INPUT", &AIScene::KeyHandler, this);
-	Events::EventsManager::GetInstance()->Subscribe("NEAREST_ENTITY_WITH_TAG", &AIScene::NearestEntityHanlder, this);
-	Events::EventsManager::GetInstance()->Subscribe("FIRST_ENTITY_WITH_TAG", &AIScene::FirstEntityHanlder, this);
 }
 
 void AIScene::Awake() {
+	Scene::Awake();
+
 	auto cam = entities->Create<CameraObject>();
 	cam->GetComponent<Camera>()->clearColor.Set(0.f);
 	cam->GetComponent<Camera>()->SetSize(static_cast<float>(mapHalfSize));
@@ -142,35 +142,6 @@ void AIScene::KeyHandler(Events::Event* event) {
 
 	if (input->key == GLFW_KEY_P && input->action == GLFW_REPEAT) {
 		SpawnFood();
-	}
-}
-
-void AIScene::NearestEntityHanlder(Events::Event* event) {
-	auto entityEvent = static_cast<Events::NearestEntityWithTag*>(event);
-	const auto items = entities->GetEntitiesWithTag(entityEvent->tag);
-	
-	float len = -1.f;
-
-	for (const auto& list : items) {
-		for (const auto& entity : list.second) {
-			const auto d = entityEvent->position - entity->GetComponent<Transform>()->GetWorldTranslation();
-			const float currentLength = Math::LengthSquared(d);
-			if (len < 0 || len > currentLength) {
-				len = currentLength;
-				*entityEvent->entityRef = entity;
-			} 		
-		}
-	}
-}
-
-void AIScene::FirstEntityHanlder(Events::Event* event) {
-	auto entityEvent = static_cast<Events::FindEntityWithTag*>(event);
-	const auto entityMap = entities->GetEntitiesWithTag(entityEvent->tag);
-	if (entityMap.size()) {
-		const auto firstSet = (*entityMap.begin()).second;
-		if (firstSet.size()) {
-			*entityEvent->entityRef = firstSet[0];
-		}
 	}
 }
 

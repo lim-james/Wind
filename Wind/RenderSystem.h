@@ -7,6 +7,7 @@
 #include "Text.h"
 #include "Shader.h"
 #include "Line.h"
+#include "Framebuffer.h"
 
 #include <Events/Event.h>
 
@@ -41,6 +42,9 @@ class RenderSystem : public System {
 	Shader* lineShader;
 	Shader* textShader;
 
+	Shader* curveShader;
+	Framebuffer* mainFBO;
+
 	Batches batches;
 
 public:
@@ -62,6 +66,8 @@ private:
 
 	void TextActiveHandler(Events::Event* event);
 	void TextFontHandler(Events::Event* event);
+
+	void ResizeHandle(Events::Event* event);
 
 	void GenerateQuad();
 	void GenerateLine();

@@ -23,8 +23,6 @@ private:
 	// event handlers
 
 	void KeyHandler(Events::Event* event);
-	void NearestEntityHanlder(Events::Event* event);
-	void FirstEntityHanlder(Events::Event* event);
 
 	// helper methods
 

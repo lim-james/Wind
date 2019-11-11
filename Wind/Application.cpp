@@ -5,6 +5,7 @@
 // Scenes
 #include "AIScene.h"
 #include "TestScene.h"
+#include "PacmanScene.h"
 
 // external
 #include <Events/EventsManager.h>
@@ -52,7 +53,7 @@ void Application::Initialize(const int& width, const int& height, const char* ti
 	// turn off vsync
 	//glfwSwapInterval(0);
 
-	current = new AIScene;
+	current = new PacmanScene;
 
 	context->BroadcastSize();
 	em->TriggerQueued();

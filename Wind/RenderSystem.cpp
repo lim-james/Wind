@@ -24,6 +24,7 @@ RenderSystem::RenderSystem() {
 	Events::EventsManager::GetInstance()->Subscribe("DRAW_LINE", &RenderSystem::DrawLineHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("TEXT_ACTIVE", &RenderSystem::TextActiveHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("TEXT_FONT", &RenderSystem::TextFontHandler, this);
+	Events::EventsManager::GetInstance()->Subscribe("WINDOW_RESIZE", &RenderSystem::ResizeHandle, this);
 
 	if (instanceBuffer == 0)
 		glGenBuffers(1, &instanceBuffer);
@@ -54,6 +55,29 @@ RenderSystem::RenderSystem() {
 	textShader->Use();
 	textShader->SetInt("tex", 0);
 
+	curveShader = new Shader("Files/Shaders/fb.vert", "Files/Shaders/curve.frag");
+	curveShader->Use();
+	curveShader->SetInt("tex", 0);
+
+	TextureData tData;
+	tData.level = 0;
+	tData.internalFormat = GL_RGB16F;
+	tData.border = 0;
+	tData.format = GL_RGBA;
+	tData.type = GL_UNSIGNED_BYTE;
+	tData.attachment = GL_COLOR_ATTACHMENT0;
+	tData.parameters.push_back({ GL_TEXTURE_MIN_FILTER, GL_LINEAR });
+	tData.parameters.push_back({ GL_TEXTURE_MAG_FILTER, GL_LINEAR });
+	tData.parameters.push_back({ GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE });
+	tData.parameters.push_back({ GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE });
+
+	RenderBufferData rbData;
+	rbData.internalFormat = GL_DEPTH24_STENCIL8;
+	rbData.attachmentFormat = GL_DEPTH_STENCIL_ATTACHMENT;
+
+	mainFBO = new Framebuffer(1, 1);
+	mainFBO->Initialize(vec2u(1600, 900), { tData }, { rbData });
+
 	lines.push_back({ vec2f(0.f), vec2f(1.f), vec4f(0.f, 1.f, 0.f, 1.f) });
 }
 
@@ -61,12 +85,18 @@ RenderSystem::~RenderSystem() {
 	delete mainShader;
 	delete lineShader;
 	delete textShader;
+
+	delete curveShader;
+	delete mainFBO;
 }
 
 void RenderSystem::Update(const float& dt) {
 
 	for (auto& cam : cameras) {
+		mainFBO->Bind();
+
 		glBindVertexArray(quadVAO);
+
 		mainShader->Use();
 		const auto& viewport = cam->GetViewport();
 		const auto& projection = cam->GetProjectionMatrix();
@@ -139,7 +169,7 @@ void RenderSystem::Update(const float& dt) {
 
 		const unsigned count = lines.size();
 		if (count) {
-			glLineWidth(cam->size * .5f);
+			glLineWidth(cam->size * .25f);
 
 			glBindVertexArray(lineVAO);
 			lineShader->Use();
@@ -169,6 +199,16 @@ void RenderSystem::Update(const float& dt) {
 
 			lines.clear();
 		}
+
+		mainFBO->Unbind();
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		curveShader->Use();
+		glBindVertexArray(quadVAO);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, mainFBO->GetTexture());
+		glDrawArrays(GL_TRIANGLES, 0, 6);
 
 		textShader->Use();
 		textShader->SetMatrix4("projection", projection);
@@ -375,6 +415,11 @@ void RenderSystem::TextFontHandler(Events::Event* event) {
 		prevList.erase(vfind(prevList, c));
 		textBatches[current].push_back(c);
 	}
+}
+
+void RenderSystem::ResizeHandle(Events::Event* event) {
+	const auto size = static_cast<Events::AnyType<vec2i>*>(event)->data;
+	mainFBO->Resize(size);
 }
 
 void RenderSystem::GenerateQuad() {

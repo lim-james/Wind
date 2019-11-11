@@ -11,7 +11,7 @@ class AISprite : public Entity {
 protected:
 
 	Entity* interest;
-	vec3f target, destination;
+	vec3f target, destination, direction;
 	float speed;
 
 public:
@@ -26,16 +26,19 @@ public:
 	void SetInterest(Entity * const _interest);
 	Entity * const GetInterest() const;
 
+	const vec3f& GetTarget() const;
 	void SetTarget(const vec3f& value);
 
 	const vec3f& GetDestination() const;
 	void SetDestination(const vec3f& _destination);
 
+	const vec3f& GetDirection() const;
+
 	void SetSpeed(const float& value);
 
 protected:
 
-	void Move(const float& dt);
+	virtual void Move(const float& dt);
 	void Update(const float& dt);
 
 	void OnCollisionEnter(Entity * const target);

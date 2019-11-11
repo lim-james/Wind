@@ -12,6 +12,7 @@
 
 AISprite::AISprite() {
 	interest = nullptr;
+	direction.Set(1.f, 0.f, 0.f);
 
 	Events::EventsManager::GetInstance()->Subscribe("AI_STATE_CHANGE", &AISprite::EventHandler, this);
 }
@@ -41,6 +42,10 @@ Entity * const AISprite::GetInterest() const {
 	return interest;
 }
 
+const vec3f& AISprite::GetTarget() const {
+	return target;
+}
+
 void AISprite::SetTarget(const vec3f& value) {
 	target = value;
 }
@@ -51,6 +56,10 @@ const vec3f& AISprite::GetDestination() const {
 
 void AISprite::SetDestination(const vec3f& _destination) {
 	destination = _destination;
+}
+
+const vec3f& AISprite::GetDirection() const {
+	return direction;
 }
 
 void AISprite::SetSpeed(const float& value) {

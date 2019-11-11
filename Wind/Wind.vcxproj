@@ -140,7 +140,12 @@
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="ColliderSystem.cpp" />
     <ClCompile Include="FishStates.cpp" />
+    <ClCompile Include="Framebuffer.cpp" />
+    <ClCompile Include="Ghost.cpp" />
+    <ClCompile Include="GhostChaseStates.cpp" />
+    <ClCompile Include="GhostStates.cpp" />
     <ClCompile Include="Line.cpp" />
+    <ClCompile Include="PacmanScene.cpp" />
     <ClCompile Include="SharkSprite.cpp" />
     <ClCompile Include="SharkStates.cpp" />
     <ClCompile Include="StateContainer.cpp" />
@@ -183,7 +188,13 @@
     <ClInclude Include="Collider.h" />
     <ClInclude Include="ColliderSystem.h" />
     <ClInclude Include="FishStates.h" />
+    <ClInclude Include="Framebuffer.h" />
+    <ClInclude Include="Ghost.h" />
+    <ClInclude Include="GhostChaseStates.h" />
+    <ClInclude Include="GhostStates.h" />
     <ClInclude Include="Line.h" />
+    <ClInclude Include="MapEvents.h" />
+    <ClInclude Include="PacmanScene.h" />
     <ClInclude Include="SharkSprite.h" />
     <ClInclude Include="SharkStates.h" />
     <ClInclude Include="State.h" />
@@ -222,6 +233,9 @@
     <ClInclude Include="Transform.h" />
     <ClInclude Include="UILabel.h" />
     <ClInclude Include="Window.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Files\Data\wall_data.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

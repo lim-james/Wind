@@ -1,3 +1,6 @@
+#ifndef ENTITY_EVENTS_H
+#define ENTITY_EVENTS_H
+
 #include "Entity.h"
 
 #include <Events/Event.h>
@@ -26,23 +29,30 @@ namespace Events {
 	struct FindEntityWithTag : Event {
 		Entity ** const entityRef;
 		const std::string tag;
+		// optional 
+		const std::string state;
 
-		FindEntityWithTag(Entity ** const entityRef, const std::string& tag)
+		FindEntityWithTag(Entity ** const entityRef, const std::string& tag, const std::string& state = "")
 			: entityRef(entityRef)
-			, tag(tag) {}
+			, tag(tag) 
+			, state(state) {}
 	};
 
 	struct NearestEntityWithTag : Event {
 		Entity ** const entityRef;
 		const std::string tag;
-
 		const vec3f position;
+		// optional
+		const std::string state;
 
-		NearestEntityWithTag(Entity ** const entityRef, const std::string& tag, const vec3f& position)
+
+		NearestEntityWithTag(Entity ** const entityRef, const std::string& tag, const vec3f& position, const std::string& state = "")
 			: entityRef(entityRef)
 			, tag(tag) 
-			, position(position) {}
+			, position(position)
+			, state(state) {}
 	};
 
-
 }
+
+#endif
