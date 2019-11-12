@@ -13,9 +13,16 @@ class PacmanScene : public Scene {
 	bool chasing;
 	float bounceTime;
 
+	struct PalletData {
+		bool isTaken;
+		Entity* object;
+	};
+
 	vec2f mapSize;
 	vec2i mapOffset;
 	bool *wallData;
+	PalletData *palletData;
+	vec2f powerPosition[4];
 
 public:
 
@@ -31,14 +38,17 @@ private:
 	// event handlers
 
 	void KeyHandler(Events::Event* event);
-	void MapHandler(Events::Event* event);
+	void MapWallHandler(Events::Event* event);
+	void MapPalletHandler(Events::Event* event);
 
 	// Helper methods
 
-	void ReadWallData(const char* filepath);
+	void ReadMapData(const char* filepath);
 
 	Ghost* const SpawnGhost(const std::string& name, const vec2i& tilePosition, const vec2f& dock, const vec2f& corner, const vec2f& start);
 	Entity* const SpawnPacman();
+	Entity* const SpawnPallet(const float& x, const float& y);
+	Entity* const SpawnPower(const float& x, const float& y);
 
 };
 

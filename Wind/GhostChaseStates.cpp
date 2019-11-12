@@ -141,11 +141,54 @@ void States::ClydeChase::FixedUpdate(Entity* const target, const float& dt) {
 		if (Math::LengthSquared(diff) >= 64.f)
 			aiSprite->SetDestination(target);
 		else
-			aiSprite->GetComponent<StateContainer>()->queuedState = "GHOST_SCATTER";
+			aiSprite->GetComponent<StateContainer>()->queuedState = "CLYDE_INVERSE_CHASE_STATE";
 	}
 }
 
 void States::ClydeChase::Exit(Entity* const target) {
+	auto ghost = static_cast<Ghost* const>(target);
+	ghost->InvertDirection();
+}
+
+
+
+// Clyde (inverse)
+
+void States::ClydeInverseChase::Enter(Entity* const target) {
+	auto ghost = static_cast<Ghost*  const>(target);
+
+	Entity* pacman = nullptr;
+	Events::EventsManager::GetInstance()->Trigger("FIRST_ENTITY_WITH_TAG", new Events::FindEntityWithTag(&pacman, "PACMAN")); 
+	ghost->SetInterest(pacman);
+
+	ghost->SetDestination(ghost->GetDock());
+}
+
+void States::ClydeInverseChase::Update(Entity* const target, const float& dt) {
+	const vec3f position = target->GetComponent<Transform>()->GetWorldTranslation();
+	auto aiSprite = static_cast<AISprite*  const>(target);
+	
+	if (aiSprite->GetInterest()) {
+		Line line;
+		line.tint.Set(1.f, 0.72f, 0.32f, 0.5f);
+		line.Set(position, aiSprite->GetDestination());
+		Events::EventsManager::GetInstance()->Trigger("DRAW_LINE", new Events::AnyType<Line>(line));
+	}
+}
+
+void States::ClydeInverseChase::FixedUpdate(Entity* const target, const float& dt) {
+	auto ghost = static_cast<Ghost*  const>(target);
+	auto interest = ghost->GetInterest();
+
+	if (interest) {
+		const vec3f target = interest->GetComponent<Transform>()->GetWorldTranslation();
+		const vec3f diff = ghost->GetComponent<Transform>()->GetWorldTranslation() - target;
+		if (Math::LengthSquared(diff) > 64.f)
+			ghost->GetComponent<StateContainer>()->queuedState = "CLYDE_CHASE_STATE";
+	}
+}
+
+void States::ClydeInverseChase::Exit(Entity* const target) {
 	auto ghost = static_cast<Ghost* const>(target);
 	ghost->InvertDirection();
 }

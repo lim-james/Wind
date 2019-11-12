@@ -38,6 +38,17 @@ namespace States {
 
 	};
 
+	class ClydeInverseChase : public State {
+
+	public:
+
+		void Enter(Entity* const target) override;
+		void Update(Entity* const target, const float& dt) override;
+		void FixedUpdate(Entity* const target, const float& dt) override;
+		void Exit(Entity* const target) override;
+
+	};
+
 	class InkyChase : public State {
 
 	public:

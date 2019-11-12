@@ -1,7 +1,7 @@
 #ifndef MATH_HPP
 #define MATH_HPP
 
-#include <vector>
+#include <utility>
 
 namespace Math {
 
@@ -41,16 +41,16 @@ namespace Math {
 	}
 
 	template<typename T>
-	std::vector<T> Quadratic(const T& a, const T& b, const T& c) {
+	std::pair<T, T> Quadratic(const T& a, const T& b, const T& c) {
 		const T& d = b * b - 4 * a * c;
 
 		if (d < 0)
 			return {};
 
-		return {
+		return std::make_pair(
 			(-b + sqrt(d)) / (2 * a),
 			(-b - sqrt(d)) / (2 * a)
-		};
+		);
 	}
 
 	template<typename T>

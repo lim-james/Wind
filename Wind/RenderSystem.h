@@ -67,7 +67,7 @@ private:
 	void TextActiveHandler(Events::Event* event);
 	void TextFontHandler(Events::Event* event);
 
-	void ResizeHandle(Events::Event* event);
+	void ResizeHandler(Events::Event* event);
 
 	void GenerateQuad();
 	void GenerateLine();

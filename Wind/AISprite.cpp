@@ -5,6 +5,8 @@
 #include "Collider.h"
 #include "Script.h"
 #include "StateContainer.h"
+// Events
+#include "MapEvents.h"
 
 #include <Math/Math.hpp>
 #include <Math/Random.hpp>
@@ -13,8 +15,6 @@
 AISprite::AISprite() {
 	interest = nullptr;
 	direction.Set(1.f, 0.f, 0.f);
-
-	Events::EventsManager::GetInstance()->Subscribe("AI_STATE_CHANGE", &AISprite::EventHandler, this);
 }
 
 void AISprite::Build() {
@@ -30,7 +30,6 @@ void AISprite::Initialize() {
 
 	speed = 1.f;
 
-	GetComponent<Collider>()->BindCollisionEnter(&AISprite::OnCollisionEnter, this);
 	GetComponent<Script>()->update = std::bind(&AISprite::Update, this, std::placeholders::_1);
 }
 
@@ -66,42 +65,71 @@ void AISprite::SetSpeed(const float& value) {
 	speed = value;
 }
 
+void AISprite::SetNewTarget() {
+	const auto& position = GetComponent<Transform>()->translation;
+	
+	vec3f newTarget = position + direction;
+
+	bool avail = false;
+	vec2i check(static_cast<int>(newTarget.x), static_cast<int>(newTarget.y));
+	Events::MapData* event = new Events::MapData(&avail, check);
+	Events::EventsManager::GetInstance()->Trigger("SPOT_AVAIL",  event);
+
+	float closest = -1.f;
+
+	if (avail) {
+		closest = Math::LengthSquared(destination - newTarget);
+		target = newTarget;
+	}	
+	
+	// check on other axis
+
+	vec3f other(direction.y, direction.x, 0.f);
+
+	newTarget = position + other;
+
+	avail = false;
+	check.Set(static_cast<int>(newTarget.x), static_cast<int>(newTarget.y));
+	event = new Events::MapData(&avail, check);
+	Events::EventsManager::GetInstance()->Trigger("SPOT_AVAIL",  event);
+
+	if (avail) {
+		const float distance = Math::LengthSquared(destination - newTarget);
+		if (closest < 0 || distance <= closest) {
+			closest = distance;
+			direction = other;
+			target = newTarget;
+		}
+	}
+
+	newTarget = position - other;
+	if (closest < 0) {
+		direction = -other;
+		target = newTarget;
+		return;
+	}	
+
+	avail = false;
+	check.Set(static_cast<int>(newTarget.x), static_cast<int>(newTarget.y));
+	event = new Events::MapData(&avail, check);
+	Events::EventsManager::GetInstance()->Trigger("SPOT_AVAIL",  event);
+
+	if (avail) {
+		const float distance = Math::LengthSquared(destination - newTarget);
+		if (distance <= closest) {
+			direction = -other;
+			target = newTarget;
+		}
+	}
+}
+
 void AISprite::Move(const float& dt) {
 	auto& position = GetComponent<Transform>()->translation;
 	vec3f dir = target - position;
 
 	if (Math::Length(dir) <= speed * dt) {
 		position = target;
-		float random = Math::RandValue();
-
-		if (interest) {
-			const vec3f dir = Math::Normalized(GetDestination() - position);
-			const vec3f fDir = Math::Abs(dir);
-
-			if (Math::LengthSquared(fDir) > 0) {
-				if (random < fDir.x)
-					target.x += dir.x / fDir.x;
-				else
-					target.y += dir.y / fDir.y;
-
-				target.x = Math::Clamp(target.x, -9.5f, 9.5f);
-				target.y = Math::Clamp(target.y, -9.5f, 9.5f);
-
-				return;
-			}
-		}
-
-		if (random < 0.25f)
-			target.x += 1.f;
-		else if (random < 0.5f)
-			target.x -= 1.f;
-		else if (random < 0.75f)
-			target.y += 1.f;
-		else
-			target.y -= 1.f;
-
-		target.x = Math::Clamp(target.x, -9.5f, 9.5f);
-		target.y = Math::Clamp(target.y, -9.5f, 9.5f);
+		SetNewTarget();
 	} else {
 		Math::Normalize(dir);
 		position += dir * speed * static_cast<float>(dt);
@@ -110,17 +138,4 @@ void AISprite::Move(const float& dt) {
 
 void AISprite::Update(const float& dt) {
 	Move(dt);
-}
-
-void AISprite::OnCollisionEnter(Entity * const target) {
-	if (GetTag() == "FISH" && target->GetTag() == "FOOD") {
-		if (target->IsUsed()) {
-			target->Destroy();
-			energy += 5.f;
-		}
-	}
-}
-
-void AISprite::EventHandler(Events::Event* event) {
-	//GetComponent<StateMachine>()->queuedState = new States::StopState;
 }

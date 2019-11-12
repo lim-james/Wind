@@ -24,7 +24,7 @@ RenderSystem::RenderSystem() {
 	Events::EventsManager::GetInstance()->Subscribe("DRAW_LINE", &RenderSystem::DrawLineHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("TEXT_ACTIVE", &RenderSystem::TextActiveHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("TEXT_FONT", &RenderSystem::TextFontHandler, this);
-	Events::EventsManager::GetInstance()->Subscribe("WINDOW_RESIZE", &RenderSystem::ResizeHandle, this);
+	Events::EventsManager::GetInstance()->Subscribe("WINDOW_RESIZE", &RenderSystem::ResizeHandler, this);
 
 	if (instanceBuffer == 0)
 		glGenBuffers(1, &instanceBuffer);
@@ -417,7 +417,7 @@ void RenderSystem::TextFontHandler(Events::Event* event) {
 	}
 }
 
-void RenderSystem::ResizeHandle(Events::Event* event) {
+void RenderSystem::ResizeHandler(Events::Event* event) {
 	const auto size = static_cast<Events::AnyType<vec2i>*>(event)->data;
 	mainFBO->Resize(size);
 }

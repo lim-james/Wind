@@ -9,6 +9,8 @@
 #include "ParticleObject.h"
 #include "AISprite.h"
 #include "Ghost.h"
+#include "Pacman.h"
+#include "PowerPallet.h"
 // components
 #include "Transform.h"
 #include "Render.h"
@@ -51,7 +53,7 @@ PacmanScene::PacmanScene() {
 	components->Subscribe<Script>(10, 1);
 	components->Subscribe<StateContainer>(10, 1);
 
-	entities->Subscribe<Sprite>(10, 1);
+	entities->Subscribe<Sprite>(100, 1);
 	entities->Subscribe<FPSLabel>(1, 1);
 	entities->Subscribe<CameraObject>(1, 1);
 	entities->Subscribe<Player>(1, 1);
@@ -60,6 +62,8 @@ PacmanScene::PacmanScene() {
 	// AI objects
 	entities->Subscribe<AISprite>(10, 1);
 	entities->Subscribe<Ghost>(4, 1);
+	entities->Subscribe<Pacman>(1, 1);
+	entities->Subscribe<PowerPallet>(4, 1);
 
 	systems->Subscribe<RenderSystem>();
 	systems->Subscribe<ParticleSystem>();
@@ -75,9 +79,10 @@ PacmanScene::PacmanScene() {
 	systems->Get<StateMachine>()->AttachState<States::BlinkyChase>("BLINKY_CHASE_STATE");
 	systems->Get<StateMachine>()->AttachState<States::PinkyChase>("PINKY_CHASE_STATE");
 	systems->Get<StateMachine>()->AttachState<States::ClydeChase>("CLYDE_CHASE_STATE");
+	systems->Get<StateMachine>()->AttachState<States::ClydeInverseChase>("CLYDE_INVERSE_CHASE_STATE");
 	systems->Get<StateMachine>()->AttachState<States::InkyChase>("INKY_CHASE_STATE");
 
-	ReadWallData("Files/Data/wall_data.txt");
+	ReadMapData("Files/Data/map_data.txt");
 	mapOffset.Set(
 		static_cast<int>(mapSize.x * 0.5f) - 1,
 		static_cast<int>(mapSize.y * 0.5f) + 1
@@ -89,12 +94,14 @@ PacmanScene::PacmanScene() {
 
 PacmanScene::~PacmanScene() {
 	delete[] wallData; 
+	delete[] palletData; 
 }
 
 void PacmanScene::Awake() {
 	Scene::Awake();
 
-	Events::EventsManager::GetInstance()->Subscribe("SPOT_AVAIL", &PacmanScene::MapHandler, this);
+	Events::EventsManager::GetInstance()->Subscribe("SPOT_AVAIL", &PacmanScene::MapWallHandler, this);
+	Events::EventsManager::GetInstance()->Subscribe("TAKE_PALLET", &PacmanScene::MapPalletHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("KEY_INPUT", &PacmanScene::KeyHandler, this);
 
 	auto cam = entities->Create<CameraObject>();
@@ -124,6 +131,18 @@ void PacmanScene::Awake() {
 	inky->SetPartner(blinky);
 
 	SpawnPacman();
+
+	for (float x = 0; x < mapSize.w; ++x) {
+		for (float y = 0; y < mapSize.h; ++y) {
+			const int i = static_cast<int>(y * mapSize.w + x);
+			if (palletData[i].isTaken)
+				palletData[i].object = SpawnPallet(x - mapOffset.x, mapSize.h - y - mapOffset.y);
+		}
+	}
+
+	for (const auto& position : powerPosition) {
+		SpawnPower(position.x - mapOffset.x, mapSize.h - position.y - mapOffset.y);
+	}
 }
 
 void PacmanScene::FixedUpdate(const float& dt) {
@@ -149,25 +168,50 @@ void PacmanScene::KeyHandler(Events::Event* event) {
 
 }
 
-void PacmanScene::MapHandler(Events::Event* event) {
-	auto mapEvent = static_cast<Events::SpotAvailability*>(event);
+void PacmanScene::MapWallHandler(Events::Event* event) {
+	auto mapEvent = static_cast<Events::MapData*>(event);
 	auto position = mapEvent->position + mapOffset;
-	position.y = mapSize.h - position.y;
-	*mapEvent->ref = !wallData[position.y * static_cast<int>(mapSize.x) + position.x];
+	position.y = static_cast<int>(mapSize.h) - position.y;
+
+	*mapEvent->ref = !wallData[position.y * static_cast<int>(mapSize.w) + position.x];
 }
 
-void PacmanScene::ReadWallData(const char* filepath) {
+void PacmanScene::MapPalletHandler(Events::Event* event) {
+	auto mapEvent = static_cast<Events::MapData*>(event);
+	auto position = mapEvent->position + mapOffset;
+	position.y = static_cast<int>(mapSize.h) - position.y;
+
+	const int i = position.y * static_cast<int>(mapSize.w) + position.x;
+	*mapEvent->ref = palletData[i].isTaken;
+	if (palletData[i].isTaken) {
+		palletData[i].isTaken = false;
+		palletData[i].object->Destroy();
+	}
+}
+
+void PacmanScene::ReadMapData(const char* filepath) {
 	std::ifstream ifs(filepath);
 
 	ifs >> mapSize.w >> mapSize.h;
 
-	int size = mapSize.w * mapSize.h;
+	int size = static_cast<int>(mapSize.w * mapSize.h);
 	wallData = new bool[size];
+	palletData = new PalletData[size];
+
+	int powerCount = 0;
 
 	char buffer;
 	for (int i = 0; i < size; ++i) {
 		ifs >> buffer;
 		wallData[i] = buffer == '#';
+
+		palletData[i].isTaken = buffer == '.';
+		palletData[i].object = nullptr;
+
+		if (buffer == 'O') {
+			powerPosition[powerCount].Set(i % static_cast<int>(mapSize.w), i / static_cast<int>(mapSize.w));
+			++powerCount;
+		}
 	}
 
 	ifs.close();
@@ -190,14 +234,38 @@ Ghost* const PacmanScene::SpawnGhost(const std::string& name, const vec2i& tileP
 }
 
 Entity* const PacmanScene::SpawnPacman() {
-	auto pacman = entities->Create<AISprite>();
+	auto pacman = entities->Create<Pacman>();
 	pacman->SetTag("PACMAN");
 	pacman->GetComponent<Transform>()->translation.Set(0.f, -9.f, 0.f);
 	pacman->GetComponent<Render>()->SetTexture(Load::TGA("Files/Textures/pacman_tilemap.tga"));
 	pacman->GetComponent<Render>()->SetTilemapSize(16, 16);
 	pacman->GetComponent<Render>()->SetCellRect(10, 14, 1, 1);
-	//pacman->GetComponent<StateContainer>()->queuedState = "GHOST_ENTERING";
-	pacman->SetSpeed(0.f);
+	pacman->SetTarget(vec3f(0.f, -9.f, 0.f));
+	pacman->SetDestination(vec3f(16.f, -5.f, 0.f));
+	pacman->SetSpeed(5.f);
 
 	return pacman;
+}
+
+Entity* const PacmanScene::SpawnPallet(const float& x, const float& y) {
+	auto pallet = entities->Create<Sprite>();
+	pallet->SetTag("PALLET");
+	pallet->GetComponent<Transform>()->translation.Set(x, y, 0.f);
+	pallet->GetComponent<Render>()->SetTexture(Load::TGA("Files/Textures/pacman_tilemap.tga"));
+	pallet->GetComponent<Render>()->SetTilemapSize(32, 32);
+	pallet->GetComponent<Render>()->SetCellRect(27, 13, 1, 1);
+
+	return pallet;
+}
+
+
+Entity* const PacmanScene::SpawnPower(const float& x, const float& y) {
+	auto pallet = entities->Create<PowerPallet>();
+	pallet->SetTag("POWER");
+	pallet->GetComponent<Transform>()->translation.Set(x, y, 0.f);
+	pallet->GetComponent<Render>()->SetTexture(Load::TGA("Files/Textures/pacman_tilemap.tga"));
+	pallet->GetComponent<Render>()->SetTilemapSize(32, 32);
+	pallet->GetComponent<Render>()->SetCellRect(27, 15, 1, 1);
+
+	return pallet;
 }

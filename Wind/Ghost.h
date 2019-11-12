@@ -37,8 +37,6 @@ private:
 	void StateHandler(Events::Event* event);
 
 	void SetEnterTarget();
-	void SetNewTarget();
-
 	void Move(const float& dt) override;
 
 };

@@ -6,11 +6,11 @@
 
 namespace Events {
 	
-	struct SpotAvailability : Event {
+	struct MapData : Event {
 		bool* const ref;
 		const vec2i position;
 
-		SpotAvailability(bool* const ref, const vec2i& position)
+		MapData(bool* const ref, const vec2i& position)
 			: ref(ref)
 			, position(position) {}
 	};

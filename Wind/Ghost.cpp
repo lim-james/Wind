@@ -3,7 +3,6 @@
 #include "Transform.h"
 #include "StateContainer.h"
 #include "Line.h"
-#include "MapEvents.h"
 
 #include <Events/EventsManager.h>
 
@@ -74,65 +73,6 @@ void Ghost::SetEnterTarget() {
 		else
 			target.y += dir.y / fDir.y;
 	}
-}
-
-void Ghost::SetNewTarget() {
-	const auto& position = GetComponent<Transform>()->translation;
-	
-	vec3f newTarget = position + direction;
-
-	bool avail = false;
-	vec2i check(static_cast<int>(newTarget.x), static_cast<int>(newTarget.y));
-	Events::SpotAvailability* event = new Events::SpotAvailability(&avail, check);
-	Events::EventsManager::GetInstance()->Trigger("SPOT_AVAIL",  event);
-
-	float closest = -1.f;
-
-	if (avail) {
-		closest = Math::LengthSquared(destination - newTarget);
-		target = newTarget;
-	}	
-	
-	// check on other axis
-
-	vec3f other(direction.y, direction.x, 0.f);
-
-	newTarget = position + other;
-
-	avail = false;
-	check.Set(static_cast<int>(newTarget.x), static_cast<int>(newTarget.y));
-	event = new Events::SpotAvailability(&avail, check);
-	Events::EventsManager::GetInstance()->Trigger("SPOT_AVAIL",  event);
-
-	if (avail) {
-		const float distance = Math::LengthSquared(destination - newTarget);
-		if (closest < 0 || distance <= closest) {
-			closest = distance;
-			direction = other;
-			target = newTarget;
-		}
-	}
-
-	newTarget = position - other;
-	if (closest < 0) {
-		direction = -other;
-		target = newTarget;
-		return;
-	}	
-
-	avail = false;
-	check.Set(static_cast<int>(newTarget.x), static_cast<int>(newTarget.y));
-	event = new Events::SpotAvailability(&avail, check);
-	Events::EventsManager::GetInstance()->Trigger("SPOT_AVAIL",  event);
-
-	if (avail) {
-		const float distance = Math::LengthSquared(destination - newTarget);
-		if (distance <= closest) {
-			direction = -other;
-			target = newTarget;
-		}
-	}
-
 }
 
 void Ghost::Move(const float& dt) {

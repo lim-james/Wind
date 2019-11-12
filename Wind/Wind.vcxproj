@@ -135,19 +135,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="AIScene.cpp" />
     <ClCompile Include="AISprite.cpp" />
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="ColliderSystem.cpp" />
-    <ClCompile Include="FishStates.cpp" />
     <ClCompile Include="Framebuffer.cpp" />
     <ClCompile Include="Ghost.cpp" />
     <ClCompile Include="GhostChaseStates.cpp" />
     <ClCompile Include="GhostStates.cpp" />
     <ClCompile Include="Line.cpp" />
+    <ClCompile Include="Pacman.cpp" />
     <ClCompile Include="PacmanScene.cpp" />
-    <ClCompile Include="SharkSprite.cpp" />
-    <ClCompile Include="SharkStates.cpp" />
+    <ClCompile Include="PowerPallet.cpp" />
     <ClCompile Include="StateContainer.cpp" />
     <ClCompile Include="StateMachine.cpp" />
     <ClCompile Include="TestScene.cpp" />
@@ -183,20 +181,18 @@
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AIScene.h" />
     <ClInclude Include="AISprite.h" />
     <ClInclude Include="Collider.h" />
     <ClInclude Include="ColliderSystem.h" />
-    <ClInclude Include="FishStates.h" />
     <ClInclude Include="Framebuffer.h" />
     <ClInclude Include="Ghost.h" />
     <ClInclude Include="GhostChaseStates.h" />
     <ClInclude Include="GhostStates.h" />
     <ClInclude Include="Line.h" />
     <ClInclude Include="MapEvents.h" />
+    <ClInclude Include="Pacman.h" />
     <ClInclude Include="PacmanScene.h" />
-    <ClInclude Include="SharkSprite.h" />
-    <ClInclude Include="SharkStates.h" />
+    <ClInclude Include="PowerPallet.h" />
     <ClInclude Include="State.h" />
     <ClInclude Include="StateContainer.h" />
     <ClInclude Include="StateMachine.h" />
@@ -235,7 +231,7 @@
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Files\Data\wall_data.txt" />
+    <Text Include="Files\Data\map_data.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

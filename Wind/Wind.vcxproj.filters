@@ -108,12 +108,6 @@
     <ClCompile Include="TestScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="AIScene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SharkSprite.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="AISprite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -124,12 +118,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Line.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FishStates.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SharkStates.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="StateContainer.cpp">
@@ -151,6 +139,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Framebuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Pacman.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PowerPallet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -251,12 +245,6 @@
     <ClInclude Include="EntityEvents.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AIScene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SharkSprite.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="AISprite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -273,12 +261,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TestScene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FishStates.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SharkStates.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="StateContainer.h">
@@ -305,8 +287,14 @@
     <ClInclude Include="Framebuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Pacman.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PowerPallet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Files\Data\wall_data.txt" />
+    <Text Include="Files\Data\map_data.txt" />
   </ItemGroup>
 </Project>

@@ -16,8 +16,6 @@ protected:
 
 public:
 
-	float energy;
-
 	AISprite();
 
 	virtual void Build();
@@ -38,12 +36,10 @@ public:
 
 protected:
 
+	void SetNewTarget();
+
 	virtual void Move(const float& dt);
 	void Update(const float& dt);
-
-	void OnCollisionEnter(Entity * const target);
-
-	void EventHandler(Events::Event* event);
 
 };
 
