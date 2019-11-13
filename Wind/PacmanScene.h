@@ -45,7 +45,7 @@ private:
 
 	void ReadMapData(const char* filepath);
 
-	Ghost* const SpawnGhost(const std::string& name, const vec2i& tilePosition, const vec2f& dock, const vec2f& corner, const vec2f& start);
+	Ghost* const SpawnGhost(const std::string& name, const int& tileColumn, const vec2f& dock, const vec2f& corner, const vec2f& start);
 	Entity* const SpawnPacman();
 	Entity* const SpawnPallet(const float& x, const float& y);
 	Entity* const SpawnPower(const float& x, const float& y);

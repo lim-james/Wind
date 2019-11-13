@@ -34,6 +34,8 @@ public:
 
 private:
 
+	void SetDirection(const vec3f& _direction) override;
+
 	void StateHandler(Events::Event* event);
 
 	void SetEnterTarget();

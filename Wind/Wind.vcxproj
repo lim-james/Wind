@@ -136,12 +136,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AISprite.cpp" />
+    <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="AnimationData.cpp" />
+    <ClCompile Include="AnimationSystem.cpp" />
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="ColliderSystem.cpp" />
     <ClCompile Include="Framebuffer.cpp" />
     <ClCompile Include="Ghost.cpp" />
     <ClCompile Include="GhostChaseStates.cpp" />
     <ClCompile Include="GhostStates.cpp" />
+    <ClCompile Include="Keyframe.cpp" />
     <ClCompile Include="Line.cpp" />
     <ClCompile Include="Pacman.cpp" />
     <ClCompile Include="PacmanScene.cpp" />
@@ -182,12 +186,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AISprite.h" />
+    <ClInclude Include="Animation.h" />
+    <ClInclude Include="AnimationData.h" />
+    <ClInclude Include="AnimationSystem.h" />
     <ClInclude Include="Collider.h" />
     <ClInclude Include="ColliderSystem.h" />
     <ClInclude Include="Framebuffer.h" />
     <ClInclude Include="Ghost.h" />
     <ClInclude Include="GhostChaseStates.h" />
     <ClInclude Include="GhostStates.h" />
+    <ClInclude Include="Keyframe.h" />
     <ClInclude Include="Line.h" />
     <ClInclude Include="MapEvents.h" />
     <ClInclude Include="Pacman.h" />

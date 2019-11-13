@@ -1,6 +1,7 @@
 #include "AISprite.h"
 
 #include "Transform.h"
+#include "Animation.h"
 #include "Render.h"
 #include "Collider.h"
 #include "Script.h"
@@ -19,6 +20,7 @@ AISprite::AISprite() {
 
 void AISprite::Build() {
 	AddComponent<Transform>();
+	AddComponent<Animation>();
 	AddComponent<Render>();
 	AddComponent<Collider>();
 	AddComponent<Script>();
@@ -65,6 +67,10 @@ void AISprite::SetSpeed(const float& value) {
 	speed = value;
 }
 
+void AISprite::SetDirection(const vec3f& _direction) {
+	direction = _direction;
+}
+
 void AISprite::SetNewTarget() {
 	const auto& position = GetComponent<Transform>()->translation;
 	
@@ -97,14 +103,14 @@ void AISprite::SetNewTarget() {
 		const float distance = Math::LengthSquared(destination - newTarget);
 		if (closest < 0 || distance <= closest) {
 			closest = distance;
-			direction = other;
+			SetDirection(other);
 			target = newTarget;
 		}
 	}
 
 	newTarget = position - other;
 	if (closest < 0) {
-		direction = -other;
+		SetDirection(-other);
 		target = newTarget;
 		return;
 	}	
@@ -117,7 +123,7 @@ void AISprite::SetNewTarget() {
 	if (avail) {
 		const float distance = Math::LengthSquared(destination - newTarget);
 		if (distance <= closest) {
-			direction = -other;
+			SetDirection(-other);
 			target = newTarget;
 		}
 	}

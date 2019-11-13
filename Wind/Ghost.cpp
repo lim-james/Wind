@@ -1,6 +1,7 @@
 #include "Ghost.h"
 
 #include "Transform.h"
+#include "Animation.h"
 #include "StateContainer.h"
 #include "Line.h"
 
@@ -52,6 +53,30 @@ void Ghost::SetPartner(Ghost* const ghost) {
 	partner = ghost;
 }
 
+void Ghost::SetDirection(const vec3f& _direction) {
+	AISprite::SetDirection(_direction);
+
+	if (GetComponent<StateContainer>()->currentState == "FRIGHTENED") return;
+
+	auto animation = GetComponent<Animation>();
+
+	if (direction.x) {
+		if (direction.x > 0) {
+			animation->queued = "RIGHT";
+		} else {
+			animation->queued = "LEFT";
+		}
+	} else {
+		if (direction.y > 0) {
+			animation->queued = "UP";
+		} else {
+			animation->queued = "DOWN";
+		}
+	}
+}
+
+
+
 void Ghost::StateHandler(Events::Event* event) {
 	auto mode = static_cast<Events::AnyType<std::string>*>(event)->data;
 
@@ -59,6 +84,8 @@ void Ghost::StateHandler(Events::Event* event) {
 		GetComponent<StateContainer>()->queuedState = chaseState;
 	else if (mode == "SCATTER")
 		GetComponent<StateContainer>()->queuedState = "GHOST_SCATTER";
+	else if (mode == "FRIGHTENED")
+		GetComponent<StateContainer>()->queuedState = "GHOST_FRIGHTENED";
 }
 
 void Ghost::SetEnterTarget() {

@@ -13,6 +13,7 @@
 #include "PowerPallet.h"
 // components
 #include "Transform.h"
+#include "Animation.h"
 #include "Render.h"
 #include "Text.h"
 #include "Camera.h"
@@ -21,6 +22,7 @@
 #include "Collider.h"
 #include "Script.h"
 // systems
+#include "AnimationSystem.h"
 #include "RenderSystem.h"
 #include "ParticleSystem.h"
 #include "ColliderSystem.h"
@@ -44,6 +46,7 @@
 
 PacmanScene::PacmanScene() {
 	components->Subscribe<Transform>(10, 1);
+	components->Subscribe<Animation>(10, 1);
 	components->Subscribe<Render>(10, 1);
 	components->Subscribe<Text>(10, 1);
 	components->Subscribe<Camera>(1, 1);
@@ -65,6 +68,7 @@ PacmanScene::PacmanScene() {
 	entities->Subscribe<Pacman>(1, 1);
 	entities->Subscribe<PowerPallet>(4, 1);
 
+	systems->Subscribe<AnimationSystem>();
 	systems->Subscribe<RenderSystem>();
 	systems->Subscribe<ParticleSystem>();
 	systems->Subscribe<ColliderSystem>();
@@ -124,10 +128,10 @@ void PacmanScene::Awake() {
 	fps->GetComponent<Text>()->paragraphAlignment = PARAGRAPH_RIGHT;
 	fps->GetComponent<Text>()->verticalAlignment = ALIGN_BOTTOM;
 
-	auto blinky = SpawnGhost("BLINKY", vec2i(15, 15), vec2f(12, 18), vec2f(13, 13), vec2f(1.f, 0.f));
-	auto pinky = SpawnGhost("PINKY", vec2i(13, 15), vec2f(-11, 18), vec2f(-12, 13), vec2f(-1.f, 0.f));
-	auto clyde = SpawnGhost("CLYDE", vec2i(12, 15), vec2f(-13, -17), vec2f(-12, -15), vec2f(0.f, 0.f));
-	auto inky = SpawnGhost("INKY", vec2i(14, 15), vec2f(14, -17), vec2f(13, -15), vec2f(2.f, 0.f));
+	auto blinky = SpawnGhost("BLINKY", 15, vec2f(12, 18), vec2f(13, 13), vec2f(1.f, 0.f));
+	auto pinky = SpawnGhost("PINKY", 13, vec2f(-11, 18), vec2f(-12, 13), vec2f(-1.f, 0.f));
+	auto clyde = SpawnGhost("CLYDE", 12, vec2f(-13, -17), vec2f(-12, -15), vec2f(0.f, 0.f));
+	auto inky = SpawnGhost("INKY", 14, vec2f(14, -17), vec2f(13, -15), vec2f(2.f, 0.f));
 	inky->SetPartner(blinky);
 
 	SpawnPacman();
@@ -217,13 +221,58 @@ void PacmanScene::ReadMapData(const char* filepath) {
 	ifs.close();
 }
 
-Ghost* const PacmanScene::SpawnGhost(const std::string& name, const vec2i& tilePosition, const vec2f& dock, const vec2f& corner, const vec2f& start) {
+Ghost* const PacmanScene::SpawnGhost(const std::string& name, const int& tileColumn, const vec2f& dock, const vec2f& corner, const vec2f& start) {
 	auto ghost = entities->Create<Ghost>();
 	ghost->SetTag(name);
 	ghost->GetComponent<Transform>()->translation.Set(start, 0.f);
+
+	Keyframe kf;
+	kf.SetTilemapSize(16, 16);
+	kf.duration = 0.1f;
+
+	AnimationData anim;
+	kf.SetCellRect(3, 13, 1, 1);
+	anim.frames.push_back(kf);
+	kf.SetCellRect(3, 12, 1, 1);
+	anim.frames.push_back(kf);
+
+	ghost->GetComponent<Animation>()->animations["FRIGHTENED"] = anim;
+
+	anim.frames.clear();
+	kf.SetCellRect(tileColumn, 15, 1, 1);
+	anim.frames.push_back(kf);
+	kf.SetCellRect(tileColumn, 14, 1, 1);
+	anim.frames.push_back(kf);
+
+	ghost->GetComponent<Animation>()->animations["RIGHT"] = anim;
+
+	anim.frames.clear();
+	kf.SetCellRect(tileColumn, 13, 1, 1);
+	anim.frames.push_back(kf);
+	kf.SetCellRect(tileColumn, 12, 1, 1);
+	anim.frames.push_back(kf);
+
+	ghost->GetComponent<Animation>()->animations["DOWN"] = anim;
+
+	anim.frames.clear();
+	kf.SetCellRect(tileColumn, 11, 1, 1);
+	anim.frames.push_back(kf);
+	kf.SetCellRect(tileColumn, 10, 1, 1);
+	anim.frames.push_back(kf);
+
+	ghost->GetComponent<Animation>()->animations["LEFT"] = anim;
+
+	anim.frames.clear();
+	kf.SetCellRect(tileColumn, 9, 1, 1);
+	anim.frames.push_back(kf);
+	kf.SetCellRect(tileColumn, 8, 1, 1);
+	anim.frames.push_back(kf);
+
+	ghost->GetComponent<Animation>()->animations["UP"] = anim;
+
 	ghost->GetComponent<Render>()->SetTexture(Load::TGA("Files/Textures/pacman_tilemap.tga"));
 	ghost->GetComponent<Render>()->SetTilemapSize(16, 16);
-	ghost->GetComponent<Render>()->SetCellRect(tilePosition.x, tilePosition.y, 1, 1);
+	ghost->GetComponent<Render>()->SetCellRect(tileColumn, 15, 1, 1);
 	ghost->GetComponent<StateContainer>()->queuedState = "GHOST_ENTERING";
 	ghost->SetDock(dock);
 	ghost->SetCorner(corner);
@@ -237,6 +286,60 @@ Entity* const PacmanScene::SpawnPacman() {
 	auto pacman = entities->Create<Pacman>();
 	pacman->SetTag("PACMAN");
 	pacman->GetComponent<Transform>()->translation.Set(0.f, -9.f, 0.f);
+
+	Keyframe kf;
+	kf.SetTilemapSize(16, 16);
+	kf.duration = 0.15f;
+
+	AnimationData anim;
+	kf.SetCellRect(10, 15, 1, 1);
+	anim.frames.push_back(kf);
+	kf.SetCellRect(10, 14, 1, 1);
+	anim.frames.push_back(kf);
+	kf.SetCellRect(10, 13, 1, 1);
+	anim.frames.push_back(kf);
+	kf.SetCellRect(10, 14, 1, 1);
+	anim.frames.push_back(kf);
+
+	pacman->GetComponent<Animation>()->animations["RIGHT"] = anim;
+	pacman->GetComponent<Animation>()->currentAnimation = "RIGHT";
+
+	anim.frames.clear();
+	kf.SetCellRect(9, 15, 1, 1);
+	anim.frames.push_back(kf);
+	kf.SetCellRect(9, 13, 1, 1);
+	anim.frames.push_back(kf);
+	kf.SetCellRect(9, 14, 1, 1);
+	anim.frames.push_back(kf);
+	kf.SetCellRect(9, 13, 1, 1);
+	anim.frames.push_back(kf);
+
+	pacman->GetComponent<Animation>()->animations["LEFT"] = anim;
+
+	anim.frames.clear();
+	kf.SetCellRect(9, 12, 1, 1);
+	anim.frames.push_back(kf);
+	kf.SetCellRect(9, 10, 1, 1);
+	anim.frames.push_back(kf);
+	kf.SetCellRect(9, 11, 1, 1);
+	anim.frames.push_back(kf);
+	kf.SetCellRect(9, 10, 1, 1);
+	anim.frames.push_back(kf);
+
+	pacman->GetComponent<Animation>()->animations["UP"] = anim;
+
+	anim.frames.clear();
+	kf.SetCellRect(10, 12, 1, 1);
+	anim.frames.push_back(kf);
+	kf.SetCellRect(10, 11, 1, 1);
+	anim.frames.push_back(kf);
+	kf.SetCellRect(10, 10, 1, 1);
+	anim.frames.push_back(kf);
+	kf.SetCellRect(10, 11, 1, 1);
+	anim.frames.push_back(kf);
+
+	pacman->GetComponent<Animation>()->animations["DOWN"] = anim;
+
 	pacman->GetComponent<Render>()->SetTexture(Load::TGA("Files/Textures/pacman_tilemap.tga"));
 	pacman->GetComponent<Render>()->SetTilemapSize(16, 16);
 	pacman->GetComponent<Render>()->SetCellRect(10, 14, 1, 1);

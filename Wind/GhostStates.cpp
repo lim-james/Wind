@@ -1,8 +1,12 @@
 #include "GhostStates.h"
 
+// game objects
 #include "Ghost.h"
+// components
+#include "Animation.h"
 #include "Transform.h"
 #include "StateContainer.h"
+// others
 #include "Line.h"
 #include "MapEvents.h"
 
@@ -99,11 +103,10 @@ void States::Eaten::Exit(Entity* const target) {
 //Frightene
 
 void States::Frightened::Enter(Entity* const target) {
-
+	target->GetComponent<Animation>()->queued = "FRIGHTENED";
 }
 
 void States::Frightened::Update(Entity* const target, const float& dt) {
-
 }
 
 void States::Frightened::FixedUpdate(Entity* const target, const float& dt) {

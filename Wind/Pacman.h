@@ -12,6 +12,8 @@ public:
 
 private:
 
+	void SetDirection(const vec3f& _direction) override;
+
 	void FixedUpdate(const float& dt);
 
 	void OnCollisionEnter(Entity * const target);

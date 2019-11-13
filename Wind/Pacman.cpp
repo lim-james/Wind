@@ -1,6 +1,7 @@
 #include "Pacman.h"
 
 #include "Transform.h"
+#include "Animation.h"
 #include "Collider.h"
 #include "Script.h"
 #include "MapEvents.h"
@@ -21,6 +22,26 @@ void Pacman::Initialize() {
 	GetComponent<Script>()->fixedUpdate = std::bind(&Pacman::FixedUpdate, this, std::placeholders::_1);
 }
 
+void Pacman::SetDirection(const vec3f& _direction) {
+	AISprite::SetDirection(_direction);
+
+	auto animation = GetComponent<Animation>();
+
+	if (direction.x) {
+		if (direction.x > 0) {
+			animation->queued = "RIGHT";
+		} else {
+			animation->queued = "LEFT";
+		}
+	} else {
+		if (direction.y > 0) {
+			animation->queued = "UP";
+		} else {
+			animation->queued = "DOWN";
+		}
+	}
+}
+
 void Pacman::FixedUpdate(const float& dt) {
 	const auto& position = GetComponent<Transform>()->GetWorldTranslation();
 	bool pickup = false;
@@ -36,6 +57,7 @@ void Pacman::FixedUpdate(const float& dt) {
 
 void Pacman::OnCollisionEnter(Entity * const target) {
 	if (target->GetTag() == "POWER") {
+		Events::EventsManager::GetInstance()->Trigger("GHOST_MODE", new Events::AnyType<std::string>("FRIGHTENED"));
 		target->Destroy();
 	}
 }
