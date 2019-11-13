@@ -37,8 +37,7 @@ public:
 protected:
 
 	virtual void SetDirection(const vec3f& _direction);
-
-	void SetNewTarget();
+	virtual void SetNewTarget();
 
 	virtual void Move(const float& dt);
 	void Update(const float& dt);

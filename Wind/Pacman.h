@@ -12,11 +12,17 @@ public:
 
 private:
 
+	// parent class methods
+
 	void SetDirection(const vec3f& _direction) override;
+	void SetNewTarget() override;
 
-	void FixedUpdate(const float& dt);
+	// component methods
 
+	// collider 
 	void OnCollisionEnter(Entity * const target);
+	// script
+	void FixedUpdate(const float& dt);
 
 };
 

@@ -31,12 +31,15 @@
 // States
 #include "GhostStates.h"
 #include "GhostChaseStates.h"
+#include "PacmanStates.h"
 // Utils
 #include "LoadTGA.h"
 #include "LoadFNT.h"
 
 #include "InputEvents.h"
 #include "MapEvents.h"
+
+#include "GameModes.h"
 
 #include <Math/Random.hpp>
 #include <Events/EventsManager.h>
@@ -86,13 +89,16 @@ PacmanScene::PacmanScene() {
 	systems->Get<StateMachine>()->AttachState<States::ClydeInverseChase>("CLYDE_INVERSE_CHASE_STATE");
 	systems->Get<StateMachine>()->AttachState<States::InkyChase>("INKY_CHASE_STATE");
 
+	systems->Get<StateMachine>()->AttachState<States::Search>("PACMAN_SEARCH");
+	systems->Get<StateMachine>()->AttachState<States::Hunt>("PACMAN_HUNT");
+
 	ReadMapData("Files/Data/map_data.txt");
 	mapOffset.Set(
 		static_cast<int>(mapSize.x * 0.5f) - 1,
 		static_cast<int>(mapSize.y * 0.5f) + 1
 	);
 
-	chasing = false;
+	gameMode = CHASE;
 	bounceTime = 0.f;
 }
 
@@ -107,6 +113,7 @@ void PacmanScene::Awake() {
 	Events::EventsManager::GetInstance()->Subscribe("SPOT_AVAIL", &PacmanScene::MapWallHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("TAKE_PALLET", &PacmanScene::MapPalletHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("KEY_INPUT", &PacmanScene::KeyHandler, this);
+	Events::EventsManager::GetInstance()->Subscribe("GAME_MODE", &PacmanScene::GameModeHandler, this);
 
 	auto cam = entities->Create<CameraObject>();
 	cam->GetComponent<Camera>()->clearColor.Set(0.f);
@@ -153,17 +160,21 @@ void PacmanScene::FixedUpdate(const float& dt) {
 	Scene::FixedUpdate(dt);
 
 	bounceTime += dt;
-	if (chasing) {
-		if (bounceTime > 40.f) {
-			Events::EventsManager::GetInstance()->Trigger("GHOST_MODE", new Events::AnyType<std::string>("SCATTER"));
-			bounceTime = 0.f;
-			chasing = false;
+	if (gameMode == CHASE) {
+		if (bounceTime > 20.f) {
+			Events::EventsManager::GetInstance()->Trigger("GAME_MODE", new Events::ModeEvent(SCATTER));
 		}
-	} else {
-		if (bounceTime > 14.f) {
-			Events::EventsManager::GetInstance()->Trigger("GHOST_MODE", new Events::AnyType<std::string>("CHASE"));
-			bounceTime = 0.f;
-			chasing = true;
+	} else if (gameMode == SCATTER) {
+		if (bounceTime > 10.f) {
+			Events::EventsManager::GetInstance()->Trigger("GAME_MODE", new Events::ModeEvent(CHASE));
+		}
+	} else if (gameMode == FRIGHTENED) {
+		if (bounceTime > 7.f) {
+			Events::EventsManager::GetInstance()->Trigger("GAME_MODE", new Events::ModeEvent(END_FRIGHTENED));
+		}
+	} else if (gameMode == END_FRIGHTENED) {
+		if (bounceTime > 3.f) {
+			Events::EventsManager::GetInstance()->Trigger("GAME_MODE", new Events::ModeEvent(SCATTER));
 		}
 	}
 }
@@ -191,6 +202,11 @@ void PacmanScene::MapPalletHandler(Events::Event* event) {
 		palletData[i].isTaken = false;
 		palletData[i].object->Destroy();
 	}
+}
+
+void PacmanScene::GameModeHandler(Events::Event* event) {
+	bounceTime = 0;
+	gameMode = static_cast<Events::ModeEvent*>(event)->data;
 }
 
 void PacmanScene::ReadMapData(const char* filepath) {
@@ -223,7 +239,7 @@ void PacmanScene::ReadMapData(const char* filepath) {
 
 Ghost* const PacmanScene::SpawnGhost(const std::string& name, const int& tileColumn, const vec2f& dock, const vec2f& corner, const vec2f& start) {
 	auto ghost = entities->Create<Ghost>();
-	ghost->SetTag(name);
+	ghost->SetTag("GHOST");
 	ghost->GetComponent<Transform>()->translation.Set(start, 0.f);
 
 	Keyframe kf;
@@ -237,6 +253,19 @@ Ghost* const PacmanScene::SpawnGhost(const std::string& name, const int& tileCol
 	anim.frames.push_back(kf);
 
 	ghost->GetComponent<Animation>()->animations["FRIGHTENED"] = anim;
+
+	anim.frames.clear();
+	kf.SetCellRect(3, 13, 1, 1);
+	anim.frames.push_back(kf);
+	kf.SetCellRect(3, 10, 1, 1);
+	anim.frames.push_back(kf);
+	kf.SetCellRect(3, 12, 1, 1);
+	anim.frames.push_back(kf);
+	kf.SetCellRect(3, 11, 1, 1);
+	anim.frames.push_back(kf);
+
+	ghost->GetComponent<Animation>()->animations["END_FRIGHTENED"] = anim;
+
 
 	anim.frames.clear();
 	kf.SetCellRect(tileColumn, 15, 1, 1);
@@ -269,6 +298,26 @@ Ghost* const PacmanScene::SpawnGhost(const std::string& name, const int& tileCol
 	anim.frames.push_back(kf);
 
 	ghost->GetComponent<Animation>()->animations["UP"] = anim;
+
+	anim.frames.clear();
+	kf.SetCellRect(11, 15, 1, 1);
+	anim.frames.push_back(kf);
+	ghost->GetComponent<Animation>()->animations["EATEN_RIGHT"] = anim;
+
+	anim.frames.clear();
+	kf.SetCellRect(11, 14, 1, 1);
+	anim.frames.push_back(kf);
+	ghost->GetComponent<Animation>()->animations["EATEN_DOWN"] = anim;
+
+	anim.frames.clear();
+	kf.SetCellRect(11, 13, 1, 1);
+	anim.frames.push_back(kf);
+	ghost->GetComponent<Animation>()->animations["EATEN_LEFT"] = anim;
+
+	anim.frames.clear();
+	kf.SetCellRect(11, 12, 1, 1);
+	anim.frames.push_back(kf);
+	ghost->GetComponent<Animation>()->animations["EATEN_UP"] = anim;
 
 	ghost->GetComponent<Render>()->SetTexture(Load::TGA("Files/Textures/pacman_tilemap.tga"));
 	ghost->GetComponent<Render>()->SetTilemapSize(16, 16);
@@ -343,6 +392,7 @@ Entity* const PacmanScene::SpawnPacman() {
 	pacman->GetComponent<Render>()->SetTexture(Load::TGA("Files/Textures/pacman_tilemap.tga"));
 	pacman->GetComponent<Render>()->SetTilemapSize(16, 16);
 	pacman->GetComponent<Render>()->SetCellRect(10, 14, 1, 1);
+	pacman->GetComponent<StateContainer>()->queuedState = "PACMAN_SEARCH";
 	pacman->SetTarget(vec3f(0.f, -9.f, 0.f));
 	pacman->SetDestination(vec3f(16.f, -5.f, 0.f));
 	pacman->SetSpeed(5.f);

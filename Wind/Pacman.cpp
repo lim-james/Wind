@@ -4,7 +4,9 @@
 #include "Animation.h"
 #include "Collider.h"
 #include "Script.h"
+#include "StateContainer.h"
 #include "MapEvents.h"
+#include "GameModes.h"
 
 #include <Events/EventsManager.h>
 
@@ -42,6 +44,94 @@ void Pacman::SetDirection(const vec3f& _direction) {
 	}
 }
 
+void Pacman::SetNewTarget() {
+	auto em = Events::EventsManager::GetInstance();
+
+	const auto& position = GetComponent<Transform>()->translation;
+	
+	vec3f newTarget = position + direction;
+
+	bool avail = false;
+	vec2i check(static_cast<int>(newTarget.x), static_cast<int>(newTarget.y));
+	Events::MapData* event = new Events::MapData(&avail, check);
+	em->Trigger("SPOT_AVAIL",  event);
+
+	float closest = -1.f;
+
+	if (avail) {
+		closest = Math::LengthSquared(destination - newTarget);
+		target = newTarget;
+	}	
+
+	// checkbehind
+	if (GetComponent<StateContainer>()->currentState == "PACMAN_HUNT") {
+		newTarget = position - direction;
+
+		avail = false;
+		check.Set(static_cast<int>(newTarget.x), static_cast<int>(newTarget.y));
+		event = new Events::MapData(&avail, check);
+		em->Trigger("SPOT_AVAIL", event);
+
+		if (avail) {
+			const float distance = Math::LengthSquared(destination - newTarget);
+			if (closest < 0 || distance <= closest) {
+				closest = distance;
+				SetDirection(-direction);
+				target = newTarget;
+			}
+		}
+	}
+
+	// check on other axis
+
+	vec3f other(direction.y, direction.x, 0.f);
+
+	newTarget = position + other;
+
+	avail = false;
+	check.Set(static_cast<int>(newTarget.x), static_cast<int>(newTarget.y));
+	event = new Events::MapData(&avail, check);
+	em->Trigger("SPOT_AVAIL",  event);
+
+	if (avail) {
+		const float distance = Math::LengthSquared(destination - newTarget);
+		if (closest < 0 || distance <= closest) {
+			closest = distance;
+			SetDirection(other);
+			target = newTarget;
+		}
+	}
+
+	newTarget = position - other;
+	if (closest < 0) {
+		SetDirection(-other);
+		target = newTarget;
+		return;
+	}	
+
+	avail = false;
+	check.Set(static_cast<int>(newTarget.x), static_cast<int>(newTarget.y));
+	event = new Events::MapData(&avail, check);
+	em->Trigger("SPOT_AVAIL",  event);
+
+	if (avail) {
+		const float distance = Math::LengthSquared(destination - newTarget);
+		if (distance <= closest) {
+			SetDirection(-other);
+			target = newTarget;
+		}
+	}
+
+}
+
+void Pacman::OnCollisionEnter(Entity * const target) {
+	if (target->GetTag() == "POWER") {
+		Events::EventsManager::GetInstance()->Trigger("GAME_MODE", new Events::ModeEvent(FRIGHTENED));
+		target->Destroy();
+		GetComponent<StateContainer>()->queuedState = "PACMAN_HUNT";
+	}
+}
+
 void Pacman::FixedUpdate(const float& dt) {
 	const auto& position = GetComponent<Transform>()->GetWorldTranslation();
 	bool pickup = false;
@@ -55,9 +145,3 @@ void Pacman::FixedUpdate(const float& dt) {
 	);
 }
 
-void Pacman::OnCollisionEnter(Entity * const target) {
-	if (target->GetTag() == "POWER") {
-		Events::EventsManager::GetInstance()->Trigger("GHOST_MODE", new Events::AnyType<std::string>("FRIGHTENED"));
-		target->Destroy();
-	}
-}

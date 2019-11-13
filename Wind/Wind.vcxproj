@@ -149,6 +149,7 @@
     <ClCompile Include="Line.cpp" />
     <ClCompile Include="Pacman.cpp" />
     <ClCompile Include="PacmanScene.cpp" />
+    <ClCompile Include="PacmanStates.cpp" />
     <ClCompile Include="PowerPallet.cpp" />
     <ClCompile Include="StateContainer.cpp" />
     <ClCompile Include="StateMachine.cpp" />
@@ -192,6 +193,7 @@
     <ClInclude Include="Collider.h" />
     <ClInclude Include="ColliderSystem.h" />
     <ClInclude Include="Framebuffer.h" />
+    <ClInclude Include="GameModes.h" />
     <ClInclude Include="Ghost.h" />
     <ClInclude Include="GhostChaseStates.h" />
     <ClInclude Include="GhostStates.h" />
@@ -200,6 +202,7 @@
     <ClInclude Include="MapEvents.h" />
     <ClInclude Include="Pacman.h" />
     <ClInclude Include="PacmanScene.h" />
+    <ClInclude Include="PacmanStates.h" />
     <ClInclude Include="PowerPallet.h" />
     <ClInclude Include="State.h" />
     <ClInclude Include="StateContainer.h" />

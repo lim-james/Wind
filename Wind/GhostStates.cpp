@@ -34,7 +34,8 @@ void States::Entering::Update(Entity* const target, const float& dt) {
 }
 
 void States::Entering::FixedUpdate(Entity* const target, const float& dt) {
-	if (target->GetComponent<Transform>()->translation == vec3f(0.f, 3.f, 0.f)) {
+	const vec3f diff = target->GetComponent<Transform>()->GetWorldTranslation() - vec3f(0.f, 3.f, 0.f);
+	if (Math::LengthSquared(diff) <= 1.f) {
 		target->GetComponent<StateContainer>()->queuedState = "GHOST_SCATTER";
 	}
 }
@@ -83,7 +84,8 @@ void States::Scatter::Exit(Entity* const target) {
 // Eaten
 
 void States::Eaten::Enter(Entity* const target) {
-
+	auto ghost = static_cast<Ghost*>(target);
+	ghost->SetDestination(vec3f(0.f, 3.f, 0.f));
 }
 
 void States::Eaten::Update(Entity* const target, const float& dt) {
@@ -91,16 +93,20 @@ void States::Eaten::Update(Entity* const target, const float& dt) {
 }
 
 void States::Eaten::FixedUpdate(Entity* const target, const float& dt) {
-
+	const vec3f diff = target->GetComponent<Transform>()->GetWorldTranslation() - vec3f(0.f, 3.f, 0.f);
+	if (Math::LengthSquared(diff) <= 1.f) {
+		target->GetComponent<StateContainer>()->queuedState = "GHOST_SCATTER";
+	}
 }
 
 void States::Eaten::Exit(Entity* const target) {
-
+	auto ghost = static_cast<Ghost* const>(target);
+	ghost->InvertDirection();
 }
 
 
 
-//Frightene
+//Frightened
 
 void States::Frightened::Enter(Entity* const target) {
 	target->GetComponent<Animation>()->queued = "FRIGHTENED";

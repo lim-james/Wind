@@ -38,6 +38,8 @@ private:
 
 	void StateHandler(Events::Event* event);
 
+	void OnCollisionEnter(Entity * const target);
+
 	void SetEnterTarget();
 	void Move(const float& dt) override;
 

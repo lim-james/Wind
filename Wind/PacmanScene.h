@@ -9,8 +9,8 @@
 #include <Events/Event.h>
 
 class PacmanScene : public Scene {
-	
-	bool chasing;
+
+	unsigned gameMode;
 	float bounceTime;
 
 	struct PalletData {
@@ -40,6 +40,7 @@ private:
 	void KeyHandler(Events::Event* event);
 	void MapWallHandler(Events::Event* event);
 	void MapPalletHandler(Events::Event* event);
+	void GameModeHandler(Events::Event* event);
 
 	// Helper methods
 

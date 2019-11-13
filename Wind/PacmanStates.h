@@ -1,22 +1,11 @@
-#ifndef GHOST_STATES_H
-#define GHOST_STATES_H
+#ifndef PACMAN_STATES_H
+#define PACMAN_STATES_H
 
 #include "State.h"
 
 namespace States {
-
-	class Entering : public State {
-
-	public:
-
-		void Enter(Entity* const target) override;
-		void Update(Entity* const target, const float& dt) override;
-		void FixedUpdate(Entity* const target, const float& dt) override;
-		void Exit(Entity* const target) override;
-
-	};
-
-	class Scatter : public State {
+	
+	class Search : public State {
 
 	public:
 
@@ -27,7 +16,7 @@ namespace States {
 
 	};
 
-	class Eaten : public State {
+	class Avoid : public State {
 
 	public:
 
@@ -37,8 +26,8 @@ namespace States {
 		void Exit(Entity* const target) override;
 
 	};
-
-	class Frightened : public State {
+	
+	class Hunt : public State {
 
 	public:
 
@@ -47,8 +36,12 @@ namespace States {
 		void FixedUpdate(Entity* const target, const float& dt) override;
 		void Exit(Entity* const target) override;
 
-	};
+	private:
+		
+		void SetNearestGhost(Entity * const target);
 
+	};
+	
 }
 
 #endif

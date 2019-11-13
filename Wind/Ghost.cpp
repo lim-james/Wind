@@ -2,8 +2,11 @@
 
 #include "Transform.h"
 #include "Animation.h"
+#include "Collider.h"
 #include "StateContainer.h"
+
 #include "Line.h"
+#include "GameModes.h"
 
 #include <Events/EventsManager.h>
 
@@ -14,11 +17,13 @@ Ghost::Ghost() {
 void Ghost::Initialize() {
 	AISprite::Initialize();
 
-	Events::EventsManager::GetInstance()->Subscribe("GHOST_MODE", &Ghost::StateHandler, this);
+	GetComponent<Collider>()->BindCollisionEnter(&Ghost::OnCollisionEnter, this);
+
+	Events::EventsManager::GetInstance()->Subscribe("GAME_MODE", &Ghost::StateHandler, this);
 }
 
 void Ghost::InvertDirection() {
-	direction = -direction;
+	SetDirection(-direction);
 }
 
 const vec3f& Ghost::GetDock() const {
@@ -56,36 +61,63 @@ void Ghost::SetPartner(Ghost* const ghost) {
 void Ghost::SetDirection(const vec3f& _direction) {
 	AISprite::SetDirection(_direction);
 
-	if (GetComponent<StateContainer>()->currentState == "FRIGHTENED") return;
+	const auto& state = GetComponent<StateContainer>()->currentState;
+	if (state == "GHOST_FRIGHTENED") return;
 
 	auto animation = GetComponent<Animation>();
 
-	if (direction.x) {
-		if (direction.x > 0) {
-			animation->queued = "RIGHT";
+	if (state == "GHOST_EATEN") {
+		if (direction.x) {
+			if (direction.x > 0) {
+				animation->queued = "EATEN_RIGHT";
+			} else {
+				animation->queued = "EATEN_LEFT";
+			}
 		} else {
-			animation->queued = "LEFT";
+			if (direction.y > 0) {
+				animation->queued = "EATEN_UP";
+			} else {
+				animation->queued = "EATEN_DOWN";
+			}
 		}
 	} else {
-		if (direction.y > 0) {
-			animation->queued = "UP";
+		if (direction.x) {
+			if (direction.x > 0) {
+				animation->queued = "RIGHT";
+			} else {
+				animation->queued = "LEFT";
+			}
 		} else {
-			animation->queued = "DOWN";
+			if (direction.y > 0) {
+				animation->queued = "UP";
+			} else {
+				animation->queued = "DOWN";
+			}
 		}
 	}
+
 }
 
-
-
 void Ghost::StateHandler(Events::Event* event) {
-	auto mode = static_cast<Events::AnyType<std::string>*>(event)->data;
+	auto mode = static_cast<Events::ModeEvent*>(event)->data;
 
-	if (mode == "CHASE")
+	if (mode == CHASE)
 		GetComponent<StateContainer>()->queuedState = chaseState;
-	else if (mode == "SCATTER")
+	else if (mode == SCATTER)
 		GetComponent<StateContainer>()->queuedState = "GHOST_SCATTER";
-	else if (mode == "FRIGHTENED")
+	else if (mode == FRIGHTENED)
 		GetComponent<StateContainer>()->queuedState = "GHOST_FRIGHTENED";
+	else if (mode == END_FRIGHTENED)
+		GetComponent<Animation>()->queued = "END_FRIGHTENED";
+}
+
+void Ghost::OnCollisionEnter(Entity * const target) {
+	if (target->GetTag() == "PACMAN") {
+		auto state = GetComponent<StateContainer>();
+		if (state->currentState == "GHOST_FRIGHTENED") {
+			state->queuedState = "GHOST_EATEN";
+		}
+	}
 }
 
 void Ghost::SetEnterTarget() {

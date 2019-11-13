@@ -15,4 +15,7 @@ void main() {
 		color = texture(tex, vs_out.texCoord) * vs_out.color;	
 	else
 		color = vs_out.color;	
+
+	if (length(color.rgb) < 0.1)
+		discard;
 }

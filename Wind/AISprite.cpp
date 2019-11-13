@@ -72,6 +72,8 @@ void AISprite::SetDirection(const vec3f& _direction) {
 }
 
 void AISprite::SetNewTarget() {
+	auto em = Events::EventsManager::GetInstance();
+
 	const auto& position = GetComponent<Transform>()->translation;
 	
 	vec3f newTarget = position + direction;
@@ -79,7 +81,7 @@ void AISprite::SetNewTarget() {
 	bool avail = false;
 	vec2i check(static_cast<int>(newTarget.x), static_cast<int>(newTarget.y));
 	Events::MapData* event = new Events::MapData(&avail, check);
-	Events::EventsManager::GetInstance()->Trigger("SPOT_AVAIL",  event);
+	em->Trigger("SPOT_AVAIL", event);
 
 	float closest = -1.f;
 
@@ -97,7 +99,7 @@ void AISprite::SetNewTarget() {
 	avail = false;
 	check.Set(static_cast<int>(newTarget.x), static_cast<int>(newTarget.y));
 	event = new Events::MapData(&avail, check);
-	Events::EventsManager::GetInstance()->Trigger("SPOT_AVAIL",  event);
+	em->Trigger("SPOT_AVAIL", event);
 
 	if (avail) {
 		const float distance = Math::LengthSquared(destination - newTarget);
@@ -118,7 +120,7 @@ void AISprite::SetNewTarget() {
 	avail = false;
 	check.Set(static_cast<int>(newTarget.x), static_cast<int>(newTarget.y));
 	event = new Events::MapData(&avail, check);
-	Events::EventsManager::GetInstance()->Trigger("SPOT_AVAIL",  event);
+	em->Trigger("SPOT_AVAIL", event);
 
 	if (avail) {
 		const float distance = Math::LengthSquared(destination - newTarget);
