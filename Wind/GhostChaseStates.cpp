@@ -213,7 +213,7 @@ void States::InkyChase::Update(Entity* const target, const float& dt) {
 		const vec3f& destination = ghost->GetDestination();
 
 		Line line;
-		line.tint.Set(1.f, 0.f, 1.f, 0.5f);
+		line.tint.Set(0.f, 1.f, 1.f, 0.5f);
 		line.Set(position, ghost->GetDestination());
 		Events::EventsManager::GetInstance()->Trigger("DRAW_LINE", new Events::AnyType<Line>(line));
 

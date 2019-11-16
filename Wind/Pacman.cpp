@@ -54,7 +54,7 @@ void Pacman::SetNewTarget() {
 	bool avail = false;
 	vec2i check(static_cast<int>(newTarget.x), static_cast<int>(newTarget.y));
 	Events::MapData* event = new Events::MapData(&avail, check);
-	em->Trigger("SPOT_AVAIL",  event);
+	em->Trigger("SPOT_AVAIL", event);
 
 	float closest = -1.f;
 
@@ -63,8 +63,7 @@ void Pacman::SetNewTarget() {
 		target = newTarget;
 	}	
 
-	// checkbehind
-	if (GetComponent<StateContainer>()->currentState == "PACMAN_HUNT") {
+	if (GetComponent<StateContainer>()->currentState == "PACMAN_AVOID") {
 		newTarget = position - direction;
 
 		avail = false;
@@ -76,12 +75,12 @@ void Pacman::SetNewTarget() {
 			const float distance = Math::LengthSquared(destination - newTarget);
 			if (closest < 0 || distance <= closest) {
 				closest = distance;
-				SetDirection(-direction);
+				SetDirection(direction);
 				target = newTarget;
 			}
 		}
 	}
-
+	
 	// check on other axis
 
 	vec3f other(direction.y, direction.x, 0.f);
@@ -91,7 +90,7 @@ void Pacman::SetNewTarget() {
 	avail = false;
 	check.Set(static_cast<int>(newTarget.x), static_cast<int>(newTarget.y));
 	event = new Events::MapData(&avail, check);
-	em->Trigger("SPOT_AVAIL",  event);
+	em->Trigger("SPOT_AVAIL", event);
 
 	if (avail) {
 		const float distance = Math::LengthSquared(destination - newTarget);
@@ -112,7 +111,7 @@ void Pacman::SetNewTarget() {
 	avail = false;
 	check.Set(static_cast<int>(newTarget.x), static_cast<int>(newTarget.y));
 	event = new Events::MapData(&avail, check);
-	em->Trigger("SPOT_AVAIL",  event);
+	em->Trigger("SPOT_AVAIL", event);
 
 	if (avail) {
 		const float distance = Math::LengthSquared(destination - newTarget);

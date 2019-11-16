@@ -49,13 +49,14 @@ void AnimationSystem::ResetAnimation(AnimationData& animation) {
 void AnimationSystem::ProcessAnimation(Animation* const component, AnimationData& animation) {
 	auto& currentFrame = animation.frames[animation.currentFrame];
 	if (animation.et >= currentFrame.duration) {
-		++animation.currentFrame;
-		if (animation.currentFrame == animation.frames.size()) {
+		if (animation.currentFrame + 1 == animation.frames.size()) {
 			if (animation.loop) {
 				animation.currentFrame = 0;
 			} else {
 				return;
 			}
+		} else {
+			++animation.currentFrame;
 		}
 		animation.et = 0.f;
 		SetProperties(component, animation);

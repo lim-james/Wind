@@ -25,6 +25,10 @@ namespace States {
 		void FixedUpdate(Entity* const target, const float& dt) override;
 		void Exit(Entity* const target) override;
 
+	private:
+		
+		void SetNearestGhost(Entity * const target);
+
 	};
 	
 	class Hunt : public State {
@@ -39,6 +43,17 @@ namespace States {
 	private:
 		
 		void SetNearestGhost(Entity * const target);
+
+	};
+		
+	class Dead : public State {
+
+	public:
+
+		void Enter(Entity* const target) override;
+		void Update(Entity* const target, const float& dt) override;
+		void FixedUpdate(Entity* const target, const float& dt) override;
+		void Exit(Entity* const target) override;
 
 	};
 	

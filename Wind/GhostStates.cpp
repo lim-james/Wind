@@ -120,5 +120,6 @@ void States::Frightened::FixedUpdate(Entity* const target, const float& dt) {
 }
 
 void States::Frightened::Exit(Entity* const target) {
-
+	auto ghost = static_cast<Ghost* const>(target);
+	ghost->InvertDirection();
 }

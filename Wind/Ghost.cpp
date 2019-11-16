@@ -101,13 +101,15 @@ void Ghost::SetDirection(const vec3f& _direction) {
 void Ghost::StateHandler(Events::Event* event) {
 	auto mode = static_cast<Events::ModeEvent*>(event)->data;
 
+	auto state = GetComponent<StateContainer>();
+
 	if (mode == CHASE)
-		GetComponent<StateContainer>()->queuedState = chaseState;
+		state->queuedState = chaseState;
 	else if (mode == SCATTER)
-		GetComponent<StateContainer>()->queuedState = "GHOST_SCATTER";
+		state->queuedState = "GHOST_SCATTER";
 	else if (mode == FRIGHTENED)
-		GetComponent<StateContainer>()->queuedState = "GHOST_FRIGHTENED";
-	else if (mode == END_FRIGHTENED)
+		state->queuedState = "GHOST_FRIGHTENED";
+	else if (mode == END_FRIGHTENED && state->currentState == "GHOST_FRIGHTENED")
 		GetComponent<Animation>()->queued = "END_FRIGHTENED";
 }
 
@@ -116,6 +118,8 @@ void Ghost::OnCollisionEnter(Entity * const target) {
 		auto state = GetComponent<StateContainer>();
 		if (state->currentState == "GHOST_FRIGHTENED") {
 			state->queuedState = "GHOST_EATEN";
+		} else {
+			target->GetComponent<StateContainer>()->queuedState = "PACMAN_DEAD";
 		}
 	}
 }

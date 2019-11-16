@@ -27,9 +27,10 @@ void StateMachine::FixedUpdate(const float& dt) {
 		auto entity = c->GetParent();
 
 		if (c->queuedState != "") {
-			if (c->currentState != "")
-				states[c->currentState]->Exit(entity);
+			const auto previous = c->currentState;
 			c->currentState = c->queuedState;
+			if (previous != "")
+				states[previous]->Exit(entity);
 			c->queuedState = "";
 			states[c->currentState]->Enter(entity);
 		}

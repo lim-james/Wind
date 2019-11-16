@@ -90,7 +90,9 @@ PacmanScene::PacmanScene() {
 	systems->Get<StateMachine>()->AttachState<States::InkyChase>("INKY_CHASE_STATE");
 
 	systems->Get<StateMachine>()->AttachState<States::Search>("PACMAN_SEARCH");
+	systems->Get<StateMachine>()->AttachState<States::Avoid>("PACMAN_AVOID");
 	systems->Get<StateMachine>()->AttachState<States::Hunt>("PACMAN_HUNT");
+	systems->Get<StateMachine>()->AttachState<States::Dead>("PACMAN_DEAD");
 
 	ReadMapData("Files/Data/map_data.txt");
 	mapOffset.Set(
@@ -98,7 +100,7 @@ PacmanScene::PacmanScene() {
 		static_cast<int>(mapSize.y * 0.5f) + 1
 	);
 
-	gameMode = CHASE;
+	gameMode = SCATTER;
 	bounceTime = 0.f;
 }
 
@@ -161,15 +163,18 @@ void PacmanScene::FixedUpdate(const float& dt) {
 
 	bounceTime += dt;
 	if (gameMode == CHASE) {
-		if (bounceTime > 20.f) {
+		if (bounceTime > 14.f) {
+			Console::Log << "Game mode: SCATTER\n";
 			Events::EventsManager::GetInstance()->Trigger("GAME_MODE", new Events::ModeEvent(SCATTER));
 		}
 	} else if (gameMode == SCATTER) {
-		if (bounceTime > 10.f) {
+		if (bounceTime > 7.f) {
+			Console::Log << "Game mode: CHASE\n";
 			Events::EventsManager::GetInstance()->Trigger("GAME_MODE", new Events::ModeEvent(CHASE));
 		}
 	} else if (gameMode == FRIGHTENED) {
 		if (bounceTime > 7.f) {
+			Console::Log << "Game mode: FRIGHTENED\n";
 			Events::EventsManager::GetInstance()->Trigger("GAME_MODE", new Events::ModeEvent(END_FRIGHTENED));
 		}
 	} else if (gameMode == END_FRIGHTENED) {
@@ -229,7 +234,10 @@ void PacmanScene::ReadMapData(const char* filepath) {
 		palletData[i].object = nullptr;
 
 		if (buffer == 'O') {
-			powerPosition[powerCount].Set(i % static_cast<int>(mapSize.w), i / static_cast<int>(mapSize.w));
+			powerPosition[powerCount].Set(
+				static_cast<float>(i % static_cast<int>(mapSize.w)), 
+				static_cast<float>(i / static_cast<int>(mapSize.w))
+			);
 			++powerCount;
 		}
 	}
@@ -326,7 +334,7 @@ Ghost* const PacmanScene::SpawnGhost(const std::string& name, const int& tileCol
 	ghost->SetDock(dock);
 	ghost->SetCorner(corner);
 	ghost->SetChaseState(name + "_CHASE_STATE");
-	ghost->SetSpeed(5.f);
+	ghost->SetSpeed(8.f);
 
 	return ghost;
 }
@@ -389,13 +397,27 @@ Entity* const PacmanScene::SpawnPacman() {
 
 	pacman->GetComponent<Animation>()->animations["DOWN"] = anim;
 
+	anim.loop = false;
+	anim.frames.clear();
+	for (int i = 15; i > 7; --i) {
+		kf.SetCellRect(8, i, 1, 1);
+		anim.frames.push_back(kf);
+	}
+	for (int i = 15; i > 10; --i) {
+		kf.SetCellRect(7, i, 1, 1);
+		anim.frames.push_back(kf);
+	}
+	pacman->GetComponent<Animation>()->animations["DEAD"] = anim;
+
+
+
 	pacman->GetComponent<Render>()->SetTexture(Load::TGA("Files/Textures/pacman_tilemap.tga"));
 	pacman->GetComponent<Render>()->SetTilemapSize(16, 16);
 	pacman->GetComponent<Render>()->SetCellRect(10, 14, 1, 1);
 	pacman->GetComponent<StateContainer>()->queuedState = "PACMAN_SEARCH";
 	pacman->SetTarget(vec3f(0.f, -9.f, 0.f));
 	pacman->SetDestination(vec3f(16.f, -5.f, 0.f));
-	pacman->SetSpeed(5.f);
+	pacman->SetSpeed(8.f);
 
 	return pacman;
 }
@@ -404,9 +426,10 @@ Entity* const PacmanScene::SpawnPallet(const float& x, const float& y) {
 	auto pallet = entities->Create<Sprite>();
 	pallet->SetTag("PALLET");
 	pallet->GetComponent<Transform>()->translation.Set(x, y, 0.f);
+	pallet->GetComponent<Transform>()->scale.Set(0.5f);
 	pallet->GetComponent<Render>()->SetTexture(Load::TGA("Files/Textures/pacman_tilemap.tga"));
-	pallet->GetComponent<Render>()->SetTilemapSize(32, 32);
-	pallet->GetComponent<Render>()->SetCellRect(27, 13, 1, 1);
+	pallet->GetComponent<Render>()->SetTilemapSize(128, 128);
+	pallet->GetComponent<Render>()->SetCellRect(109, 53, 2, 2);
 
 	return pallet;
 }

@@ -10,7 +10,7 @@ void main() {
 	vec2 dist = texCoord - vec2(.5f);
 	float r = length(dist);
 
-	vec2 distortTexCoord = texCoord + dist * sin(r * r * 2.f) * r * .5f;// * r * .5f;
+	vec2 distortTexCoord = texCoord + dist * sin(r * r * 4.f) * r * .5f;// * r * .5f;
 	
 	if (distortTexCoord.x < 0 || distortTexCoord.x > 1 ||
 		distortTexCoord.y < 0 || distortTexCoord.y > 1) {

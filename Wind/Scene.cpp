@@ -87,7 +87,7 @@ void Scene::FirstEntityHanlder(Events::Event* event) {
 	auto entityEvent = static_cast<Events::FindEntityWithTag*>(event);
 	const auto entityMap = entities->GetEntitiesWithTag(entityEvent->tag);
 	if (entityMap.size()) {
-		if (entityEvent->name == "") {
+		if (entityEvent->state == "") {
 			const auto firstSet = (*entityMap.begin()).second;
 			if (firstSet.size()) {
 				*entityEvent->entityRef = firstSet[0];
