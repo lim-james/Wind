@@ -15,7 +15,6 @@ private:
 	// parent class methods
 
 	void SetDirection(const vec3f& _direction) override;
-	void SetNewTarget() override;
 
 	// component methods
 

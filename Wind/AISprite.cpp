@@ -63,6 +63,10 @@ const vec3f& AISprite::GetDirection() const {
 	return direction;
 }
 
+void AISprite::InvertDirection() {
+	SetDirection(-direction);
+}
+
 void AISprite::SetSpeed(const float& value) {
 	speed = value;
 }
@@ -137,11 +141,19 @@ void AISprite::Move(const float& dt) {
 
 	if (Math::Length(dir) <= speed * dt) {
 		position = target;
+
+		if (position.x > 13.f) {
+			position.x = -12.f;
+		} else if (position.x < -12.f) {
+			position.x = 13.f;
+		}
+
 		SetNewTarget();
 	} else {
 		Math::Normalize(dir);
 		position += dir * speed * static_cast<float>(dt);
 	}
+
 }
 
 void AISprite::Update(const float& dt) {

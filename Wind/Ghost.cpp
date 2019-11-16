@@ -22,10 +22,6 @@ void Ghost::Initialize() {
 	Events::EventsManager::GetInstance()->Subscribe("GAME_MODE", &Ghost::StateHandler, this);
 }
 
-void Ghost::InvertDirection() {
-	SetDirection(-direction);
-}
-
 const vec3f& Ghost::GetDock() const {
 	return dock;
 }
@@ -98,6 +94,14 @@ void Ghost::SetDirection(const vec3f& _direction) {
 
 }
 
+void Ghost::SetNewTarget()
+{
+	if (GetComponent<StateContainer>()->currentState == "GHOST_ENTERING")
+		SetEnterTarget();
+	else
+		AISprite::SetNewTarget();
+}
+
 void Ghost::StateHandler(Events::Event* event) {
 	auto mode = static_cast<Events::ModeEvent*>(event)->data;
 
@@ -115,11 +119,12 @@ void Ghost::StateHandler(Events::Event* event) {
 
 void Ghost::OnCollisionEnter(Entity * const target) {
 	if (target->GetTag() == "PACMAN") {
-		auto state = GetComponent<StateContainer>();
-		if (state->currentState == "GHOST_FRIGHTENED") {
-			state->queuedState = "GHOST_EATEN";
-		} else if (state->currentState != "GHOST_EATEN") {
-			target->GetComponent<StateContainer>()->queuedState = "PACMAN_DEAD";
+		auto selfState = GetComponent<StateContainer>();
+		auto targetState = target->GetComponent<StateContainer>();
+		if (selfState->currentState == "GHOST_FRIGHTENED") {
+			selfState->queuedState = "GHOST_EATEN";
+		} else if (selfState->currentState != "GHOST_EATEN" && targetState->currentState != "PACMAN_DEAD") {
+			targetState->queuedState = "PACMAN_DEAD";
 		}
 	}
 }
@@ -137,20 +142,3 @@ void Ghost::SetEnterTarget() {
 			target.y += dir.y / fDir.y;
 	}
 }
-
-void Ghost::Move(const float& dt) {
-	auto& position = GetComponent<Transform>()->translation;
-	vec3f dir = target - position;
-
-	if (Math::Length(dir) <= speed * dt) {
-		position = target;
-		if (GetComponent<StateContainer>()->currentState == "GHOST_ENTERING")
-			SetEnterTarget();
-		else
-			SetNewTarget();
-	} else {
-		Math::Normalize(dir);
-		position += dir * speed * static_cast<float>(dt);
-	}
-}
-

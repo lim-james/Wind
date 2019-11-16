@@ -89,6 +89,7 @@ PacmanScene::PacmanScene() {
 	systems->Get<StateMachine>()->AttachState<States::ClydeInverseChase>("CLYDE_INVERSE_CHASE_STATE");
 	systems->Get<StateMachine>()->AttachState<States::InkyChase>("INKY_CHASE_STATE");
 
+	systems->Get<StateMachine>()->AttachState<States::Hungry>("PACMAN_HUNGRY");
 	systems->Get<StateMachine>()->AttachState<States::Search>("PACMAN_SEARCH");
 	systems->Get<StateMachine>()->AttachState<States::Avoid>("PACMAN_AVOID");
 	systems->Get<StateMachine>()->AttachState<States::Hunt>("PACMAN_HUNT");
@@ -411,7 +412,7 @@ Entity* const PacmanScene::SpawnPacman() {
 	pacman->GetComponent<Render>()->SetTexture(Load::TGA("Files/Textures/pacman_tilemap.tga"));
 	pacman->GetComponent<Render>()->SetTilemapSize(16, 16);
 	pacman->GetComponent<Render>()->SetCellRect(10, 14, 1, 1);
-	pacman->GetComponent<StateContainer>()->queuedState = "PACMAN_SEARCH";
+	pacman->GetComponent<StateContainer>()->queuedState = "PACMAN_AVOID";
 	pacman->SetTarget(vec3f(0.f, -9.f, 0.f));
 	pacman->SetDestination(vec3f(16.f, -5.f, 0.f));
 	pacman->SetSpeed(8.f);

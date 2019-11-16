@@ -31,6 +31,7 @@ public:
 	void SetDestination(const vec3f& _destination);
 
 	const vec3f& GetDirection() const;
+	void InvertDirection();
 
 	void SetSpeed(const float& value);
 
@@ -39,7 +40,7 @@ protected:
 	virtual void SetDirection(const vec3f& _direction);
 	virtual void SetNewTarget();
 
-	virtual void Move(const float& dt);
+	void Move(const float& dt);
 	void Update(const float& dt);
 
 };

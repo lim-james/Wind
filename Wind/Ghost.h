@@ -18,8 +18,6 @@ public:
 
 	void Initialize() override;
 
-	void InvertDirection();
-
 	const vec3f& GetDock() const;
 	void SetDock(const vec3f& position);
 
@@ -35,13 +33,12 @@ public:
 private:
 
 	void SetDirection(const vec3f& _direction) override;
+	void SetNewTarget() override;
+	void SetEnterTarget();
 
 	void StateHandler(Events::Event* event);
 
 	void OnCollisionEnter(Entity * const target);
-
-	void SetEnterTarget();
-	void Move(const float& dt) override;
 
 };
 
