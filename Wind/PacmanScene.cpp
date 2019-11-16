@@ -164,17 +164,14 @@ void PacmanScene::FixedUpdate(const float& dt) {
 	bounceTime += dt;
 	if (gameMode == CHASE) {
 		if (bounceTime > 14.f) {
-			Console::Log << "Game mode: SCATTER\n";
 			Events::EventsManager::GetInstance()->Trigger("GAME_MODE", new Events::ModeEvent(SCATTER));
 		}
 	} else if (gameMode == SCATTER) {
 		if (bounceTime > 7.f) {
-			Console::Log << "Game mode: CHASE\n";
 			Events::EventsManager::GetInstance()->Trigger("GAME_MODE", new Events::ModeEvent(CHASE));
 		}
 	} else if (gameMode == FRIGHTENED) {
 		if (bounceTime > 7.f) {
-			Console::Log << "Game mode: FRIGHTENED\n";
 			Events::EventsManager::GetInstance()->Trigger("GAME_MODE", new Events::ModeEvent(END_FRIGHTENED));
 		}
 	} else if (gameMode == END_FRIGHTENED) {

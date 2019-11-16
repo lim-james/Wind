@@ -143,7 +143,7 @@ Font* Load::FNT(const std::string& fntPath, const std::string& tgaPath) {
 }
 
 void Load::ClearFontCache() {
-	for (const auto& item : fontCache)
+	for (auto& item : fontCache)
 		delete item.second;
 
 	fontCache.clear();

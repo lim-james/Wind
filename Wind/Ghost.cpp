@@ -118,7 +118,7 @@ void Ghost::OnCollisionEnter(Entity * const target) {
 		auto state = GetComponent<StateContainer>();
 		if (state->currentState == "GHOST_FRIGHTENED") {
 			state->queuedState = "GHOST_EATEN";
-		} else {
+		} else if (state->currentState != "GHOST_EATEN") {
 			target->GetComponent<StateContainer>()->queuedState = "PACMAN_DEAD";
 		}
 	}

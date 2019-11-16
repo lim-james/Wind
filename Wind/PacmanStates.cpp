@@ -18,8 +18,8 @@ void States::Search::Enter(Entity* const target) {
 	Events::EventsManager::GetInstance()->Trigger("NEAREST_ENTITY_WITH_TAG", new Events::NearestEntityWithTag(&nearest, "POWER", position));
 	if (nearest) {
 		pacman->SetInterest(nearest);
-		//pacman->SetDestination(nearest->GetComponent<Transform>()->GetWorldTranslation());
-		pacman->SetDestination(vec3f(0.f));
+		pacman->SetDestination(nearest->GetComponent<Transform>()->GetWorldTranslation());
+		//pacman->SetDestination(vec3f(0.f));
 	} else {
 		pacman->GetComponent<StateContainer>()->queuedState = "PACMAN_AVOID";
 	}
