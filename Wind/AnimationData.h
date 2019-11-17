@@ -4,6 +4,7 @@
 #include "Keyframe.h"
 
 #include <vector>
+#include <functional>
 
 struct AnimationData {
 
@@ -12,6 +13,8 @@ struct AnimationData {
 
 	std::vector<Keyframe> frames;
 	bool loop;
+
+	std::function<void()> completed;
 
 	AnimationData();
 

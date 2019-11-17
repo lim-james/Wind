@@ -17,6 +17,8 @@ bool operator==(const Instance& lhs, const Instance& rhs) {
 }
 
 RenderSystem::RenderSystem() {
+	debugging = false;
+
 	Events::EventsManager::GetInstance()->Subscribe("CAMERA_ACTIVE", &RenderSystem::CameraActiveHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("CAMERA_DEPTH", &RenderSystem::CameraDepthHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("RENDER_ACTIVE", &RenderSystem::RenderActiveHandler, this);

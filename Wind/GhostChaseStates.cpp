@@ -13,15 +13,21 @@
 #include <Events/EventsManager.h>
 
 
+void States::GhostChase::SetNearestPaman(Entity * const target) {
+	const vec3f position = target->GetComponent<Transform>()->GetWorldTranslation();
+	auto ghost = static_cast<AISprite*  const>(target);
+
+	Entity* pacman = nullptr;
+	Events::EventsManager::GetInstance()->Trigger("NEAREST_ENTITY_WITH_TAG", new Events::NearestEntityWithTag(&pacman, "PACMAN", position)); 
+	ghost->SetInterest(pacman);
+}
+
+
 
 // Blinky 
 
 void States::BlinkyChase::Enter(Entity* const target) {
-	auto aiSprite = static_cast<AISprite*  const>(target);
-
-	Entity* pacman = nullptr;
-	Events::EventsManager::GetInstance()->Trigger("FIRST_ENTITY_WITH_TAG", new Events::FindEntityWithTag(&pacman, "PACMAN")); 
-	aiSprite->SetInterest(pacman);
+	SetNearestPaman(target);
 }
 
 void States::BlinkyChase::Update(Entity* const target, const float& dt) {
@@ -40,6 +46,11 @@ void States::BlinkyChase::FixedUpdate(Entity* const target, const float& dt) {
 	auto aiSprite = static_cast<AISprite*  const>(target);
 	auto interest = aiSprite->GetInterest();
 
+	if (!interest || !interest->IsUsed()) {
+		SetNearestPaman(target);
+		interest = aiSprite->GetInterest();
+	}
+
 	if (interest)
 		aiSprite->SetDestination(interest->GetComponent<Transform>()->GetWorldTranslation());
 }
@@ -54,11 +65,7 @@ void States::BlinkyChase::Exit(Entity* const target) {
 // Pinky 
 
 void States::PinkyChase::Enter(Entity* const target) {
-	auto aiSprite = static_cast<AISprite*  const>(target);
-
-	Entity* pacman = nullptr;
-	Events::EventsManager::GetInstance()->Trigger("FIRST_ENTITY_WITH_TAG", new Events::FindEntityWithTag(&pacman, "PACMAN")); 
-	aiSprite->SetInterest(pacman);
+	SetNearestPaman(target);
 }
 
 void States::PinkyChase::Update(Entity* const target, const float& dt) {
@@ -86,10 +93,15 @@ void States::PinkyChase::Update(Entity* const target, const float& dt) {
 
 void States::PinkyChase::FixedUpdate(Entity* const target, const float& dt) {
 	auto aiSprite = static_cast<AISprite*  const>(target);
-	auto interest = static_cast<AISprite*  const>(aiSprite->GetInterest());
+	auto interest = aiSprite->GetInterest();
 
+	if (!interest || !interest->IsUsed()) {
+		SetNearestPaman(target);
+		interest = aiSprite->GetInterest();
+	}
+	
 	if (interest) {
-		const vec3f& direction = interest->GetDirection();
+		const vec3f& direction = static_cast<AISprite*  const>(interest)->GetDirection();
 		if (direction == vec3f(0.f, 1.f, 0.f)) {
 			aiSprite->SetDestination(
 				interest->GetComponent<Transform>()->GetWorldTranslation() + vec3f(-2.f, 2.f, 0.f)
@@ -112,11 +124,7 @@ void States::PinkyChase::Exit(Entity* const target) {
 // Clyde 
 
 void States::ClydeChase::Enter(Entity* const target) {
-	auto aiSprite = static_cast<AISprite*  const>(target);
-
-	Entity* pacman = nullptr;
-	Events::EventsManager::GetInstance()->Trigger("FIRST_ENTITY_WITH_TAG", new Events::FindEntityWithTag(&pacman, "PACMAN")); 
-	aiSprite->SetInterest(pacman);
+	SetNearestPaman(target);
 }
 
 void States::ClydeChase::Update(Entity* const target, const float& dt) {
@@ -135,6 +143,11 @@ void States::ClydeChase::FixedUpdate(Entity* const target, const float& dt) {
 	auto aiSprite = static_cast<AISprite*  const>(target);
 	auto interest = aiSprite->GetInterest();
 
+	if (!interest || !interest->IsUsed()) {
+		SetNearestPaman(target);
+		interest = aiSprite->GetInterest();
+	}
+
 	if (interest) {
 		const vec3f target = interest->GetComponent<Transform>()->GetWorldTranslation();
 		const vec3f diff = aiSprite->GetComponent<Transform>()->GetWorldTranslation() - target;
@@ -146,8 +159,7 @@ void States::ClydeChase::FixedUpdate(Entity* const target, const float& dt) {
 }
 
 void States::ClydeChase::Exit(Entity* const target) {
-	auto ghost = static_cast<Ghost* const>(target);
-	ghost->InvertDirection();
+
 }
 
 
@@ -155,12 +167,9 @@ void States::ClydeChase::Exit(Entity* const target) {
 // Clyde (inverse)
 
 void States::ClydeInverseChase::Enter(Entity* const target) {
+	SetNearestPaman(target);
+
 	auto ghost = static_cast<Ghost*  const>(target);
-
-	Entity* pacman = nullptr;
-	Events::EventsManager::GetInstance()->Trigger("FIRST_ENTITY_WITH_TAG", new Events::FindEntityWithTag(&pacman, "PACMAN")); 
-	ghost->SetInterest(pacman);
-
 	ghost->SetDestination(ghost->GetDock());
 }
 
@@ -180,6 +189,11 @@ void States::ClydeInverseChase::FixedUpdate(Entity* const target, const float& d
 	auto ghost = static_cast<Ghost*  const>(target);
 	auto interest = ghost->GetInterest();
 
+	if (!interest || !interest->IsUsed()) {
+		SetNearestPaman(target);
+		interest = ghost->GetInterest();
+	}
+	
 	if (interest) {
 		const vec3f target = interest->GetComponent<Transform>()->GetWorldTranslation();
 		const vec3f diff = ghost->GetComponent<Transform>()->GetWorldTranslation() - target;
@@ -189,8 +203,7 @@ void States::ClydeInverseChase::FixedUpdate(Entity* const target, const float& d
 }
 
 void States::ClydeInverseChase::Exit(Entity* const target) {
-	auto ghost = static_cast<Ghost* const>(target);
-	ghost->InvertDirection();
+
 }
 
 
@@ -240,10 +253,15 @@ void States::InkyChase::Update(Entity* const target, const float& dt) {
 
 void States::InkyChase::FixedUpdate(Entity* const target, const float& dt) {
 	auto ghost = static_cast<Ghost*  const>(target);
-	auto interest = static_cast<AISprite*  const>(ghost->GetInterest());
+	auto interest = ghost->GetInterest();
 
+	if (!interest || !interest->IsUsed()) {
+		SetNearestPaman(target);
+		interest = ghost->GetInterest();
+	}
+	
 	if (interest) {
-		const vec3f& direction = interest->GetDirection();
+		const vec3f& direction = static_cast<AISprite*  const>(interest)->GetDirection();
 		const vec3f& partnerPosition = ghost->GetPartner()->GetComponent<Transform>()->GetWorldTranslation();
 		const vec3f& interestPosition = interest->GetComponent<Transform>()->GetWorldTranslation();
 
@@ -258,3 +276,4 @@ void States::InkyChase::Exit(Entity* const target) {
 	auto ghost = static_cast<Ghost* const>(target);
 	ghost->InvertDirection();
 }
+

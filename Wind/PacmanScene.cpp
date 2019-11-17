@@ -183,7 +183,10 @@ void PacmanScene::FixedUpdate(const float& dt) {
 }
 
 void PacmanScene::KeyHandler(Events::Event* event) {
+	Events::KeyInput* input = static_cast<Events::KeyInput*>(event);
 
+	if (input->key == GLFW_KEY_SPACE && input->action == GLFW_PRESS)
+		SpawnPacman();
 }
 
 void PacmanScene::MapWallHandler(Events::Event* event) {
@@ -271,7 +274,6 @@ Ghost* const PacmanScene::SpawnGhost(const std::string& name, const int& tileCol
 	anim.frames.push_back(kf);
 
 	ghost->GetComponent<Animation>()->animations["END_FRIGHTENED"] = anim;
-
 
 	anim.frames.clear();
 	kf.SetCellRect(tileColumn, 15, 1, 1);
@@ -405,9 +407,12 @@ Entity* const PacmanScene::SpawnPacman() {
 		kf.SetCellRect(7, i, 1, 1);
 		anim.frames.push_back(kf);
 	}
+
+	anim.completed = [pacman]() {
+		pacman->Destroy();
+	};
+
 	pacman->GetComponent<Animation>()->animations["DEAD"] = anim;
-
-
 
 	pacman->GetComponent<Render>()->SetTexture(Load::TGA("Files/Textures/pacman_tilemap.tga"));
 	pacman->GetComponent<Render>()->SetTilemapSize(16, 16);

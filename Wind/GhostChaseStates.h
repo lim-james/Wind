@@ -5,7 +5,15 @@
 
 namespace States {
 
-	class BlinkyChase : public State {
+	class GhostChase {
+
+	protected:
+
+		void SetNearestPaman(Entity * const target);
+
+	};
+
+	class BlinkyChase : public State, public GhostChase {
 
 	public:
 
@@ -16,7 +24,7 @@ namespace States {
 
 	};
 
-	class PinkyChase : public State {
+	class PinkyChase : public State, public GhostChase {
 
 	public:
 
@@ -27,7 +35,7 @@ namespace States {
 
 	};
 
-	class ClydeChase : public State {
+	class ClydeChase : public State, public GhostChase {
 
 	public:
 
@@ -38,7 +46,7 @@ namespace States {
 
 	};
 
-	class ClydeInverseChase : public State {
+	class ClydeInverseChase : public State, public GhostChase {
 
 	public:
 
@@ -49,7 +57,7 @@ namespace States {
 
 	};
 
-	class InkyChase : public State {
+	class InkyChase : public State, public GhostChase {
 
 	public:
 

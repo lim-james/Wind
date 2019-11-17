@@ -44,7 +44,7 @@ void States::Hungry::FixedUpdate(Entity * const target, const float & dt) {
 	const auto& pacmanPosition = pacman->GetComponent<Transform>()->GetWorldTranslation();
 	const auto& direction = ghostPosition - pacmanPosition;
 
-	if (Math::LengthSquared(direction) < 25.f) {
+	if (Math::LengthSquared(direction) < 36.f) {
 		pacman->GetComponent<StateContainer>()->queuedState = "PACMAN_AVOID";
 		pacman->InvertDirection();
 	}

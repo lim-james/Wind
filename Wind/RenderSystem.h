@@ -26,6 +26,8 @@ bool operator==(const Instance& lhs, const Instance& rhs);
 typedef std::map<unsigned, std::vector<Instance>> Batches;
 
 class RenderSystem : public System {
+
+	bool debugging;
 	
 	std::vector<Camera*> cameras;
 
