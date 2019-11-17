@@ -77,3 +77,7 @@ void ParticleEmitter::SetActive(const bool& state) {
 	Component::SetActive(state);
 	Events::EventsManager::GetInstance()->Trigger("EMITTER_ACTIVE", new Events::AnyType<ParticleEmitter*>(this));
 }
+
+void ParticleEmitter::Play() {
+	age = 0.f;
+}

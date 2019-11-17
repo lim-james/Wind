@@ -4,6 +4,7 @@
 #include "Animation.h"
 #include "Collider.h"
 #include "Script.h"
+#include "ParticleEmitter.h"
 #include "StateContainer.h"
 #include "MapEvents.h"
 #include "GameModes.h"
@@ -14,6 +15,7 @@ void Pacman::Build() {
 	AISprite::Build();
 
 	AddComponent<Script>();
+	AddComponent<ParticleEmitter>();
 }
 
 void Pacman::Initialize() {
@@ -22,6 +24,22 @@ void Pacman::Initialize() {
 	GetComponent<Collider>()->BindCollisionEnter(&Pacman::OnCollisionEnter, this);
 
 	GetComponent<Script>()->fixedUpdate = std::bind(&Pacman::FixedUpdate, this, std::placeholders::_1);
+
+	auto emitter = GetComponent<ParticleEmitter>();
+
+	emitter->loop = false;
+	emitter->offset.z = -1.f;
+	emitter->duration = 0.5f;
+	emitter->spawnInterval = 0.01f;
+	emitter->lifetime = 1.f;
+	emitter->angleRange.z = 180.f;
+	emitter->speed = 15.f;
+	emitter->accelRad = -50.f;
+	emitter->accelRadRange = 10.f;
+	emitter->startSize.Set(0.5f);
+	emitter->endSize.Set(0.f);
+	emitter->startColor.Set(1.f, 1.f, 0.f, 1.f);
+	emitter->endColor.Set(1.f, 1.f, 0.f, 0.f);
 }
 
 void Pacman::SetDirection(const vec3f& _direction) {
@@ -49,6 +67,7 @@ void Pacman::OnCollisionEnter(Entity * const target) {
 		Events::EventsManager::GetInstance()->Trigger("GAME_MODE", new Events::ModeEvent(FRIGHTENED));
 		target->Destroy();
 		GetComponent<StateContainer>()->queuedState = "PACMAN_HUNT";
+		GetComponent<ParticleEmitter>()->Play();
 	}
 }
 

@@ -52,6 +52,8 @@ struct ParticleEmitter : Component {
 	void Initialize() override;
 	void SetActive(const bool& state) override;
 
+	void Play();
+
 };
 
 #endif

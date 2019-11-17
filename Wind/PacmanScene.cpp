@@ -4,7 +4,6 @@
 #include "Sprite.h"
 #include "FPSLabel.h"
 #include "CameraObject.h"
-#include "Player.h"
 #include "UILabel.h"
 #include "ParticleObject.h"
 #include "AISprite.h"
@@ -62,7 +61,6 @@ PacmanScene::PacmanScene() {
 	entities->Subscribe<Sprite>(100, 1);
 	entities->Subscribe<FPSLabel>(1, 1);
 	entities->Subscribe<CameraObject>(1, 1);
-	entities->Subscribe<Player>(1, 1);
 	entities->Subscribe<UILabel>(10, 1);
 	entities->Subscribe<ParticleObject>(10, 1);
 	// AI objects
