@@ -3,8 +3,6 @@
 #include "InputEvents.h"
 #include "LoadFNT.h"
 // Scenes
-#include "AIScene.h"
-#include "TestScene.h"
 #include "PacmanScene.h"
 
 // external
