@@ -29,6 +29,8 @@ public:
 	template<typename EntityType>
 	void Initialize();
 
+	void Destroy();
+
 	template<typename EntityType>
 	const bool Has() const;
 

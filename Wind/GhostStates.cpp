@@ -17,6 +17,8 @@
 void States::Entering::Enter(Entity* const target) {
 	auto ghost = static_cast<Ghost*>(target);
 	ghost->SetDestination(vec3f(0.f, 3.f, 0.f));
+	vec3f position = ghost->GetComponent<Transform>()->GetWorldTranslation();
+	ghost->SetTarget(vec3f(round(position.x), round(position.y), 0.f));
 }
 
 void States::Entering::Update(Entity* const target, const float& dt) {

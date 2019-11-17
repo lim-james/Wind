@@ -4,6 +4,7 @@
 #include "Scene.h"
 
 #include "Ghost.h"
+#include "UILabel.h"
 
 #include <Math/Vectors.hpp>
 #include <Events/Event.h>
@@ -23,6 +24,8 @@ class PacmanScene : public Scene {
 	bool *wallData;
 	PalletData *palletData;
 	vec2f powerPosition[4];
+
+	UILabel* title;
 
 public:
 

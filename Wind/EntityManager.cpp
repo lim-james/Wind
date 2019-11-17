@@ -49,6 +49,16 @@ void EntityManager::Initialize() {
 	}
 }
 
+void EntityManager::Destroy() {
+	for (auto& typeSets : used) {
+		for (auto& tagSets : typeSets.second) {
+			auto& list = tagSets.second;
+			for (int i = static_cast<int>(list.size()) - 1; i >= 0; --i)
+				list[i]->Destroy();
+		}
+	}
+}
+
 const std::map<unsigned, std::vector<Entity*>>& EntityManager::GetEntitiesWithTag(const std::string& tag) {
 	return used[tag];
 }

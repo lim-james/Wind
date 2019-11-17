@@ -93,14 +93,29 @@ PacmanScene::PacmanScene() {
 	systems->Get<StateMachine>()->AttachState<States::Hunt>("PACMAN_HUNT");
 	systems->Get<StateMachine>()->AttachState<States::Dead>("PACMAN_DEAD");
 
+	Events::EventsManager::GetInstance()->Subscribe("SPOT_AVAIL", &PacmanScene::MapWallHandler, this);
+	Events::EventsManager::GetInstance()->Subscribe("TAKE_PALLET", &PacmanScene::MapPalletHandler, this);
+	Events::EventsManager::GetInstance()->Subscribe("KEY_INPUT", &PacmanScene::KeyHandler, this);
+	Events::EventsManager::GetInstance()->Subscribe("GAME_MODE", &PacmanScene::GameModeHandler, this);
+
 	ReadMapData("Files/Data/map_data.txt");
+
 	mapOffset.Set(
 		static_cast<int>(mapSize.x * 0.5f) - 1,
 		static_cast<int>(mapSize.y * 0.5f) + 1
 	);
 
-	gameMode = SCATTER;
-	bounceTime = 0.f;
+	for (float x = 0; x < mapSize.w; ++x) {
+		for (float y = 0; y < mapSize.h; ++y) {
+			const int i = static_cast<int>(y * mapSize.w + x);
+			if (palletData[i].isTaken)
+				palletData[i].object = SpawnPallet(x - mapOffset.x, mapSize.h - y - mapOffset.y);
+		}
+	}
+
+	for (const auto& position : powerPosition) {
+		SpawnPower(position.x - mapOffset.x, mapSize.h - position.y - mapOffset.y);
+	}
 }
 
 PacmanScene::~PacmanScene() {
@@ -110,11 +125,6 @@ PacmanScene::~PacmanScene() {
 
 void PacmanScene::Awake() {
 	Scene::Awake();
-
-	Events::EventsManager::GetInstance()->Subscribe("SPOT_AVAIL", &PacmanScene::MapWallHandler, this);
-	Events::EventsManager::GetInstance()->Subscribe("TAKE_PALLET", &PacmanScene::MapPalletHandler, this);
-	Events::EventsManager::GetInstance()->Subscribe("KEY_INPUT", &PacmanScene::KeyHandler, this);
-	Events::EventsManager::GetInstance()->Subscribe("GAME_MODE", &PacmanScene::GameModeHandler, this);
 
 	auto cam = entities->Create<CameraObject>();
 	cam->GetComponent<Camera>()->clearColor.Set(0.f);
@@ -136,6 +146,18 @@ void PacmanScene::Awake() {
 	fps->GetComponent<Text>()->paragraphAlignment = PARAGRAPH_RIGHT;
 	fps->GetComponent<Text>()->verticalAlignment = ALIGN_BOTTOM;
 
+	title = entities->Create<UILabel>();
+	title->GetComponent<Transform>()->translation.Set(-mapSize.w, 0.f, 0.f);
+	title->GetComponent<Transform>()->scale.Set(5.f);
+	title->GetComponent<Render>()->tint.Set(0.01f);
+	title->GetComponent<Text>()->SetFont(Load::FNT("Files/Fonts/Microsoft.fnt", "Files/Fonts/Microsoft.tga"));
+	title->GetComponent<Text>()->paragraphAlignment = PARAGRAPH_LEFT;
+	title->GetComponent<Text>()->verticalAlignment = ALIGN_TOP;
+	title->GetComponent<Text>()->text = "Pac-Man\nJames\n";
+
+	gameMode = SCATTER;
+	bounceTime = 0.f;
+
 	auto blinky = SpawnGhost("BLINKY", 15, vec2f(12, 18), vec2f(13, 13), vec2f(1.f, 0.f));
 	auto pinky = SpawnGhost("PINKY", 13, vec2f(-11, 18), vec2f(-12, 13), vec2f(-1.f, 0.f));
 	auto clyde = SpawnGhost("CLYDE", 12, vec2f(-13, -17), vec2f(-12, -15), vec2f(0.f, 0.f));
@@ -143,18 +165,6 @@ void PacmanScene::Awake() {
 	inky->SetPartner(blinky);
 
 	SpawnPacman();
-
-	for (float x = 0; x < mapSize.w; ++x) {
-		for (float y = 0; y < mapSize.h; ++y) {
-			const int i = static_cast<int>(y * mapSize.w + x);
-			if (palletData[i].isTaken)
-				palletData[i].object = SpawnPallet(x - mapOffset.x, mapSize.h - y - mapOffset.y);
-		}
-	}
-
-	for (const auto& position : powerPosition) {
-		SpawnPower(position.x - mapOffset.x, mapSize.h - position.y - mapOffset.y);
-	}
 }
 
 void PacmanScene::FixedUpdate(const float& dt) {
@@ -176,6 +186,23 @@ void PacmanScene::FixedUpdate(const float& dt) {
 	} else if (gameMode == END_FRIGHTENED) {
 		if (bounceTime > 3.f) {
 			Events::EventsManager::GetInstance()->Trigger("GAME_MODE", new Events::ModeEvent(SCATTER));
+		}
+	}
+
+	if (entities->GetEntitiesWithTag("PACMAN").begin()->second.size() == 0)
+		SpawnPacman();
+
+	if (entities->GetEntitiesWithTag("PALLET").begin()->second.size() == 0) {
+		entities->Destroy();
+		Awake();
+		for (float x = 0; x < mapSize.w; ++x) {
+			for (float y = 0; y < mapSize.h; ++y) {
+				const int i = static_cast<int>(y * mapSize.w + x);
+				if (palletData[i].object) {
+					palletData[i].isTaken = true;
+					palletData[i].object = SpawnPallet(x - mapOffset.x, mapSize.h - y - mapOffset.y);
+				}
+			}
 		}
 	}
 }
@@ -211,6 +238,24 @@ void PacmanScene::MapPalletHandler(Events::Event* event) {
 void PacmanScene::GameModeHandler(Events::Event* event) {
 	bounceTime = 0;
 	gameMode = static_cast<Events::ModeEvent*>(event)->data;
+
+	title->GetComponent<Text>()->text = "Pac-Man\nJames\n";
+	switch (gameMode) {
+	case CHASE:
+		title->GetComponent<Text>()->text += "CHASE";
+		break;
+	case SCATTER:
+		title->GetComponent<Text>()->text += "SCATTER";
+		break;
+	case FRIGHTENED:
+		title->GetComponent<Text>()->text += "FRIGHTENED";
+		break;
+	case END_FRIGHTENED:
+		title->GetComponent<Text>()->text += "FRIGHTENED";
+		break;
+	default:
+		break;
+	}
 }
 
 void PacmanScene::ReadMapData(const char* filepath) {
