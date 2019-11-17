@@ -45,7 +45,7 @@ void Pacman::SetDirection(const vec3f& _direction) {
 }
 
 void Pacman::OnCollisionEnter(Entity * const target) {
-	if (target->GetTag() == "POWER") {
+	if (target->GetTag() == "POWER" && target->IsUsed()) {
 		Events::EventsManager::GetInstance()->Trigger("GAME_MODE", new Events::ModeEvent(FRIGHTENED));
 		target->Destroy();
 		GetComponent<StateContainer>()->queuedState = "PACMAN_HUNT";

@@ -38,7 +38,7 @@ void Application::Initialize(const int& width, const int& height, const char* ti
 
 	auto em = Events::EventsManager::GetInstance();
 
-	em->Subscribe("EXIT", &Window::Close, context);
+	em->Subscribe("CLOSE", &Window::Close, context);
 	em->Subscribe("KEY_INPUT", &Application::OnEvent, this);
 	em->Subscribe("TEXT_INPUT", &Application::OnEvent, this);
 	em->Subscribe("CURSOR_POSITION_INPUT", &Application::OnEvent, this);
@@ -110,7 +110,7 @@ void Application::OnEvent(Events::Event* event) {
 		Events::KeyInput* input = static_cast<Events::KeyInput*>(event);
 		// quit program if escaped
 		if (input->key == GLFW_KEY_ESCAPE && input->action == GLFW_RELEASE) {
-			Events::EventsManager::GetInstance()->Trigger("EXIT");
+			Events::EventsManager::GetInstance()->Trigger("CLOSE");
 			return;
 		}
 	} else if (event->name == "CURSOR_POSITION_INPUT") {

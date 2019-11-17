@@ -22,6 +22,24 @@ namespace Events {
 		delete instance;
 	}
 
+	void EventsManager::UnsubscribeAll() {
+		emptyCallbacks.clear();
+		eventCallbacks.clear();
+		emptyContextCallbacks.clear();
+		eventContextCallbacks.clear();
+	}
+
+	void EventsManager::Unsubscribe(const std::string& name) {
+		emptyCallbacks[name].clear();
+		eventCallbacks[name].clear();
+		
+		for (auto& callbacks : emptyContextCallbacks)
+			callbacks.second.erase(name);
+
+		for (auto& callbacks : eventContextCallbacks)
+			callbacks.second.erase(name);
+	}
+
 	void EventsManager::Trigger(const std::string& name) {
 		for (auto& callback : emptyCallbacks[name])
 			callback();

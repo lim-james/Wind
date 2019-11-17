@@ -59,6 +59,8 @@ public:
 
 private:
 
+	void KeyHandler(Events::Event* event);
+
 	void CameraActiveHandler(Events::Event* event);
 	void CameraDepthHandler(Events::Event* event);
 

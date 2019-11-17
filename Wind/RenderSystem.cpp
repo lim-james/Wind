@@ -3,10 +3,13 @@
 #include "Entity.h"
 #include "Transform.h"
 
+#include "InputEvents.h"
+
 #include <Events/EventsManager.h>
 #include <Math/MatrixTransform.hpp>
 #include <MACROS.h>
 #include <GL/glew.h>
+#include <GLFW/glfw3.h>
 
 unsigned RenderSystem::instanceBuffer = 0;
 unsigned RenderSystem::quadVAO = 0;
@@ -19,11 +22,11 @@ bool operator==(const Instance& lhs, const Instance& rhs) {
 RenderSystem::RenderSystem() {
 	debugging = false;
 
+	Events::EventsManager::GetInstance()->Subscribe("KEY_INPUT", &RenderSystem::KeyHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("CAMERA_ACTIVE", &RenderSystem::CameraActiveHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("CAMERA_DEPTH", &RenderSystem::CameraDepthHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("RENDER_ACTIVE", &RenderSystem::RenderActiveHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("TEXTURE_CHANGE", &RenderSystem::TextureChangeHandler, this);
-	Events::EventsManager::GetInstance()->Subscribe("DRAW_LINE", &RenderSystem::DrawLineHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("TEXT_ACTIVE", &RenderSystem::TextActiveHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("TEXT_FONT", &RenderSystem::TextFontHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("WINDOW_RESIZE", &RenderSystem::ResizeHandler, this);
@@ -318,6 +321,19 @@ void RenderSystem::Update(const float& dt) {
 }
 
 void RenderSystem::FixedUpdate(const float& dt) {}
+
+void RenderSystem::KeyHandler(Events::Event * event) {
+	Events::KeyInput* input = static_cast<Events::KeyInput*>(event);
+
+	if (input->key == GLFW_KEY_ENTER && input->action == GLFW_PRESS) {
+		debugging = !debugging;
+
+		if (debugging) 
+			Events::EventsManager::GetInstance()->Subscribe("DRAW_LINE", &RenderSystem::DrawLineHandler, this);
+		else
+			Events::EventsManager::GetInstance()->Unsubscribe("DRAW_LINE", this);
+	}
+}
 
 void RenderSystem::CameraActiveHandler(Events::Event* event) {
 	auto& c = static_cast<Events::AnyType<Camera*>*>(event)->data;
