@@ -1,6 +1,9 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
+// Scenes
+#include "ChatRoom.h"
+
 #include "Window.h"
 #include "InputController.h"
 #include "Scene.h"

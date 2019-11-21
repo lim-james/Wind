@@ -1,8 +1,5 @@
 #include "AnimationSystem.h"
 
-#include "Entity.h"
-#include "Render.h"
-
 #include <Events/EventsManager.h>
 
 AnimationSystem::AnimationSystem() {
@@ -13,25 +10,29 @@ AnimationSystem::~AnimationSystem() {
 	components.clear();
 }
 
-void AnimationSystem::Update(const float& dt) {
+void AnimationSystem::Update(const float & dt) {
 	for (auto& c : components) {
-		if (c->queued != "") {
-			ResetAnimation(c->animations[c->currentAnimation]);
-			c->currentAnimation = c->queued;
-			c->queued = "";
-		}
-		
-		if (c->currentAnimation != "") {
-			auto& currentAnimation = c->animations[c->currentAnimation];
-			currentAnimation.et += dt;
-			ProcessAnimation(c, currentAnimation);
+		std::vector<AnimationBase*>& anims = c->animations;
+
+		if (!anims.size()) continue;
+
+		for (auto& a : anims)
+			a->Update(static_cast<float>(dt));
+
+		const int size = static_cast<int>(anims.size());
+
+		for (int i = size - 1; i >= 0; --i) {
+			if (!c->animations[i]->IsActive()) {
+				delete anims[i];
+				anims.erase(anims.begin() + i);
+			}
 		}
 	}
 }
 
-void AnimationSystem::FixedUpdate(const float& dt) {}
+void AnimationSystem::FixedUpdate(const float & dt) {}
 
-void AnimationSystem::ActiveHandler(Events::Event* event) {
+void AnimationSystem::ActiveHandler(Events::Event * event) {
 	const auto c = static_cast<Events::AnyType<Animation*>*>(event)->data;
 
 	if (c->IsActive()) {
@@ -39,33 +40,4 @@ void AnimationSystem::ActiveHandler(Events::Event* event) {
 	} else {
 		components.erase(vfind(components, c));
 	}
-}
-
-void AnimationSystem::ResetAnimation(AnimationData& animation) {
-	animation.et = 0.f;
-	animation.currentFrame = 0;
-}
-
-void AnimationSystem::ProcessAnimation(Animation* const component, AnimationData& animation) {
-	if (animation.frames.size() <= animation.currentFrame) return;
-
-	auto& currentFrame = animation.frames[animation.currentFrame];
-	if (animation.et >= currentFrame.duration) {
-		++animation.currentFrame;
-		if (animation.currentFrame == animation.frames.size()) {
-			if (animation.loop) {
-				animation.currentFrame = 0;
-			} else {
-				animation.completed();
-				return;
-			}
-		}
-		animation.et = 0.f;
-		SetProperties(component, animation);
-	}
-}
-
-void AnimationSystem::SetProperties(Animation* const component, AnimationData& animation) {
-	auto render = component->GetParent()->GetComponent<Render>();
-	render->uvRect = animation.frames[animation.currentFrame].uvRect;
 }

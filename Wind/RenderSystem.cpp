@@ -98,8 +98,6 @@ RenderSystem::~RenderSystem() {
 void RenderSystem::Update(const float& dt) {
 
 	for (auto& cam : cameras) {
-		mainFBO->Bind();
-
 		glBindVertexArray(quadVAO);
 
 		mainShader->Use();
@@ -204,16 +202,6 @@ void RenderSystem::Update(const float& dt) {
 
 			lines.clear();
 		}
-
-		mainFBO->Unbind();
-
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		curveShader->Use();
-		glBindVertexArray(quadVAO);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, mainFBO->GetTexture());
-		glDrawArrays(GL_TRIANGLES, 0, 6);
 
 		textShader->Use();
 		textShader->SetMatrix4("projection", projection);

@@ -2,9 +2,6 @@
 
 #include "InputEvents.h"
 #include "LoadFNT.h"
-// Scenes
-#include "PacmanScene.h"
-
 // external
 #include <Events/EventsManager.h>
 #include <Logger/Logger.h>
@@ -51,7 +48,7 @@ void Application::Initialize(const int& width, const int& height, const char* ti
 	// turn off vsync
 	//glfwSwapInterval(0);
 
-	current = new PacmanScene;
+	current = new ChatRoom;
 
 	context->BroadcastSize();
 	em->TriggerQueued();

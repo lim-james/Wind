@@ -26,12 +26,6 @@ private:
 
 	void ActiveHandler(Events::Event* event);
 
-	// helper methods
-
-	void ResetAnimation(AnimationData& animation);
-	void ProcessAnimation(Animation* const component, AnimationData& animation);
-	void SetProperties(Animation* const component, AnimationData& animation);
-	
 };
 
 #endif
