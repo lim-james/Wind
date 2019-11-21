@@ -20,9 +20,15 @@ UITextField::UITextField() {
 void UITextField::Build() {
 	Sprite::Build();
 	AddComponent<Text>();
+	AddComponent<Script>();
 
 	et = 0.f;
 	shiftHeld = false;
+}
+
+void UITextField::Initialize() {
+	Sprite::Initialize();
+	GetComponent<Script>()->fixedUpdate = std::bind(&UITextField::FixedUpdate, this, std::placeholders::_1);
 }
 
 void UITextField::SetCursor(Sprite * const _cursor) {
@@ -43,6 +49,7 @@ void UITextField::KeyHandler(Events::Event* event) {
 			text.erase(text.begin() + cursorPosition - 1);
 			--cursorPosition;
 			UpdateCursorOffset();
+			didChangeCallback(this);
 		}
 	} else if (keyInput->key == GLFW_KEY_ENTER && keyInput->action == GLFW_PRESS) {
 			auto& text = GetComponent<Text>()->text;
@@ -50,11 +57,13 @@ void UITextField::KeyHandler(Events::Event* event) {
 			text.insert(text.begin() + cursorPosition, '\n');
 			++cursorPosition;
 			UpdateCursorOffset();
+			didChangeCallback(this);
 		} else {
 			didReturnCallback(this);
 			text.clear();
 			cursorPosition = 0;
 			UpdateCursorOffset();
+			didChangeCallback(this);
 		}
 	} else if (keyInput->key == GLFW_KEY_LEFT && keyInput->action != GLFW_RELEASE) {
 		if (cursorPosition != 0) {
@@ -82,6 +91,7 @@ void UITextField::TextHandler(Events::Event * event) {
 	text.insert(text.begin() + cursorPosition, c);
 	++cursorPosition;
 	UpdateCursorOffset();
+	didChangeCallback(this);
 }
 
 void UITextField::UpdateCursorOffset() {

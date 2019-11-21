@@ -19,14 +19,19 @@ public:
 	UITextField();
 
 	virtual void Build();
+	virtual void Initialize();
 
 	void SetCursor(Sprite* const _cursor);
+
+	template<typename Context>
+	void BindDidChange(void(Context::*callback)(UITextField*), Context* context);
 
 	template<typename Context>
 	void BindDidReturn(void(Context::*callback)(UITextField*), Context* context);
 
 private:
 
+	std::function<void(UITextField*)> didChangeCallback;
 	std::function<void(UITextField*)> didReturnCallback;
 
 	void FixedUpdate(const float& dt);
@@ -37,6 +42,11 @@ private:
 	void UpdateCursorOffset();
 
 };
+
+template<typename Context>
+void UITextField::BindDidChange(void(Context::*callback)(UITextField*), Context* context) {
+	didChangeCallback = std::bind(callback, context, std::placeholders::_1);
+}
 
 template<typename Context>
 void UITextField::BindDidReturn(void(Context::*callback)(UITextField*), Context* context) {

@@ -49,6 +49,8 @@ class RenderSystem : public System {
 
 	Batches batches;
 
+	vec2f windowSize;
+
 public:
 
 	RenderSystem();

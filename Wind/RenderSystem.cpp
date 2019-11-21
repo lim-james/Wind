@@ -35,6 +35,7 @@ RenderSystem::RenderSystem() {
 		glGenBuffers(1, &instanceBuffer);
 
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_SCISSOR_TEST);
 
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
@@ -96,6 +97,9 @@ RenderSystem::~RenderSystem() {
 }
 
 void RenderSystem::Update(const float& dt) {
+	glViewport(0, 0, windowSize.w, windowSize.h);
+	glScissor(0, 0, windowSize.w, windowSize.h);
+	glClearColor(0, 0, 0, 0);
 
 	for (auto& cam : cameras) {
 		glBindVertexArray(quadVAO);
@@ -424,8 +428,8 @@ void RenderSystem::TextFontHandler(Events::Event* event) {
 }
 
 void RenderSystem::ResizeHandler(Events::Event* event) {
-	const auto size = static_cast<Events::AnyType<vec2i>*>(event)->data;
-	mainFBO->Resize(size);
+	windowSize = static_cast<Events::AnyType<vec2i>*>(event)->data;
+	mainFBO->Resize(windowSize);
 }
 
 void RenderSystem::GenerateQuad() {

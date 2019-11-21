@@ -48,6 +48,7 @@ private:
 	void UpdateViewport();
 
 	friend class RenderSystem;
+	friend class ButtonSystem;
 
 };
 

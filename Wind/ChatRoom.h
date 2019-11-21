@@ -4,18 +4,18 @@
 #include "TCP.h"
 
 #include "Scene.h"
-#include "Sprite.h"
 
 #include "UITextField.h"
+#include "UIButton.h"
 
 #include <Math/Vectors.hpp>
 
 class ChatRoom : public Scene {
 
-
-	Sprite* cursor;
-
 	TCP* client;
+
+	UITextField* textField;
+	UIButton* confirm;
 
 public:
 
@@ -26,7 +26,12 @@ public:
 
 private:
 
+	void DidChangeHandler(UITextField* const target);
 	void ReturnHandler(UITextField* const target);
+
+	void MouseOverHandler(Entity* target);
+	void MouseOutHandler(Entity* target);
+	void MouseOnClick(Entity* target);
 
 };
 

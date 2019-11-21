@@ -137,6 +137,8 @@
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="AnimationSystem.cpp" />
+    <ClCompile Include="Button.cpp" />
+    <ClCompile Include="ButtonSystem.cpp" />
     <ClCompile Include="SpriteAnimation.cpp" />
     <ClCompile Include="SpriteAnimationData.cpp" />
     <ClCompile Include="SpriteAnimationSystem.cpp" />
@@ -184,6 +186,8 @@
   <ItemGroup>
     <ClInclude Include="Animation.h" />
     <ClInclude Include="AnimationSystem.h" />
+    <ClInclude Include="Button.h" />
+    <ClInclude Include="ButtonSystem.h" />
     <ClInclude Include="SpriteAnimation.h" />
     <ClInclude Include="SpriteAnimationData.h" />
     <ClInclude Include="SpriteAnimationSystem.h" />
