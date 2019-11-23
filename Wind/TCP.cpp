@@ -103,7 +103,7 @@ void TCP::Broadcast(const std::string & message, std::function<bool(SOCKET)> inc
 	}
 }
 
-void TCP::Connect(const std::string & ip) {
+void TCP::Connect(const std::string & ip, std::function<void(void)> completed) {
 	targetSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
 	sockaddr_in addr;
@@ -118,6 +118,9 @@ void TCP::Connect(const std::string & ip) {
 	}
 
 	std::cout << "Connected to " << ip << "::" << port << '\n';
+	
+	if (completed)
+		completed();
 }
 
 void TCP::Send(const std::string& message) {
@@ -129,10 +132,7 @@ std::string TCP::Receive() {
 	ZeroMemory(buffer, sizeof(buffer));
 
 	int length = 0;
-
-	while (length <= 0) {
-		length = recv(targetSocket, buffer, sizeof(buffer), 0);
-	}
+	length = recv(targetSocket, buffer, sizeof(buffer), 0);
 
 	return std::string(buffer, length);
 }

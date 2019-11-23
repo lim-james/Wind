@@ -8,18 +8,17 @@
 #include <Events/EventsManager.h>
 #include <GLFW/glfw3.h>
 
-ButtonSystem::ButtonSystem() {
+ButtonSystem::~ButtonSystem() {
+	buttons.clear();
+	cameras.clear();
+}
+
+void ButtonSystem::Start() {
 	Events::EventsManager::GetInstance()->Subscribe("CAMERA_ACTIVE", &ButtonSystem::CameraActiveHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("BUTTON_ACTIVE", &ButtonSystem::ButtonActiveHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("WINDOW_RESIZE", &ButtonSystem::ResizeHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("CURSOR_POSITION_INPUT", &ButtonSystem::CursorPositionHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("MOUSE_BUTTON_INPUT", &ButtonSystem::MouseButtonHandler, this);
-	
-}
-
-ButtonSystem::~ButtonSystem() {
-	buttons.clear();
-	cameras.clear();
 }
 
 void ButtonSystem::Update(const float & dt) {

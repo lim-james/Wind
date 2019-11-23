@@ -14,8 +14,9 @@ class SpriteAnimationSystem : public System {
 
 public:
 
-	SpriteAnimationSystem();
 	~SpriteAnimationSystem() override;
+
+	void Start() override;
 
 	void Update(const float& dt) override;
 	void FixedUpdate(const float& dt) override;

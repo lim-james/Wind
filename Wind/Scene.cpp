@@ -26,10 +26,19 @@ Scene::~Scene() {
 void Scene::Awake() {
 	Events::EventsManager::GetInstance()->Subscribe("NEAREST_ENTITY_WITH_TAG", &Scene::NearestEntityHanlder, this);
 	Events::EventsManager::GetInstance()->Subscribe("FIRST_ENTITY_WITH_TAG", &Scene::FirstEntityHanlder, this);
+
+	components->Start();
+	entities->Start();
+	systems->Start();
 }
 
 void Scene::Reset() {
+	Events::EventsManager::GetInstance()->Subscribe("NEAREST_ENTITY_WITH_TAG", &Scene::NearestEntityHanlder, this);
+	Events::EventsManager::GetInstance()->Subscribe("FIRST_ENTITY_WITH_TAG", &Scene::FirstEntityHanlder, this);
 
+	components->Start();
+	entities->Start();
+	systems->Start();
 }
 
 void Scene::Start() {
@@ -44,7 +53,17 @@ void Scene::Update(const float& dt) {
 	systems->Update(dt);
 }
 
+void Scene::Stop() {
+	components->Stop();
+	entities->Stop();
+	systems->Stop();
+
+	Events::EventsManager::GetInstance()->UnsubscribeContext(this);
+}
+
 void Scene::Destroy() {}
+
+void Scene::PrepareForSegue(Scene * destination) { }
 
 void Scene::NearestEntityHanlder(Events::Event* event) {
 	auto entityEvent = static_cast<Events::NearestEntityWithTag*>(event);

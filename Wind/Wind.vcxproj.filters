@@ -123,9 +123,6 @@
     <ClCompile Include="Keyframe.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ChatRoom.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="UIButton.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -154,6 +151,21 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ButtonSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LobbyScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ChatRoom.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UITableView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UITableViewCell.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -278,9 +290,6 @@
     <ClInclude Include="GameModes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ChatRoom.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="UIButton.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -309,6 +318,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ButtonSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LobbyScene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ChatRoom.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UITableView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UITableViewCell.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

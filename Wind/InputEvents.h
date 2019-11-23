@@ -43,13 +43,22 @@ namespace Events {
 
 	typedef AnyType<vec2f> ScrollInput;
 
-	struct InputMode :Event {
+	struct InputMode : Event {
 		const int mode;
 		const int value;
 
 		InputMode(const int& mode, const int& value)
 			: mode(mode)
 			, value(value) {}
+	};
+
+	struct DropInput : Event {
+		const int count;
+		const char** paths;
+
+		DropInput(const int& count, const char** paths)
+			: count(count)
+			, paths(paths) {}
 	};
 
 }

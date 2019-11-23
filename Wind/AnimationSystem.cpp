@@ -2,12 +2,12 @@
 
 #include <Events/EventsManager.h>
 
-AnimationSystem::AnimationSystem() {
-	Events::EventsManager::GetInstance()->Subscribe("ANIMATION_ACTIVE", &AnimationSystem::ActiveHandler, this);
-}
-
 AnimationSystem::~AnimationSystem() {
 	components.clear();
+}
+
+void AnimationSystem::Start() {
+	Events::EventsManager::GetInstance()->Subscribe("ANIMATION_ACTIVE", &AnimationSystem::ActiveHandler, this);
 }
 
 void AnimationSystem::Update(const float & dt) {

@@ -24,6 +24,9 @@ public:
 	ComponentsManager();
 	~ComponentsManager();
 
+	void Start();
+	void Stop();
+
 	void Initialize();
 
 	template<typename ComponentType>

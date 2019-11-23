@@ -11,7 +11,7 @@
 #include <Math/Random.hpp>
 #include <MACROS.h>
 
-ParticleSystem::ParticleSystem() {
+void ParticleSystem::Start() {
 	Events::EventsManager::GetInstance()->Subscribe("EMITTER_ACTIVE", &ParticleSystem::EmitterActiveHandler, this);
 }
 

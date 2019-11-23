@@ -11,8 +11,7 @@
 #include <iostream>
 
 Application::Application()
-	: context(nullptr)
-	, current(nullptr) {}
+	: context(nullptr) {}
 
 void Application::Initialize(const int& width, const int& height, const char* title, const bool& fullscreen) {
 	// initialize GLFW
@@ -45,10 +44,12 @@ void Application::Initialize(const int& width, const int& height, const char* ti
 	em->Subscribe("TIMER_STOP", &Application::OnTimerEvent, this);
 #endif
 
+	sceneManager = new SceneManager;
+	sceneManager->Add("LOBBY", new LobbyScene);
+	sceneManager->Add("CHAT_ROOM", new ChatRoom);
+	sceneManager->SetEntryPoint("CHAT_ROOM");
 	// turn off vsync
 	//glfwSwapInterval(0);
-
-	current = new ChatRoom;
 
 	context->BroadcastSize();
 	em->TriggerQueued();
@@ -60,9 +61,6 @@ void Application::Run() {
 	auto em = Events::EventsManager::GetInstance();
 
 	em->Trigger("CURSOR_SENSITIVITY", new Events::AnyType<float>(0.1f));
-	//Events::EventsManager::GetInstance()->Trigger("INPUT_MODE_CHANGE", new Events::InputMode(GLFW_CURSOR, GLFW_CURSOR_DISABLED));
-
-	current->Awake();
 
 	float t = 0.f;
 
@@ -72,6 +70,8 @@ void Application::Run() {
 		const float et = static_cast<float>(timer.GetElapsedTime());
 		const float dt = static_cast<float>(timer.GetDeltaTime());
 
+		auto current = sceneManager->GetSource();
+
 		t += dt;
 		if (t >= FRAMERATE) {
 			current->FixedUpdate(t);
@@ -80,6 +80,7 @@ void Application::Run() {
 
 		current->Update(dt);
 
+		sceneManager->Segue();
 		context->SwapBuffers();
 		timer.Update();
 
@@ -93,7 +94,7 @@ void Application::Exit() {
 #endif
 
 	delete context;
-	delete current;
+	delete sceneManager;
 
 	Load::ClearFontCache();
 

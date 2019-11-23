@@ -24,8 +24,9 @@ class ButtonSystem : public System {
 
 public:
 
-	ButtonSystem();
-	~ButtonSystem();
+	~ButtonSystem() override;
+
+	void Start() override;
 
 	void Update(const float& dt) override;
 	void FixedUpdate(const float& dt) override;

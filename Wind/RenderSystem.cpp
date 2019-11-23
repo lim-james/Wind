@@ -22,15 +22,6 @@ bool operator==(const Instance& lhs, const Instance& rhs) {
 RenderSystem::RenderSystem() {
 	debugging = false;
 
-	Events::EventsManager::GetInstance()->Subscribe("KEY_INPUT", &RenderSystem::KeyHandler, this);
-	Events::EventsManager::GetInstance()->Subscribe("CAMERA_ACTIVE", &RenderSystem::CameraActiveHandler, this);
-	Events::EventsManager::GetInstance()->Subscribe("CAMERA_DEPTH", &RenderSystem::CameraDepthHandler, this);
-	Events::EventsManager::GetInstance()->Subscribe("RENDER_ACTIVE", &RenderSystem::RenderActiveHandler, this);
-	Events::EventsManager::GetInstance()->Subscribe("TEXTURE_CHANGE", &RenderSystem::TextureChangeHandler, this);
-	Events::EventsManager::GetInstance()->Subscribe("TEXT_ACTIVE", &RenderSystem::TextActiveHandler, this);
-	Events::EventsManager::GetInstance()->Subscribe("TEXT_FONT", &RenderSystem::TextFontHandler, this);
-	Events::EventsManager::GetInstance()->Subscribe("WINDOW_RESIZE", &RenderSystem::ResizeHandler, this);
-
 	if (instanceBuffer == 0)
 		glGenBuffers(1, &instanceBuffer);
 
@@ -96,6 +87,17 @@ RenderSystem::~RenderSystem() {
 	delete mainFBO;
 }
 
+void RenderSystem::Start() {	
+	Events::EventsManager::GetInstance()->Subscribe("KEY_INPUT", &RenderSystem::KeyHandler, this);
+	Events::EventsManager::GetInstance()->Subscribe("CAMERA_ACTIVE", &RenderSystem::CameraActiveHandler, this);
+	Events::EventsManager::GetInstance()->Subscribe("CAMERA_DEPTH", &RenderSystem::CameraDepthHandler, this);
+	Events::EventsManager::GetInstance()->Subscribe("RENDER_ACTIVE", &RenderSystem::RenderActiveHandler, this);
+	Events::EventsManager::GetInstance()->Subscribe("TEXTURE_CHANGE", &RenderSystem::TextureChangeHandler, this);
+	Events::EventsManager::GetInstance()->Subscribe("TEXT_ACTIVE", &RenderSystem::TextActiveHandler, this);
+	Events::EventsManager::GetInstance()->Subscribe("TEXT_FONT", &RenderSystem::TextFontHandler, this);
+	Events::EventsManager::GetInstance()->Subscribe("WINDOW_RESIZE", &RenderSystem::ResizeHandler, this);
+}
+
 void RenderSystem::Update(const float& dt) {
 	glViewport(0, 0, windowSize.w, windowSize.h);
 	glScissor(0, 0, windowSize.w, windowSize.h);
@@ -129,6 +131,8 @@ void RenderSystem::Update(const float& dt) {
 
 		for (auto& batchPair : batches) {
 			auto& batch = batchPair.second;
+
+			if (batch.empty()) continue;
 
 			for (auto& instance : batch) {
 				auto& c = instance.component;

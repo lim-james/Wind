@@ -14,7 +14,7 @@ class ScriptSystem : public System {
 
 public:
 
-	ScriptSystem();
+	void Start() override;
 
 	void Initialize() override;
 	void Update(const float& dt) override;

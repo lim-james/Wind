@@ -2,11 +2,12 @@
 #define APPLICATION_H
 
 // Scenes
+#include "LobbyScene.h"
 #include "ChatRoom.h"
 
 #include "Window.h"
 #include "InputController.h"
-#include "Scene.h"
+#include "SceneManager.h"
 
 #include <Timer/Timer.h>
 #include <Events/Event.h>
@@ -27,8 +28,7 @@ class Application {
 
 	Window* context;
 	InputController inputController;
-
-	Scene* current;
+	SceneManager* sceneManager;
 
 public:
 

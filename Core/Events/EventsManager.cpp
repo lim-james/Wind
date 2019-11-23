@@ -4,7 +4,6 @@ namespace Events {
 
 	EventsManager* EventsManager::instance = nullptr;
 
-
 	EventsManager::~EventsManager() {
 		for (const auto& queued : queuedEvents)
 			if (queued.event)

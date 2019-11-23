@@ -28,7 +28,10 @@ public:
 	// updates every frame
 	virtual void Update(const float& dt);
 
+	virtual void Stop();
 	virtual void Destroy();
+
+	virtual void PrepareForSegue(Scene* destination);
 
 private:
 

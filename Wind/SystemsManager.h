@@ -16,6 +16,9 @@ public:
 
 	~SystemsManager();
 
+	void Start();
+	void Stop();
+
 	template<typename SystemType>
 	const bool Has() const {
 		return systems.find(indexof(SystemType)) != systems.end();

@@ -24,6 +24,9 @@ public:
 	EntityManager(ComponentsManager* manager);
 	~EntityManager();
 
+	void Start();
+	void Stop();
+
 	void Initialize();
 
 	template<typename EntityType>

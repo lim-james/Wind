@@ -3,7 +3,7 @@
 #include <Events/EventsManager.h>
 #include <MACROS.h>
 
-ScriptSystem::ScriptSystem() {
+void ScriptSystem::Start() {
 	Events::EventsManager::GetInstance()->Subscribe("SCRIPT_ACTIVE", &ScriptSystem::ActiveHandler, this);
 }
 

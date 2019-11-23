@@ -9,6 +9,16 @@ SystemsManager::~SystemsManager() {
 	systems.clear();
 }
 
+void SystemsManager::Start() {
+	for (auto& s : systems)
+		s.second->Start();
+}
+
+void SystemsManager::Stop() {
+	for (auto& s : systems)
+		s.second->Stop();
+}
+
 void SystemsManager::Initialize() {
 	for (const auto& s : systems)
 		s.second->Initialize();

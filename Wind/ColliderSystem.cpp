@@ -6,12 +6,12 @@
 #include <Events/EventsManager.h>
 #include <MACROS.h>
 
-ColliderSystem::ColliderSystem() {
-	Events::EventsManager::GetInstance()->Subscribe("COLLIDER_ACTIVE", &ColliderSystem::ActiveHandler, this);
-}
-
 ColliderSystem::~ColliderSystem() {
 	components.clear();
+}
+
+void ColliderSystem::Start() {
+	Events::EventsManager::GetInstance()->Subscribe("COLLIDER_ACTIVE", &ColliderSystem::ActiveHandler, this);
 }
 
 void ColliderSystem::Update(const float& dt) {}

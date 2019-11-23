@@ -139,10 +139,12 @@
     <ClCompile Include="AnimationSystem.cpp" />
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="ButtonSystem.cpp" />
+    <ClCompile Include="ChatRoom.cpp" />
+    <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="SpriteAnimation.cpp" />
     <ClCompile Include="SpriteAnimationData.cpp" />
     <ClCompile Include="SpriteAnimationSystem.cpp" />
-    <ClCompile Include="ChatRoom.cpp" />
+    <ClCompile Include="LobbyScene.cpp" />
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="ColliderSystem.cpp" />
     <ClCompile Include="Framebuffer.cpp" />
@@ -180,6 +182,8 @@
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="UIButton.cpp" />
     <ClCompile Include="UILabel.cpp" />
+    <ClCompile Include="UITableView.cpp" />
+    <ClCompile Include="UITableViewCell.cpp" />
     <ClCompile Include="UITextField.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
@@ -188,10 +192,12 @@
     <ClInclude Include="AnimationSystem.h" />
     <ClInclude Include="Button.h" />
     <ClInclude Include="ButtonSystem.h" />
+    <ClInclude Include="ChatRoom.h" />
+    <ClInclude Include="SceneManager.h" />
     <ClInclude Include="SpriteAnimation.h" />
     <ClInclude Include="SpriteAnimationData.h" />
     <ClInclude Include="SpriteAnimationSystem.h" />
-    <ClInclude Include="ChatRoom.h" />
+    <ClInclude Include="LobbyScene.h" />
     <ClInclude Include="Collider.h" />
     <ClInclude Include="ColliderSystem.h" />
     <ClInclude Include="Framebuffer.h" />
@@ -233,6 +239,8 @@
     <ClInclude Include="Transform.h" />
     <ClInclude Include="UIButton.h" />
     <ClInclude Include="UILabel.h" />
+    <ClInclude Include="UITableView.h" />
+    <ClInclude Include="UITableViewCell.h" />
     <ClInclude Include="UITextField.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>

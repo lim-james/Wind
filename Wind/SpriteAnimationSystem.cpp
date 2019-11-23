@@ -5,12 +5,12 @@
 
 #include <Events/EventsManager.h>
 
-SpriteAnimationSystem::SpriteAnimationSystem() {
-	Events::EventsManager::GetInstance()->Subscribe("SPRITE_ANIMATION_ACTIVE", &SpriteAnimationSystem::ActiveHandler, this);
-}
-
 SpriteAnimationSystem::~SpriteAnimationSystem() {
 	components.clear();
+}
+
+void SpriteAnimationSystem::Start() {
+	Events::EventsManager::GetInstance()->Subscribe("SPRITE_ANIMATION_ACTIVE", &SpriteAnimationSystem::ActiveHandler, this);
 }
 
 void SpriteAnimationSystem::Update(const float& dt) {

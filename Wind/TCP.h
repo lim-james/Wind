@@ -35,7 +35,7 @@ public:
 
 	// client methods
 
-	void Connect(const std::string& ip);
+	void Connect(const std::string& ip, std::function<void(void)> completed);
 	void Send(const std::string& message);
 	std::string Receive();
 

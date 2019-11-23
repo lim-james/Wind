@@ -7,8 +7,12 @@
 
 class UITextField : public Sprite {
 
+	static std::vector<UITextField*> all;
+
 	float et;
+	bool isFocused;
 	bool shiftHeld;
+	bool toggle;
 
 	unsigned cursorPosition;
 
@@ -20,6 +24,8 @@ public:
 
 	virtual void Build();
 	virtual void Initialize();
+
+	void Focus();
 
 	void SetCursor(Sprite* const _cursor);
 
@@ -34,12 +40,18 @@ private:
 	std::function<void(UITextField*)> didChangeCallback;
 	std::function<void(UITextField*)> didReturnCallback;
 
+	void DidChange(UITextField* tf);
+	void DidReturn(UITextField* tf);
+
 	void FixedUpdate(const float& dt);
 
 	void KeyHandler(Events::Event* event);
 	void TextHandler(Events::Event* event);
 
+	void MouseOnClick(Entity* target);
+
 	void UpdateCursorOffset();
+
 
 };
 

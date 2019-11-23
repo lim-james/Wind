@@ -1,8 +1,10 @@
 #include "UITextField.h"
 
 #include "Transform.h"
+#include "Animation.h"
 #include "Render.h"
 #include "Text.h"
+#include "Button.h"
 #include "Script.h"
 // Events
 #include "InputEvents.h"
@@ -11,15 +13,20 @@
 
 #include <GLFW/glfw3.h>
 
+std::vector<UITextField*> UITextField::all = {};
+
 UITextField::UITextField() {
 	Events::EventsManager::GetInstance()->Subscribe("KEY_INPUT", &UITextField::KeyHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("TEXT_INPUT", &UITextField::TextHandler, this);
-}
 
+	all.push_back(this);
+}
 
 void UITextField::Build() {
 	Sprite::Build();
+	AddComponent<Animation>();
 	AddComponent<Text>();
+	AddComponent<Button>();
 	AddComponent<Script>();
 
 	et = 0.f;
@@ -28,7 +35,17 @@ void UITextField::Build() {
 
 void UITextField::Initialize() {
 	Sprite::Initialize();
+
 	GetComponent<Script>()->fixedUpdate = std::bind(&UITextField::FixedUpdate, this, std::placeholders::_1);
+	GetComponent<Button>()->BindHandler(&UITextField::MouseOnClick, this, MOUSE_CLICK);
+}
+
+void UITextField::Focus() {
+	for (auto& tf : all)
+		tf->isFocused = false;
+	isFocused = true;
+	cursorPosition = GetComponent<Text>()->text.length();
+	UpdateCursorOffset();
 }
 
 void UITextField::SetCursor(Sprite * const _cursor) {
@@ -36,12 +53,39 @@ void UITextField::SetCursor(Sprite * const _cursor) {
 	UpdateCursorOffset();
 }
 
+void UITextField::DidChange(UITextField * tf) {
+	if (didChangeCallback)
+		didChangeCallback(this);
+}
+
+void UITextField::DidReturn(UITextField * tf) {
+	if (didReturnCallback)
+		didReturnCallback(this);
+}
+
 void UITextField::FixedUpdate(const float& dt) {
 	et += dt;
 	cursor->GetComponent<Render>()->tint.a = Math::Abs(sin(et * 5.f));
+
+	if (toggle) {
+		for (unsigned i = 0; i < all.size(); ++i) {
+			if (all[i]->isFocused) {
+				all[i]->isFocused = false;
+				if (i + 1 == all.size()) {
+					all[0]->Focus();
+				} else {
+					all[i + 1]->Focus();
+				}
+				break;
+			}
+		}
+		toggle = false;
+	}
 }
 
 void UITextField::KeyHandler(Events::Event* event) {
+	if (!isFocused) return;
+
 	const auto keyInput = static_cast<Events::KeyInput* >(event);
 	if (keyInput->key == GLFW_KEY_BACKSPACE && keyInput->action != GLFW_RELEASE) {
 		auto& text = GetComponent<Text>()->text;
@@ -49,7 +93,7 @@ void UITextField::KeyHandler(Events::Event* event) {
 			text.erase(text.begin() + cursorPosition - 1);
 			--cursorPosition;
 			UpdateCursorOffset();
-			didChangeCallback(this);
+			DidChange(this);
 		}
 	} else if (keyInput->key == GLFW_KEY_ENTER && keyInput->action == GLFW_PRESS) {
 			auto& text = GetComponent<Text>()->text;
@@ -57,13 +101,13 @@ void UITextField::KeyHandler(Events::Event* event) {
 			text.insert(text.begin() + cursorPosition, '\n');
 			++cursorPosition;
 			UpdateCursorOffset();
-			didChangeCallback(this);
+			DidChange(this);
 		} else {
-			didReturnCallback(this);
+			DidReturn(this);
 			text.clear();
 			cursorPosition = 0;
 			UpdateCursorOffset();
-			didChangeCallback(this);
+			DidChange(this);
 		}
 	} else if (keyInput->key == GLFW_KEY_LEFT && keyInput->action != GLFW_RELEASE) {
 		if (cursorPosition != 0) {
@@ -82,16 +126,24 @@ void UITextField::KeyHandler(Events::Event* event) {
 		} else if (keyInput->action == GLFW_RELEASE) {
 			shiftHeld = false;
 		}
+	} else if (keyInput->key == GLFW_KEY_TAB && keyInput->action == GLFW_PRESS) {
+		toggle = true;
 	}
 }
 
 void UITextField::TextHandler(Events::Event * event) {
+	if (!isFocused) return;
+
 	const auto c = static_cast<Events::TextInput* >(event)->data;
 	auto& text = GetComponent<Text>()->text;
 	text.insert(text.begin() + cursorPosition, c);
 	++cursorPosition;
 	UpdateCursorOffset();
-	didChangeCallback(this);
+	DidChange(this);
+}
+
+void UITextField::MouseOnClick(Entity * target) {
+	Focus();
 }
 
 void UITextField::UpdateCursorOffset() {

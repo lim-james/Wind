@@ -3,15 +3,15 @@
 #include <Events/EventsManager.h>
 #include <MACROS.h>
 
-StateMachine::StateMachine() {
-	Events::EventsManager::GetInstance()->Subscribe("STATE_CONTAINER_ACTIVE", &StateMachine::ActiveHandler, this);
-}
-
 StateMachine::~StateMachine() {
 	for (auto& state : states)
 		delete state.second;
 
 	states.clear();
+}
+
+void StateMachine::Start() {
+	Events::EventsManager::GetInstance()->Subscribe("STATE_CONTAINER_ACTIVE", &StateMachine::ActiveHandler, this);
 }
 
 void StateMachine::Update(const float& dt) {

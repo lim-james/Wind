@@ -5,12 +5,7 @@
 #include <Events/EventsManager.h>	
 
 EntityManager::EntityManager(ComponentsManager* manager)
-	: componentsManager(manager) {
-	Events::EventsManager::GetInstance()->Subscribe("CREATE_ENTITY", &EntityManager::OnCreate, this);
-	Events::EventsManager::GetInstance()->Subscribe("ENTITY_USED", &EntityManager::OnUsed, this);
-	Events::EventsManager::GetInstance()->Subscribe("ENTITY_DESTROY", &EntityManager::OnDestroy, this);
-	Events::EventsManager::GetInstance()->Subscribe("TAG_CHANGE", &EntityManager::TagChangeHandler, this);
-}
+	: componentsManager(manager) {}
 
 EntityManager::~EntityManager() {
 	typeMap.clear();
@@ -31,6 +26,17 @@ EntityManager::~EntityManager() {
 		}
 	}
 	unused.clear();
+}
+
+void EntityManager::Start() {
+	Events::EventsManager::GetInstance()->Subscribe("CREATE_ENTITY", &EntityManager::OnCreate, this);
+	Events::EventsManager::GetInstance()->Subscribe("ENTITY_USED", &EntityManager::OnUsed, this);
+	Events::EventsManager::GetInstance()->Subscribe("ENTITY_DESTROY", &EntityManager::OnDestroy, this);
+	Events::EventsManager::GetInstance()->Subscribe("TAG_CHANGE", &EntityManager::TagChangeHandler, this);
+}
+
+void EntityManager::Stop() {
+	Events::EventsManager::GetInstance()->UnsubscribeContext(this);
 }
 
 void EntityManager::Initialize() {
