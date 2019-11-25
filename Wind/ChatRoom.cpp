@@ -85,15 +85,15 @@ void ChatRoom::Start() {
 	tableView->BindCellForRowHandler(&ChatRoom::CellForRow, this);
 	tableView->ReloadData();
 
-	//std::thread([this]() {
-	//	while (true) {
-	//		auto result = client->Receive();
-	//		if (result != "") {
-	//			messages.push_back(result);
-	//			updated = true;
-	//		}
-	//	}
-	//}).detach();
+	std::thread([this]() {
+		while (true) {
+			auto result = client->Receive();
+			if (result != "") {
+				messages.push_back(result);
+				updated = true;
+			}
+		}
+	}).detach();
 }
 
 void ChatRoom::Update(const float & dt) {

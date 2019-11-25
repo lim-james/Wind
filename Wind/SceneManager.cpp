@@ -38,6 +38,7 @@ void SceneManager::Segue() {
 
 		if (s) {
 			s->PrepareForSegue(d);
+			s->Stop();
 			s->Destroy();
 		}
 
