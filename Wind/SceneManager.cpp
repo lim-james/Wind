@@ -42,11 +42,11 @@ void SceneManager::Segue() {
 			s->Destroy();
 		}
 
-		d->Reset();
-		d->Start();
-		
 		source = destination;
 		destination = "";
+
+		d->Reset();
+		d->Start();
 	}
  }
 

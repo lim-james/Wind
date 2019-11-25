@@ -10,22 +10,26 @@ class QueenProblem : public Scene {
 	int solutions;
 
 	int knightPaths[8];
+	Entity* queenObjects[8];
 
 public:
 
 	QueenProblem();
 
 	void Awake() override;
+	void Start() override;
 	
 private:
 
 	void KeyHandler(Events::Event* event);
 
 	void Solve8Queen(const int& column, std::vector<int> list, std::vector<int> avail);
+	void UpdateQueens(std::vector<int> list);
 
 	bool IsBoardCompleted(std::vector<bool>& visited);
 	bool IsKnightValid(int& position, std::vector<bool>& visited);
 	void KnightTour(int depth, std::vector<int> positions, std::vector<bool> visited);
+
  
 };
 

@@ -21,21 +21,7 @@
 #include <Events/EventsManager.h>
 
 QueenProblem::QueenProblem() {
-	components->Subscribe<Transform>(10, 1);
-	components->Subscribe<Render>(10, 1);
-	components->Subscribe<Text>(10, 1);
-	components->Subscribe<Camera>(1, 1);
-	components->Subscribe<Script>(1, 1);
-
-	entities->Subscribe<Sprite>(100, 1);
-	entities->Subscribe<FPSLabel>(1, 1);
-	entities->Subscribe<CameraObject>(1, 1);
-	entities->Subscribe<UILabel>(10, 1);
-
-	systems->Subscribe<RenderSystem>();
-	systems->Subscribe<ScriptSystem>();
-
-	gridSize = 4;
+	gridSize = 8;
 	iterations = 0;
 	solutions = 0;
 
@@ -53,12 +39,30 @@ QueenProblem::QueenProblem() {
 	for (unsigned i = 0; i < 8; ++i) {
 		knightPaths[i] = nightMovement[i].y * gridSize + nightMovement[i].x;
 	}
-
-	Events::EventsManager::GetInstance()->Subscribe("KEY_INPUT", &QueenProblem::KeyHandler, this);
 }
 
 void QueenProblem::Awake() {
 	Scene::Awake();
+
+	Events::EventsManager::GetInstance()->Subscribe("KEY_INPUT", &QueenProblem::KeyHandler, this);
+
+	components->Subscribe<Transform>(10, 1);
+	components->Subscribe<Render>(10, 1);
+	components->Subscribe<Text>(10, 1);
+	components->Subscribe<Camera>(1, 1);
+	components->Subscribe<Script>(1, 1);
+
+	entities->Subscribe<Sprite>(100, 1);
+	entities->Subscribe<FPSLabel>(1, 1);
+	entities->Subscribe<CameraObject>(1, 1);
+	entities->Subscribe<UILabel>(10, 1);
+
+	systems->Subscribe<RenderSystem>();
+	systems->Subscribe<ScriptSystem>();
+}
+
+void QueenProblem::Start() {
+	Scene::Start();
 
 	auto cam = entities->Create<CameraObject>();
 	cam->GetComponent<Camera>()->clearColor.Set(0.f);
@@ -71,39 +75,47 @@ void QueenProblem::Awake() {
 	// most performant : 500 - 700 FPS
 	auto fps = entities->Create<FPSLabel>();
 	fps->GetComponent<Transform>()->translation.Set(gridSize, 0.f, 0.f);
-	fps->GetComponent<Transform>()->scale.Set(4.f);
+	fps->GetComponent<Transform>()->scale.Set(1.f);
 	fps->GetComponent<Render>()->tint.Set(0.01f);
 	fps->GetComponent<Text>()->SetFont(Load::FNT("Files/Fonts/Microsoft.fnt", "Files/Fonts/Microsoft.tga"));
 	fps->GetComponent<Text>()->text = "60";
-	//fps->GetComponent<Text>()->scale = 0.25f;
+	fps->GetComponent<Text>()->scale = 0.5f;
 	fps->GetComponent<Text>()->paragraphAlignment = PARAGRAPH_RIGHT;
 	fps->GetComponent<Text>()->verticalAlignment = ALIGN_BOTTOM;
-	
-	//std::vector<int> list(gridSize);
-	//std::vector<int> avail(gridSize);
-	//for (int i = 0; i < gridSize; ++i)
-	//	avail[i] = i;
 
-	//Solve8Queen(0, list, avail);
-	//std::cout << "Iterations : " << iterations << '\n';
-	//std::cout << "Solutions  : " << solutions << '\n';
+	for (int i = 0; i < gridSize; ++i) {
+		auto queen = entities->Create<Sprite>();
+		queen->GetComponent<Transform>()->translation.Set((i - gridSize * 0.5f) + 0.5f, (i - gridSize * 0.5f) + 0.5f, 0.5f);
+		//queen->GetComponent<Transform>()->scale.Set(0.5f);
+		queen->GetComponent<Render>()->SetTexture(Load::TGA("Files/Textures/queen.tga"));
+		queenObjects[i] = queen;
+	}
 
-	std::vector<bool> visited(gridSize * gridSize);
-	visited[1] = true;
-	KnightTour(0, { 1 }, visited);
+	std::vector<int> list(gridSize, -1);
+	std::vector<int> avail(gridSize);
+	for (int i = 0; i < gridSize; ++i)
+		avail[i] = i;
 
-	std::cout << "iterations : " << iterations << '\n';
+	Solve8Queen(0, list, avail);
+	std::cout << "Iterations : " << iterations << '\n';
 	std::cout << "Solutions  : " << solutions << '\n';
 
-	auto queen = entities->Create<Sprite>();
-	queen->GetComponent<Transform>()->translation.Set(0.5f);
-	queen->GetComponent<Render>()->SetTexture(Load::TGA("Files/Textures/queen.tga"));
+	//std::vector<bool> visited(gridSize * gridSize);
+	//visited[1] = true;
+	//KnightTour(0, { 1 }, visited);
+
+	//std::cout << "iterations : " << iterations << '\n';
+	//std::cout << "Solutions  : " << solutions << '\n';
 }
 
 void QueenProblem::KeyHandler(Events::Event * event) {
 }
 
 void QueenProblem::Solve8Queen(const int& column, std::vector<int> list, std::vector<int> avail) {
+	UpdateQueens(list);
+	Events::EventsManager::GetInstance()->Trigger("STEP");
+	Sleep(10);
+
 	if (column == gridSize) {
 		++solutions;
 		std::cout << "Solution : ";
@@ -169,6 +181,14 @@ void QueenProblem::Solve8Queen(const int& column, std::vector<int> list, std::ve
 
 	}
 
+}
+
+void QueenProblem::UpdateQueens(std::vector<int> list) {
+	for (int i = 0; i < gridSize; ++i) {
+		const auto y = list[i];
+		queenObjects[i]->GetComponent<Transform>()->translation.Set((i - gridSize * 0.5f) + 0.5f, (y - gridSize * 0.5f) + 0.5f, 0.5f);
+		queenObjects[i]->GetComponent<Render>()->tint.a = y >= 0 ? 1.f : 0.f;
+	}
 }
 
 

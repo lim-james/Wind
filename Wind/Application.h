@@ -4,6 +4,7 @@
 // Scenes
 #include "LobbyScene.h"
 #include "ChatRoom.h"
+#include "QueenProblem.h"
 
 #include "Window.h"
 #include "InputController.h"
@@ -25,6 +26,7 @@ class Application {
 #endif
 
 	Timer timer;
+	float bt;
 
 	Window* context;
 	InputController inputController;
@@ -45,6 +47,8 @@ private:
 #if _DEBUG
 	void OnTimerEvent(Events::Event* event);
 #endif
+
+	void Step();
 
 };
 

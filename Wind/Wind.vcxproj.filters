@@ -168,6 +168,9 @@
     <ClCompile Include="UITableViewCell.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="QueenProblem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h">
@@ -333,6 +336,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UITableViewCell.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="QueenProblem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

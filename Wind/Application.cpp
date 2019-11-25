@@ -11,7 +11,8 @@
 #include <iostream>
 
 Application::Application()
-	: context(nullptr) {}
+	: context(nullptr)
+	, bt(0.f) {}
 
 void Application::Initialize(const int& width, const int& height, const char* title, const bool& fullscreen) {
 	// initialize GLFW
@@ -44,10 +45,11 @@ void Application::Initialize(const int& width, const int& height, const char* ti
 	em->Subscribe("TIMER_STOP", &Application::OnTimerEvent, this);
 #endif
 
+	em->Subscribe("STEP", &Application::Step, this);
+
 	sceneManager = new SceneManager;
-	sceneManager->Add("LOBBY", new LobbyScene);
-	sceneManager->Add("CHAT_ROOM", new ChatRoom);
-	sceneManager->SetEntryPoint("LOBBY");
+	sceneManager->Add("QUEEN", new QueenProblem);
+	sceneManager->SetEntryPoint("QUEEN");
 	// turn off vsync
 	//glfwSwapInterval(0);
 
@@ -56,35 +58,11 @@ void Application::Initialize(const int& width, const int& height, const char* ti
 }
 
 void Application::Run() {
+	Events::EventsManager::GetInstance()->Trigger("CURSOR_SENSITIVITY", new Events::AnyType<float>(0.1f));
+
 	timer.Start();
-
-	auto em = Events::EventsManager::GetInstance();
-
-	em->Trigger("CURSOR_SENSITIVITY", new Events::AnyType<float>(0.1f));
-
-	float t = 0.f;
-
 	while (!context->ShouldClose()) {
-		glfwPollEvents();
-
-		const float et = static_cast<float>(timer.GetElapsedTime());
-		const float dt = static_cast<float>(timer.GetDeltaTime());
-
-		auto current = sceneManager->GetSource();
-
-		t += dt;
-		if (t >= FRAMERATE) {
-			current->FixedUpdate(t);
-			t = 0.f;
-		}
-
-		current->Update(dt);
-
-		sceneManager->Segue();
-		context->SwapBuffers();
-		timer.Update();
-
-		em->TriggerQueued();
+		Step();
 	}
 }
 
@@ -128,5 +106,27 @@ void Application::OnTimerEvent(Events::Event* event) {
 		timers[timer->data].Update();
 		Console::Log << "[TIMER] " << timer->data << " : " << timers[timer->data].GetElapsedTime() << '\n';
 	}
+}
+void Application::Step() {
+	glfwPollEvents();
+
+	const float et = static_cast<float>(timer.GetElapsedTime());
+	const float dt = static_cast<float>(timer.GetDeltaTime());
+
+	auto current = sceneManager->GetSource();
+
+	bt += dt;
+	if (bt >= FRAMERATE) {
+		current->FixedUpdate(bt);
+		bt = 0.f;
+	}
+
+	current->Update(dt);
+
+	sceneManager->Segue();
+	context->SwapBuffers();
+	timer.Update();
+
+	Events::EventsManager::GetInstance()->TriggerQueued();
 }
 #endif
