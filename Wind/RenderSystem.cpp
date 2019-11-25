@@ -20,7 +20,7 @@ bool operator==(const Instance& lhs, const Instance& rhs) {
 }
 
 RenderSystem::RenderSystem() {
-	debugging = false;
+	debugging = true;
 
 	if (instanceBuffer == 0)
 		glGenBuffers(1, &instanceBuffer);
@@ -93,6 +93,7 @@ void RenderSystem::Start() {
 	Events::EventsManager::GetInstance()->Subscribe("CAMERA_DEPTH", &RenderSystem::CameraDepthHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("RENDER_ACTIVE", &RenderSystem::RenderActiveHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("TEXTURE_CHANGE", &RenderSystem::TextureChangeHandler, this);
+	Events::EventsManager::GetInstance()->Subscribe("DRAW_LINE", &RenderSystem::DrawLineHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("TEXT_ACTIVE", &RenderSystem::TextActiveHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("TEXT_FONT", &RenderSystem::TextFontHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("WINDOW_RESIZE", &RenderSystem::ResizeHandler, this);
@@ -180,7 +181,7 @@ void RenderSystem::Update(const float& dt) {
 
 		const unsigned count = lines.size();
 		if (count) {
-			glLineWidth(cam->size * .25f);
+			glLineWidth(cam->size);
 
 			glBindVertexArray(lineVAO);
 			lineShader->Use();
@@ -269,8 +270,7 @@ void RenderSystem::Update(const float& dt) {
 				vec3f position(0.f);
 				position.x = translation.x - lineOffset[0];
 
-				switch (text->verticalAlignment)
-				{
+				switch (text->verticalAlignment) {
 				case ALIGN_MIDDLE:
 					position.y = translation.y + size.y * 0.5f;
 					break;

@@ -107,6 +107,8 @@ void Application::OnTimerEvent(Events::Event* event) {
 		Console::Log << "[TIMER] " << timer->data << " : " << timers[timer->data].GetElapsedTime() << '\n';
 	}
 }
+#endif
+
 void Application::Step() {
 	glfwPollEvents();
 
@@ -129,4 +131,3 @@ void Application::Step() {
 
 	Events::EventsManager::GetInstance()->TriggerQueued();
 }
-#endif

@@ -17,6 +17,8 @@
 // utils
 #include "LoadTGA.h"
 #include "LoadFNT.h"
+// events
+#include "Line.h"
 
 #include <Events/EventsManager.h>
 
@@ -25,20 +27,14 @@ QueenProblem::QueenProblem() {
 	iterations = 0;
 	solutions = 0;
 
-	vec2i nightMovement[] = {
-		vec2i( 2, 1),
-		vec2i( 1, 2),
-		vec2i(-1, 2),
-		vec2i(-2, 1),
-		vec2i(-2, -1),
-		vec2i(-1, -2),
-		vec2i( 1, -2),
-		vec2i( 2, -1)
-	};
-
-	for (unsigned i = 0; i < 8; ++i) {
-		knightPaths[i] = nightMovement[i].y * gridSize + nightMovement[i].x;
-	}
+	knightPaths[0] = vec2i(2, 1);
+	knightPaths[1] = vec2i(1, 2);
+	knightPaths[2] = vec2i(-1, 2);
+	knightPaths[3] = vec2i(-2, 1);
+	knightPaths[4] = vec2i(-2, -1);
+	knightPaths[5] = vec2i(-1, -2);
+	knightPaths[6] = vec2i(1, -2);
+	knightPaths[7] = vec2i(2, -1);
 }
 
 void QueenProblem::Awake() {
@@ -66,15 +62,15 @@ void QueenProblem::Start() {
 
 	auto cam = entities->Create<CameraObject>();
 	cam->GetComponent<Camera>()->clearColor.Set(0.f);
-	cam->GetComponent<Camera>()->SetSize(gridSize);
+	cam->GetComponent<Camera>()->SetSize(static_cast<float>(gridSize));
 
 	auto grid = entities->Create<Sprite>();
-	grid->GetComponent<Transform>()->scale.Set(gridSize);
+	grid->GetComponent<Transform>()->scale.Set(static_cast<float>(gridSize));
 	grid->GetComponent<Render>()->SetTexture(Load::TGA("Files/Textures/chessboard.tga"));
 
 	// most performant : 500 - 700 FPS
 	auto fps = entities->Create<FPSLabel>();
-	fps->GetComponent<Transform>()->translation.Set(gridSize, 0.f, 0.f);
+	fps->GetComponent<Transform>()->translation.Set(static_cast<float>(gridSize), 0.f, 0.f);
 	fps->GetComponent<Transform>()->scale.Set(1.f);
 	fps->GetComponent<Render>()->tint.Set(0.01f);
 	fps->GetComponent<Text>()->SetFont(Load::FNT("Files/Fonts/Microsoft.fnt", "Files/Fonts/Microsoft.tga"));
@@ -86,10 +82,13 @@ void QueenProblem::Start() {
 	for (int i = 0; i < gridSize; ++i) {
 		auto queen = entities->Create<Sprite>();
 		queen->GetComponent<Transform>()->translation.Set((i - gridSize * 0.5f) + 0.5f, (i - gridSize * 0.5f) + 0.5f, 0.5f);
-		//queen->GetComponent<Transform>()->scale.Set(0.5f);
 		queen->GetComponent<Render>()->SetTexture(Load::TGA("Files/Textures/queen.tga"));
 		queenObjects[i] = queen;
 	}
+
+	//knight = entities->Create<Sprite>();
+	//knight->GetComponent<Transform>()->translation.Set(0.5f, 0.5f, 0.5f);
+	//knight->GetComponent<Render>()->SetTexture(Load::TGA("Files/Textures/knight.tga"));
 
 	std::vector<int> list(gridSize, -1);
 	std::vector<int> avail(gridSize);
@@ -100,10 +99,9 @@ void QueenProblem::Start() {
 	std::cout << "Iterations : " << iterations << '\n';
 	std::cout << "Solutions  : " << solutions << '\n';
 
-	//std::vector<bool> visited(gridSize * gridSize);
-	//visited[1] = true;
-	//KnightTour(0, { 1 }, visited);
-
+	//std::vector<bool> visited(gridSize * gridSize, false);
+	//visited[0] = true;
+	//KnightTour(0, { vec2i(0) }, visited);
 	//std::cout << "iterations : " << iterations << '\n';
 	//std::cout << "Solutions  : " << solutions << '\n';
 }
@@ -122,6 +120,7 @@ void QueenProblem::Solve8Queen(const int& column, std::vector<int> list, std::ve
 		for (const auto& item : list)
 			std::cout << item << ' ';
 		std::cout << '\n';
+		Sleep(1000);
 		return;
 	}
 
@@ -163,7 +162,7 @@ void QueenProblem::Solve8Queen(const int& column, std::vector<int> list, std::ve
 
 				bool attacks = false;
 
-				for (unsigned c = 0; c < column - 1; ++c) {
+				for (int c = 0; c < column - 1; ++c) {
 					const int x = static_cast<int>(c);
 					const int y = list[c];
 						
@@ -192,6 +191,14 @@ void QueenProblem::UpdateQueens(std::vector<int> list) {
 }
 
 
+int QueenProblem::GetMapIndex(const vec2i& position) {
+	if (position.x < 0 || position.x >= gridSize ||
+		position.y < 0 || position.y >= gridSize)
+		return -1;
+
+	return position.x + position.y * gridSize;
+}
+
 bool QueenProblem::IsBoardCompleted(std::vector<bool>& visited) {
 	for (unsigned i = 0; i < visited.size(); ++i)
 		if (!visited[i]) return false;
@@ -199,33 +206,61 @@ bool QueenProblem::IsBoardCompleted(std::vector<bool>& visited) {
 	return true;
 }
 
-bool QueenProblem::IsKnightValid(int& position, std::vector<bool>& visited) {
-	return position >= 0 && position < gridSize * gridSize && !visited[position];
+bool QueenProblem::IsKnightValid(const int& index, std::vector<bool>& visited) {
+	return index >= 0 && !visited[index];
 }
 
-void QueenProblem::KnightTour(int depth, std::vector<int> positions, std::vector<bool> visited) {
+void QueenProblem::KnightTour(int depth, std::vector<vec2i> positions, std::vector<bool> visited) {
+	UpdateKnight(positions.back());
+
 	if (IsBoardCompleted(visited)) {
 		++solutions;
-		//std::cout << "Tour : ";
-		//for (const auto& pos : positions) {
-		//	std::cout << pos << ' ';
-		//}
-		//std::cout << '\n';
+		std::cout << "Tour : ";
+		auto previous = positions.front();
+		bool first = true;
+
+		const vec2i offset(gridSize * 0.5f);
+
+		for (const auto& pos : positions) {
+			std::cout << GetMapIndex(pos) + 1 << ' ';
+			if (first) {
+				first = false;
+			} else {
+				Line line;
+				line.Set(previous - offset, pos - offset);
+				line.tint.Set(1.f);
+				Events::EventsManager::GetInstance()->Trigger("DRAW_LINE", new Events::AnyType<Line>(line));
+				previous = pos;
+			}
+		}
+		std::cout << '\n';
+		Events::EventsManager::GetInstance()->Trigger("STEP");
+		Sleep(1000);
 		return;
 	}
 
+	Events::EventsManager::GetInstance()->Trigger("STEP");
+
 	++iterations;
 	for (const auto& path : knightPaths) {
-		int newPosition = positions.back() + path;
-		if (IsKnightValid(newPosition, visited)) {
+		const auto newPosition = positions.back() + path;
+		const auto positionIndex = GetMapIndex(newPosition);
+		if (IsKnightValid(positionIndex, visited)) {
 			auto copy = visited;
-			copy[newPosition] = true;
+			copy[positionIndex] = true;
 
 			auto positionsCopy = positions;
 			positionsCopy.push_back(newPosition);
 			KnightTour(depth + 1, positionsCopy, copy);
 		}
 	}
+}
+
+void QueenProblem::UpdateKnight(const vec2i & position) {
+	const float offset = static_cast<float>(gridSize) * 0.5f;
+	const float x = static_cast<float>(position.x) - offset;
+	const float y = static_cast<float>(position.y) - offset;
+	knight->GetComponent<Transform>()->translation.Set(x + 0.5f, y + 0.5f, 0.5f);
 }
 
 
