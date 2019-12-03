@@ -48,7 +48,7 @@ void Application::Initialize(const int& width, const int& height, const char* ti
 	em->Subscribe("STEP", &Application::Step, this);
 
 	sceneManager = new SceneManager;
-	sceneManager->Add("QUEEN", new QueenProblem);
+	sceneManager->Add("QUEEN", new PathFinding);
 	sceneManager->SetEntryPoint("QUEEN");
 	// turn off vsync
 	//glfwSwapInterval(0);

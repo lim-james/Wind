@@ -10,7 +10,8 @@ SceneManager::SceneManager()
 
 SceneManager::~SceneManager() {
 	for (auto& scenePair : scenes) {
-		delete scenePair.second;
+		if (scenePair.second)
+			delete scenePair.second;
 	}
 
 	scenes.clear();

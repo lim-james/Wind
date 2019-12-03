@@ -168,7 +168,13 @@
     <ClCompile Include="UITableViewCell.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="QueenProblem.cpp">
+    <ClCompile Include="PathFinding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Maze.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Mouse.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -338,7 +344,13 @@
     <ClInclude Include="UITableViewCell.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="QueenProblem.h">
+    <ClInclude Include="PathFinding.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Maze.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Mouse.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

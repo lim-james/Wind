@@ -140,7 +140,9 @@
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="ButtonSystem.cpp" />
     <ClCompile Include="ChatRoom.cpp" />
-    <ClCompile Include="QueenProblem.cpp" />
+    <ClCompile Include="Maze.cpp" />
+    <ClCompile Include="Mouse.cpp" />
+    <ClCompile Include="PathFinding.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="SpriteAnimation.cpp" />
     <ClCompile Include="SpriteAnimationData.cpp" />
@@ -194,7 +196,9 @@
     <ClInclude Include="Button.h" />
     <ClInclude Include="ButtonSystem.h" />
     <ClInclude Include="ChatRoom.h" />
-    <ClInclude Include="QueenProblem.h" />
+    <ClInclude Include="Maze.h" />
+    <ClInclude Include="Mouse.h" />
+    <ClInclude Include="PathFinding.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="SpriteAnimation.h" />
     <ClInclude Include="SpriteAnimationData.h" />

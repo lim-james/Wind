@@ -100,8 +100,8 @@ void RenderSystem::Start() {
 }
 
 void RenderSystem::Update(const float& dt) {
-	glViewport(0, 0, windowSize.w, windowSize.h);
-	glScissor(0, 0, windowSize.w, windowSize.h);
+	glViewport(0, 0, static_cast<GLsizei>(windowSize.w), static_cast<GLsizei>(windowSize.h));
+	glScissor(0, 0, static_cast<GLsizei>(windowSize.w), static_cast<GLsizei>(windowSize.h));
 	glClearColor(0, 0, 0, 0);
 
 	for (auto& cam : cameras) {

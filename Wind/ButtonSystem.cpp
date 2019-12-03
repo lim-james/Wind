@@ -50,11 +50,13 @@ void ButtonSystem::FixedUpdate(const float & dt) {
 
 				if (mouseActions[GLFW_MOUSE_BUTTON_LEFT] != GLFW_RELEASE) {
 					if (prevMouseActions[GLFW_MOUSE_BUTTON_LEFT] == GLFW_RELEASE) {
+						prevMouseActions[GLFW_MOUSE_BUTTON_LEFT] = mouseActions[GLFW_MOUSE_BUTTON_LEFT];
 						if (button->handlers[MOUSE_DOWN])
 							button->handlers[MOUSE_DOWN](parent);
 					}
 				} else {
 					if (prevMouseActions[GLFW_MOUSE_BUTTON_LEFT] != GLFW_RELEASE) {
+						prevMouseActions[GLFW_MOUSE_BUTTON_LEFT] = mouseActions[GLFW_MOUSE_BUTTON_LEFT];
 						if (button->handlers[MOUSE_CLICK])
 							button->handlers[MOUSE_CLICK](parent);
 					}
