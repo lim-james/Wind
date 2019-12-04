@@ -26,6 +26,7 @@
 #include "Line.h"
 
 #include <Events/EventsManager.h>
+#include <GLFW/glfw3.h>
 
 PathFinding::PathFinding() {
 	gridSize = 12;
@@ -62,6 +63,7 @@ void PathFinding::Reset() {
 	Scene::Reset();
 	Events::EventsManager::GetInstance()->Subscribe("UPDATE_VISION", &PathFinding::UpdateVision, this);
 	Events::EventsManager::GetInstance()->Subscribe("DRAW_PATH", &PathFinding::DrawPath, this);
+	Events::EventsManager::GetInstance()->Subscribe("KEY_INPUT", &PathFinding::KeyHandler, this);
 }
 
 void PathFinding::Start() {
@@ -89,7 +91,7 @@ void PathFinding::Start() {
 	// float grid size
 	const float fgs = static_cast<float>(gridSize) * 0.5f;
 	maze.Generate(0, gridSize, vec2i(0), 0.3f);
-	mouse.Reset(vec2i(0), gridSize);
+	mouse.Init(vec2i(0), gridSize);
 
 	for (float x = -fgs; x < fgs; ++x) {
 		for (float y = -fgs; y < fgs; ++y) {
@@ -99,12 +101,20 @@ void PathFinding::Start() {
 
 			const int index = maze.GetMapIndex(static_cast<int>(x + fgs), static_cast<int>(y + fgs));
 
-			if (maze.IsBlocked(index)) {
-				tile->GetComponent<Render>()->tint.Set(0.f, 0.f, 0.f, 1.f);
-			} else {
-				tile->GetComponent<Render>()->tint.Set(1.f);
+			switch (maze.GetMapData(index)) {
+			case WALL:
+				tile->GetComponent<Render>()->tint.Set(1.f, 0.f, 0.f, 0.5f);
+				break;
+			case FOG:
+				tile->GetComponent<Render>()->tint.Set(0.f);
+				break;
+			case PATH:
+				tile->GetComponent<Render>()->tint.Set(1.f, 1.f, 1.f, 0.5f);
+				break;
+			default:
+				break;
 			}
-			
+
 			tile->GetComponent<Button>()->BindHandler(&PathFinding::OnMouseOverHandler, this, MOUSE_OVER);
 			tile->GetComponent<Button>()->BindHandler(&PathFinding::OnMouseOutHandler, this, MOUSE_OUT);
 			tile->GetComponent<Button>()->BindHandler(&PathFinding::OnMouseDownHandler, this, MOUSE_DOWN);
@@ -121,7 +131,7 @@ void PathFinding::Start() {
 
 void PathFinding::UpdateVision() {
 	auto vision = mouse.GetVision();
-	auto index = maze.GetMapIndex(mouse.GetPosition());
+	auto index = maze.GetMapIndex(mouse.GetMapPosition());
 
 	for (unsigned i = 0; i < vision.size(); ++i) {
 		if (i == index) {
@@ -143,9 +153,6 @@ void PathFinding::UpdateVision() {
 			break;
 		}
 	}
-
-	Events::EventsManager::GetInstance()->Trigger("STEP");
-	//Sleep(20);
 }
 
 void PathFinding::DrawPath(Events::Event * event) {
@@ -159,6 +166,13 @@ void PathFinding::DrawPath(Events::Event * event) {
 	}
 	Events::EventsManager::GetInstance()->Trigger("STEP");
 	Sleep(20);
+}
+
+void PathFinding::KeyHandler(Events::Event * event) {
+	const auto keyInput = static_cast<Events::KeyInput* >(event);
+	if (keyInput->key == GLFW_KEY_SPACE && keyInput->action == GLFW_PRESS) {
+		
+	}
 }
 
 void PathFinding::OnMouseOverHandler(Entity * entity) {

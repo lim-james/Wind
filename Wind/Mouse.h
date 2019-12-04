@@ -2,6 +2,7 @@
 #define MOUSE_H
 
 #include "Maze.h"
+#include "Sprite.h"
 
 #include <Math/Vectors.hpp>
 
@@ -21,11 +22,9 @@ struct DNode {
 
 };
 
-class Mouse {
+class Mouse : public Entity {
 
 	vec2i directions[4];
-
-	vec2i position;
 
 	Maze* maze;
 	std::vector<unsigned> vision;
@@ -34,11 +33,13 @@ public:
 	
 	Mouse();
 
-	void Reset(const vec2i& _position, const unsigned& mapSize);
-	void Explore(Maze* _maze);
+	void Init(const vec2i& _position, Maze* const maze);
+	void Explore();
 	void Goto(const vec2i& target);
 
-	const vec2i& GetPosition() const;
+	vec2i GetMapPosition();
+	void SetMapPosition(const vec2i& position);
+
 	const std::vector<unsigned>& GetVision() const;
 
 private:

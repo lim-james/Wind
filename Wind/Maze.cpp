@@ -24,13 +24,33 @@ void Maze::Generate(const unsigned& seed, const unsigned & _size, const vec2i & 
 	}
 }
 
+const unsigned & Maze::GetSize() const {
+	return size;
+}
+
 bool Maze::IsBlocked(const vec2i & position) const {
 	const int index = GetMapIndex(position);
 	return index < 0 || grid[index] == WALL;
 }
 
-bool Maze::IsBlocked(const int index) const {
+bool Maze::IsBlocked(const int& index) const {
 	return index < 0 || grid[index] == WALL;
+}
+
+int Maze::GetMapData(const vec2i & position) const {
+	const int index = GetMapIndex(position);
+	if (index < 0) return WALL;
+	return grid[index];
+}
+
+int Maze::GetMapData(const int & x, const int & y) const {
+	const int index = GetMapIndex(x, y);
+	if (index < 0) return WALL;
+	return grid[index];
+}
+
+int Maze::GetMapData(const int & index) const {
+	return grid[index];
 }
 
 int Maze::GetMapIndex(const vec2i & position) const {

@@ -1,5 +1,7 @@
 #include "Mouse.h"
 
+#include "Transform.h"
+
 #include <Events/EventsManager.h>
 
 DNode::DNode() 
@@ -23,14 +25,13 @@ Mouse::Mouse() {
 	directions[3] = vec2i(0, -1);
 }
 
-void Mouse::Reset(const vec2i & _position, const unsigned& mapSize) {
+void Mouse::Init(const vec2i & _position, Maze* const maze) {
 	position = _position;
-	vision.resize(mapSize * mapSize, FOG);
+	vision.resize(maze->GetSize() * maze->GetSize(), FOG);
 }
 
-void Mouse::Explore(Maze * _maze) {
-	maze = _maze;
-	Scan(position);
+void Mouse::Explore() {
+	Scan(GetMapPosition());
 }
 
 void Mouse::Goto(const vec2i & target) {
@@ -106,8 +107,23 @@ void Mouse::Goto(const vec2i & target) {
 
 }
 
-const vec2i & Mouse::GetPosition() const {
-	return position;
+vec2i Mouse::GetMapPosition() {
+	auto translation = GetComponent<Transform>()->GetWorldTranslation();
+	const int halfSize = static_cast<int>(maze->GetSize()) / 2; 
+	
+	return vec2i(
+		static_cast<int>(translation.x) + halfSize,
+		static_cast<int>(translation.y) + halfSize
+	);
+}
+
+void Mouse::SetMapPosition(const vec2i & position) {
+	const float halfSize = static_cast<float>(maze->GetSize()) * 0.5f; 
+	GetComponent<Transform>()->translation.Set(
+		static_cast<float>(position.x) + halfSize,
+		static_cast<float>(position.y) + halfSize,
+		0.f
+	);
 }
 
 const std::vector<unsigned>& Mouse::GetVision() const {
@@ -115,11 +131,6 @@ const std::vector<unsigned>& Mouse::GetVision() const {
 }
 
 void Mouse::Scan(const vec2i & curr) {
-	vec2i temp = position;
-	position = curr;
-	Events::EventsManager::GetInstance()->Trigger("UPDATE_VISION");
-	position = temp;
-
 	const int index = maze->GetMapIndex(curr);
 	if (index < 0 || vision[index] != FOG) return;
 

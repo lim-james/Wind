@@ -30,6 +30,7 @@ private:
 
 	void UpdateVision();
 	void DrawPath(Events::Event* event);
+	void KeyHandler(Events::Event* event);
 
 	void OnMouseOverHandler(Entity* entity);
 	void OnMouseOutHandler(Entity* entity);
