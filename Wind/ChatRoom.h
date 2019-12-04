@@ -5,6 +5,11 @@
 
 #include "Scene.h"
 
+// messaging helpers
+#include "Codable.h"
+#include "Message.h"
+#include "Profile.h"
+// elements
 #include "UITextField.h"
 #include "UITableView.h"
 
@@ -12,11 +17,13 @@ class ChatRoom : public Scene {
 
 	TCP* client;
 
+	Profile* profile;
+
 	UITextField* textField;
 	UITableView* tableView;
 
 	bool updated;
-	std::vector<std::string> messages;
+	std::vector<Message> messages;
 
 public:
 
@@ -32,6 +39,9 @@ public:
 
 private:
 
+	void ReadThread();
+
+	void ChangeHandler(UITextField* const target);
 	void ReturnHandler(UITextField* const target);
 
 	void MouseOverHandler(Entity* target);
@@ -42,6 +52,8 @@ private:
 	void CellForRow(UITableView* tableView, UITableViewCell* cell, unsigned row);
 
 	UITextField* CreateTextField(const std::string& _prompt = "");
+
+	void CommandHandler(const std::string& command);
 
 };
 

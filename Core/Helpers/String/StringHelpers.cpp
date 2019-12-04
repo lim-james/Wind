@@ -57,9 +57,8 @@ std::string Helpers::Join(const std::vector<std::string>& list, const std::strin
 //}
 
 std::string Helpers::Trim(std::string content) {
-	int length = content.length();
-	while (length > 0 && content[0] == ' ') content.erase(0, 1);
-	while (length > 0 && content[length - 1] == ' ') content.erase(--length, 1);
+	while (!content.empty() && content.front() == ' ') content.erase(content.begin());
+	while (!content.empty() && content.back() == ' ') content.pop_back();
 
 	return content;
 }

@@ -15,12 +15,16 @@ protected:
 
 public:
 
+	// Initialization of local variables
 	Scene();
+	// Destruction
 	virtual ~Scene();
 
-	// Initialization
+	// subscribe to events, subscribe ECS
 	virtual void Awake();
+	// subscribe to events
 	virtual void Reset();
+	// creation of game objects
 	virtual void Start();
 
 	// updates every fixed timestep
@@ -28,6 +32,7 @@ public:
 	// updates every frame
 	virtual void Update(const float& dt);
 
+	// unsubscribe events
 	virtual void Stop();
 	virtual void Destroy();
 

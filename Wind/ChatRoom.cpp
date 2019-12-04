@@ -26,15 +26,19 @@
 #include "InputEvents.h"
 
 #include <Events/EventsManager.h>
+#include <Helpers/String/StringHelpers.h>
 #include <GLFW/glfw3.h>
 
 #include <thread>
 
 ChatRoom::ChatRoom() {
-
+	// ::REMOVE::
+	profile = new Profile;
+	profile->name = "James";
+	profile->status = "Bored af";
 }
 
-ChatRoom::~ChatRoom() {}
+ChatRoom::~ChatRoom() { }
 
 void ChatRoom::Awake() {
 	Scene::Awake();
@@ -72,10 +76,11 @@ void ChatRoom::Start() {
 	cursor->GetComponent<Transform>()->scale.Set(0.1f, 1.f, 1.f);
 	cursor->GetComponent<Render>()->tint.Set(0.f, 1.f, 1.f, 1.f);
 
-	textField = CreateTextField("James");
+	textField = CreateTextField(profile->name);
 	textField->GetComponent<Transform>()->translation.y = -17.f;
 	textField->SetCursor(cursor);
 	textField->Focus();
+	textField->BindDidChange(&ChatRoom::ChangeHandler, this);
 	textField->BindDidReturn(&ChatRoom::ReturnHandler, this);
 
 	tableView = entities->Create<UITableView>();
@@ -85,15 +90,7 @@ void ChatRoom::Start() {
 	tableView->BindCellForRowHandler(&ChatRoom::CellForRow, this);
 	tableView->ReloadData();
 
-	std::thread([this]() {
-		while (true) {
-			auto result = client->Receive();
-			if (result != "") {
-				messages.push_back(result);
-				updated = true;
-			}
-		}
-	}).detach();
+	std::thread(&ChatRoom::ReadThread, this).detach();
 }
 
 void ChatRoom::Update(const float & dt) {
@@ -109,8 +106,43 @@ void ChatRoom::SetClient(TCP * const _client) {
 	client = _client;
 }
 
+void ChatRoom::ReadThread() {
+	while (true) {
+		auto result = client->Receive();
+		if (result != "") {
+			Message message;
+			message.Decode(result);
+			messages.push_back(message);
+			updated = true;
+		}
+	}
+}
+
+void ChatRoom::ChangeHandler(UITextField * const target) {
+	auto component = target->GetComponent<Text>();
+
+	if (component->text.empty()) return;
+
+	if (component->text.front() == '/') {
+		component->color.Set(0.8f);
+	} else {
+		component->color.Set(1.f);
+	}
+}
+
 void ChatRoom::ReturnHandler(UITextField * const target) {
-	client->Send(target->GetComponent<Text>()->text);
+	auto text = target->GetComponent<Text>()->text;
+	text = Helpers::Trim(text);
+	if (text.empty()) return;
+
+	if (text.front() == '/') {
+		CommandHandler(text);
+	} else {
+		Content message(text);
+		auto result = Codable::Join(2, profile, &message);
+		client->Send(result);
+	}
+
 }
 
 void ChatRoom::MouseOverHandler(Entity * target) {
@@ -140,7 +172,9 @@ unsigned ChatRoom::NumberOfRows(UITableView * tableView) {
 void ChatRoom::CellForRow(UITableView * tableView, UITableViewCell * cell, unsigned row) {
 	cell->GetComponent<Render>()->tint.Set(0.f, 0.f, 0.f, 1.f);
 	const int i = messages.size() - 1 - row;
-	cell->title->GetComponent<Text>()->text = messages[i];
+	auto current = messages[i];
+	cell->title->GetComponent<Text>()->text = current.content.body;
+	cell->subtitle->GetComponent<Text>()->text = current.profile.name + " is " + current.profile.status;
 
 	if (row == 0) {
 		cell->title->GetComponent<Text>()->color.a = 0.f;
@@ -179,4 +213,14 @@ UITextField * ChatRoom::CreateTextField(const std::string & _prompt) {
 	prompt->GetComponent<Text>()->paragraphAlignment = PARAGRAPH_LEFT;
 
 	return result;
+}
+
+void ChatRoom::CommandHandler(const std::string & command) {
+	auto list = Helpers::Split(command, ' ');
+	auto name = list[0];
+
+	if (name == "/iam") {
+		list.erase(list.begin());
+		profile->status = Helpers::Join(list, ' ');
+	}
 }
