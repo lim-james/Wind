@@ -42,8 +42,6 @@ LobbyScene::~LobbyScene() {
 void LobbyScene::Awake() {
 	Scene::Awake();
 
-	Events::EventsManager::GetInstance()->Subscribe("DROP_INPUT", &LobbyScene::DropHandler, this);
-
 	components->Subscribe<Transform>(10, 1);
 	components->Subscribe<Animation>(10, 1);
 	components->Subscribe<Render>(10, 1);

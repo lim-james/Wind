@@ -31,6 +31,7 @@ public:
 	~ChatRoom() override;
 
 	void Awake() override;
+	void Reset() override;
 	void Start() override;
 
 	void Update(const float& dt) override;
@@ -38,6 +39,8 @@ public:
 	void SetClient(TCP* const _client);
 
 private:
+
+	void DropHandler(Events::Event* event);
 
 	void ReadThread();
 

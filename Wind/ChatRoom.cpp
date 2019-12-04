@@ -27,6 +27,7 @@
 
 #include <Events/EventsManager.h>
 #include <Helpers/String/StringHelpers.h>
+#include <Helpers/File/FileHelpers.h>
 #include <GLFW/glfw3.h>
 
 #include <thread>
@@ -34,7 +35,8 @@
 ChatRoom::ChatRoom() {
 	// ::REMOVE::
 	profile = new Profile;
-	profile->name = "James";
+	std::cin >> profile->name;
+	//profile->name = "John";
 	profile->status = "Bored af";
 }
 
@@ -64,6 +66,12 @@ void ChatRoom::Awake() {
 	systems->Subscribe<RenderSystem>();
 	systems->Subscribe<ButtonSystem>();
 	systems->Subscribe<ScriptSystem>();
+}
+
+void ChatRoom::Reset() {
+	Scene::Reset();
+
+	Events::EventsManager::GetInstance()->Subscribe("DROP_INPUT", &ChatRoom::DropHandler, this);
 }
 
 void ChatRoom::Start() {
@@ -106,6 +114,22 @@ void ChatRoom::SetClient(TCP * const _client) {
 	client = _client;
 }
 
+void ChatRoom::DropHandler(Events::Event * event) {
+	auto drop = static_cast<Events::DropInput*>(event);
+	//imageView->GetComponent<Render>()->SetTexture(Load::TGA(drop->paths[0]));
+
+	for (int i = 0; i < drop->count; ++i) {
+		const auto path = drop->paths[i];
+		const auto name = Helpers::Split(path, '\\').back();
+
+		Content message;
+		message.type = FILE_CONTENT;
+		message.title = name;
+		message.body = Helpers::LoadFile(path);
+		client->Send(Codable::Join(2, profile, &message));
+	}
+}
+
 void ChatRoom::ReadThread() {
 	while (true) {
 		auto result = client->Receive();
@@ -114,6 +138,15 @@ void ChatRoom::ReadThread() {
 			message.Decode(result);
 			messages.push_back(message);
 			updated = true;
+
+			Console::Warn << "Result : " << result << '\n';
+
+			if (message.content.type == FILE_CONTENT) {
+				if (message.profile.name != profile->name) {
+					Helpers::WriteFile(message.content.title, message.content.body);
+				}
+			}
+
 		}
 	}
 }
@@ -138,9 +171,9 @@ void ChatRoom::ReturnHandler(UITextField * const target) {
 	if (text.front() == '/') {
 		CommandHandler(text);
 	} else {
-		Content message(text);
-		auto result = Codable::Join(2, profile, &message);
-		client->Send(result);
+		Content message;
+		message.body = text;
+		client->Send(Codable::Join(2, profile, &message));
 	}
 
 }
@@ -173,8 +206,18 @@ void ChatRoom::CellForRow(UITableView * tableView, UITableViewCell * cell, unsig
 	cell->GetComponent<Render>()->tint.Set(0.f, 0.f, 0.f, 1.f);
 	const int i = messages.size() - 1 - row;
 	auto current = messages[i];
-	cell->title->GetComponent<Text>()->text = current.content.body;
 	cell->subtitle->GetComponent<Text>()->text = current.profile.name + " is " + current.profile.status;
+
+	switch (current.content.type) {
+	case TEXT_CONTENT:
+		cell->title->GetComponent<Text>()->text = current.content.body;
+		break;
+	case FILE_CONTENT:
+		cell->title->GetComponent<Text>()->text = current.content.title;
+		break;
+	default:
+		break;
+	}
 
 	if (row == 0) {
 		cell->title->GetComponent<Text>()->color.a = 0.f;

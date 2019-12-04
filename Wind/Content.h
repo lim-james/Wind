@@ -3,12 +3,16 @@
 
 #include "Codable.h"
 
+#define TEXT_CONTENT 0
+#define FILE_CONTENT 1
+
 struct Content : Codable {
 
+	int type;
+	std::string title;
 	std::string body;
 
 	Content();
-	Content(const std::string& body);
 
 	void Decode(const std::string& _content) override;
 	std::string Encode() const override;
