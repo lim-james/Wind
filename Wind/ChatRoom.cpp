@@ -126,7 +126,10 @@ void ChatRoom::DropHandler(Events::Event * event) {
 		message.type = FILE_CONTENT;
 		message.title = name;
 		message.body = Helpers::LoadFile(path);
-		client->Send(Codable::Join(2, profile, &message));
+		Console::Warn << "Content : " << message.body.length() << " bytes\n";
+		auto temp = Codable::Join(2, profile, &message);
+		client->Send(temp);
+		Codable::Split(temp, 2, profile, &message);
 	}
 }
 
@@ -138,8 +141,6 @@ void ChatRoom::ReadThread() {
 			message.Decode(result);
 			messages.push_back(message);
 			updated = true;
-
-			Console::Warn << "Result : " << result << '\n';
 
 			if (message.content.type == FILE_CONTENT) {
 				if (message.profile.name != profile->name) {
