@@ -14,6 +14,19 @@ std::vector<std::string> Helpers::Split(const std::string& content, const char& 
 	return parts;
 }
 
+std::vector<std::string> Helpers::Group(const std::string & content, const unsigned& size) {
+	const unsigned count = content.length() / size;
+	std::vector<std::string> result(count + 1, "");
+
+	for (unsigned i = 0; i < count; ++i) {
+		result[i] = content.substr(size * i, size);
+	}
+
+	result[count] = content.substr(size * count);
+	
+	return result;
+}
+
 std::string Helpers::Join(const std::vector<std::string>& list) {
 	std::string result;
 

@@ -13,6 +13,8 @@ namespace Helpers {
 
 	std::vector<std::string> Split(const std::string& content, const char& delimiter);
 
+	std::vector<std::string> Group(const std::string& content, const unsigned& size);
+
 	template<typename T>
 	std::vector<T> Split(const std::string& content, const char& delimiter);
 

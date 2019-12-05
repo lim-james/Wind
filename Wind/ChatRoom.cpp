@@ -122,14 +122,14 @@ void ChatRoom::DropHandler(Events::Event * event) {
 		const auto path = drop->paths[i];
 		const auto name = Helpers::Split(path, '\\').back();
 
+		const auto contents = Helpers::LoadFile(path);
+		const auto groups = Helpers::Group(contents, 4096);
+
 		Content message;
 		message.type = FILE_CONTENT;
 		message.title = name;
-		message.body = Helpers::LoadFile(path);
-		Console::Warn << "Content : " << message.body.length() << " bytes\n";
-		auto temp = Codable::Join(2, profile, &message);
-		client->Send(temp);
-		Codable::Split(temp, 2, profile, &message);
+		message.body = contents;
+		client->Send(Codable::Join(2, profile, &message));
 	}
 }
 
