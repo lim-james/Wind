@@ -26,6 +26,8 @@ public:
 
 	TCP(const USHORT& port);
 
+	bool Receive(SOCKET& sock, std::string& message);
+
 	// server methods
 
 	void Initialize(const std::string& _welcome);

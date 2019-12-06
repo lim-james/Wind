@@ -15,11 +15,7 @@
 #include "Camera.h"
 #include "Button.h"
 #include "Script.h"
-// systems
-#include "AnimationSystem.h"
-#include "RenderSystem.h"
-#include "ButtonSystem.h"
-#include "ScriptSystem.h"
+#include "Text.h"
 // utils
 #include "LoadFNT.h"
 // events
@@ -32,41 +28,9 @@
 
 #include <thread>
 
-ChatRoom::ChatRoom() {
-	// ::REMOVE::
-	profile = new Profile;
-	std::cin >> profile->name;
-	//profile->name = "John";
-	profile->status = "Bored af";
-}
+ChatRoom::ChatRoom() { }
 
 ChatRoom::~ChatRoom() { }
-
-void ChatRoom::Awake() {
-	Scene::Awake();
-
-	components->Subscribe<Transform>(10, 1);
-	components->Subscribe<Animation>(10, 1);
-	components->Subscribe<Render>(10, 1);
-	components->Subscribe<Text>(10, 1);
-	components->Subscribe<Camera>(1, 1);
-	components->Subscribe<Button>(10, 1);
-	components->Subscribe<Script>(1, 1);
-		
-	entities->Subscribe<Sprite>(1, 1);
-	entities->Subscribe<UILabel>(10, 1);
-	entities->Subscribe<UIButton>(10, 1);
-	entities->Subscribe<UITextField>(1, 1);
-	entities->Subscribe<FPSLabel>(1, 1);
-	entities->Subscribe<UITableView>(1, 1);
-	entities->Subscribe<UITableView>(10, 1);
-	entities->Subscribe<CameraObject>(1, 1);
-
-	systems->Subscribe<AnimationSystem>();
-	systems->Subscribe<RenderSystem>();
-	systems->Subscribe<ButtonSystem>();
-	systems->Subscribe<ScriptSystem>();
-}
 
 void ChatRoom::Reset() {
 	Scene::Reset();
@@ -108,6 +72,10 @@ void ChatRoom::Update(const float & dt) {
 		tableView->ReloadData();
 		updated = false;
 	}
+}
+
+void ChatRoom::SetProfile(Profile * const _profile) {
+	profile = _profile;
 }
 
 void ChatRoom::SetClient(TCP * const _client) {

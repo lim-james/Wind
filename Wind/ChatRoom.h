@@ -1,23 +1,22 @@
 #ifndef CHAT_ROOM_H
 #define CHAT_ROOM_H
 
+#include "Profile.h"
 #include "TCP.h"
 
-#include "Scene.h"
+#include "UIViewController.h"
 
 // messaging helpers
 #include "Codable.h"
 #include "Message.h"
-#include "Profile.h"
 // elements
 #include "UITextField.h"
 #include "UITableView.h"
 
-class ChatRoom : public Scene {
-
-	TCP* client;
+class ChatRoom : public UIViewController {
 
 	Profile* profile;
+	TCP* client;
 
 	UITextField* textField;
 	UITableView* tableView;
@@ -30,12 +29,12 @@ public:
 	ChatRoom();
 	~ChatRoom() override;
 
-	void Awake() override;
 	void Reset() override;
 	void Start() override;
 
 	void Update(const float& dt) override;
 
+	void SetProfile(Profile* const _profile);
 	void SetClient(TCP* const _client);
 
 private:

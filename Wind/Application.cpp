@@ -45,9 +45,10 @@ void Application::Initialize(const int& width, const int& height, const char* ti
 #endif
 
 	sceneManager = new SceneManager;
+	sceneManager->Add("LOGIN", new LoginScene);
 	sceneManager->Add("LOBBY", new LobbyScene);
 	sceneManager->Add("CHAT_ROOM", new ChatRoom);
-	sceneManager->SetEntryPoint("LOBBY");
+	sceneManager->SetEntryPoint("LOGIN");
 	// turn off vsync
 	//glfwSwapInterval(0);
 

@@ -63,22 +63,11 @@ void LobbyScene::Awake() {
 	systems->Subscribe<ScriptSystem>();
 }
 
-void LobbyScene::Reset() {
-	Scene::Reset();
-
-	Events::EventsManager::GetInstance()->Subscribe("DROP_INPUT", &LobbyScene::DropHandler, this);
-}
-
 void LobbyScene::Start() {
 	Scene::Start();
 
 	auto cam = entities->Create<CameraObject>();
 	cam->GetComponent<Camera>()->SetSize(20);
-
-	imageView = entities->Create<Sprite>();
-	imageView->GetComponent<Transform>()->translation.y = 10.f;
-	imageView->GetComponent<Transform>()->scale.Set(4.f);
-	imageView->GetComponent<Render>()->tint.Set(1.f);
 
 	auto cursor = entities->Create<Sprite>();
 	cursor->GetComponent<Transform>()->scale.Set(0.1f, 1.f, 1.f);
@@ -111,17 +100,12 @@ void LobbyScene::Start() {
 
 void LobbyScene::PrepareForSegue(Scene * destination) {
 	auto dest = static_cast<ChatRoom*>(destination);
+	dest->SetProfile(profile);
 	dest->SetClient(client);
 }
 
-void LobbyScene::DropHandler(Events::Event * event) {
-	auto drop = static_cast<Events::DropInput*>(event);
-	Console::Log << "Dragged in " << drop->paths[0] << '\n';
-	imageView->GetComponent<Render>()->SetTexture(Load::TGA(drop->paths[0]));
-
-	for (int i = 0; i < drop->count; ++i) {
-			
-	}
+void LobbyScene::SetProfile(Profile * const _profile) {
+	profile = _profile;
 }
 
 void LobbyScene::DidChangeHandler(UITextField * const target) {

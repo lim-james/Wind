@@ -12,7 +12,6 @@ class UITextField : public Sprite {
 	float et;
 	bool isFocused;
 	bool shiftHeld;
-	bool toggle;
 
 	unsigned cursorPosition;
 

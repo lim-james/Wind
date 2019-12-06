@@ -1,18 +1,11 @@
 #include "Content.h"
 
-#include <Logger/Logger.h>
-
 Content::Content() 
 	: type(TEXT_CONTENT)
 	, body("") { }
 
 void Content::Decode(const std::string & _content) {
-	Console::Warn << "Decoding\n";
-	Console::Warn << _content << '\n';
-
 	type = static_cast<int>(_content.front());
-
-	Console::Warn << "Type : " << type << '\n';
 
 	auto content = _content;
 	content.erase(content.begin());

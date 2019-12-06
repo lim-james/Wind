@@ -18,7 +18,6 @@ std::vector<UITextField*> UITextField::all = {};
 UITextField::UITextField() {
 	Events::EventsManager::GetInstance()->Subscribe("KEY_INPUT", &UITextField::KeyHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("TEXT_INPUT", &UITextField::TextHandler, this);
-
 	all.push_back(this);
 }
 
@@ -41,8 +40,8 @@ void UITextField::Initialize() {
 }
 
 void UITextField::Focus() {
-	for (auto& tf : all)
-		tf->isFocused = false;
+	for (auto& field : all)
+		field->isFocused = false;
 	isFocused = true;
 	cursorPosition = GetComponent<Text>()->text.length();
 	UpdateCursorOffset();
@@ -66,21 +65,6 @@ void UITextField::DidReturn(UITextField * tf) {
 void UITextField::FixedUpdate(const float& dt) {
 	et += dt;
 	cursor->GetComponent<Render>()->tint.a = Math::Abs(sin(et * 5.f));
-
-	if (toggle) {
-		for (unsigned i = 0; i < all.size(); ++i) {
-			if (all[i]->isFocused) {
-				all[i]->isFocused = false;
-				if (i + 1 == all.size()) {
-					all[0]->Focus();
-				} else {
-					all[i + 1]->Focus();
-				}
-				break;
-			}
-		}
-		toggle = false;
-	}
 }
 
 void UITextField::KeyHandler(Events::Event* event) {
@@ -126,8 +110,6 @@ void UITextField::KeyHandler(Events::Event* event) {
 		} else if (keyInput->action == GLFW_RELEASE) {
 			shiftHeld = false;
 		}
-	} else if (keyInput->key == GLFW_KEY_TAB && keyInput->action == GLFW_PRESS) {
-		toggle = true;
 	}
 }
 

@@ -148,6 +148,7 @@
     <ClCompile Include="Content.cpp" />
     <ClCompile Include="Message.cpp" />
     <ClCompile Include="Profile.cpp" />
+    <ClCompile Include="LoginScene.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="SpriteAnimation.cpp" />
     <ClCompile Include="SpriteAnimationData.cpp" />
@@ -193,6 +194,7 @@
     <ClCompile Include="UITableView.cpp" />
     <ClCompile Include="UITableViewCell.cpp" />
     <ClCompile Include="UITextField.cpp" />
+    <ClCompile Include="UIViewController.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -205,6 +207,7 @@
     <ClInclude Include="Content.h" />
     <ClInclude Include="Message.h" />
     <ClInclude Include="Profile.h" />
+    <ClInclude Include="LoginScene.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="SpriteAnimation.h" />
     <ClInclude Include="SpriteAnimationData.h" />
@@ -254,6 +257,7 @@
     <ClInclude Include="UITableView.h" />
     <ClInclude Include="UITableViewCell.h" />
     <ClInclude Include="UITextField.h" />
+    <ClInclude Include="UIViewController.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>

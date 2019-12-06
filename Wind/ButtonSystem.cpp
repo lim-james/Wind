@@ -43,29 +43,24 @@ void ButtonSystem::FixedUpdate(const float & dt) {
 
 			if (offset.x <= size.x && offset.y <= size.y) {
 				if (!prev) {
-					if (button->handlers[MOUSE_OVER])
-						button->handlers[MOUSE_OVER](parent);
+					PerformAction(MOUSE_OVER, button);
 					prev = true;
 				}
 
 				if (mouseActions[GLFW_MOUSE_BUTTON_LEFT] != GLFW_RELEASE) {
 					if (prevMouseActions[GLFW_MOUSE_BUTTON_LEFT] == GLFW_RELEASE) {
-						if (button->handlers[MOUSE_DOWN])
-							button->handlers[MOUSE_DOWN](parent);
+						PerformAction(MOUSE_DOWN, button);
 					}
 				} else {
 					if (prevMouseActions[GLFW_MOUSE_BUTTON_LEFT] != GLFW_RELEASE) {
-						if (button->handlers[MOUSE_CLICK])
-							button->handlers[MOUSE_CLICK](parent);
+						PerformAction(MOUSE_CLICK, button);
 					}
 
-					if (button->handlers[MOUSE_UP])
-						button->handlers[MOUSE_UP](parent);
+					PerformAction(MOUSE_UP, button);
 				}
 			} else {
 				if (prev) {
-					if (button->handlers[MOUSE_OUT])
-						button->handlers[MOUSE_OUT](parent);
+					PerformAction(MOUSE_OUT, button);
 					prev = false;
 				}
 			}
@@ -123,4 +118,10 @@ vec2f ButtonSystem::GetWorldSpace(Camera * const camera) {
 	result.x *= camera->aspectRatio;
 
 	return result;
+}
+
+void ButtonSystem::PerformAction(const unsigned& index, Button * const self)
+{
+	auto& callback = self->handlers[index];
+	if (callback) callback(self->GetParent());
 }

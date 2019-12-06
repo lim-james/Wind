@@ -43,6 +43,8 @@ private:
 
 	vec2f GetWorldSpace(Camera * const camera);
 
+	void PerformAction(const unsigned& index, Button* const self);
+
 };
 
 #endif

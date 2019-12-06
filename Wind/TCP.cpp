@@ -14,6 +14,26 @@ TCP::TCP(const USHORT & port) : port(port) {
 	std::cout << "Winsock Initialised\n";
 }
 
+bool TCP::Receive(SOCKET & sock, std::string & message) {
+	char buffer[4096];
+
+	int length = 0;
+	int last = 0;
+
+	do {
+		ZeroMemory(buffer, sizeof(buffer));
+		length = recv(sock, buffer, sizeof(buffer), 0);
+		last = static_cast<int>(buffer[length]);
+
+		if (length <= 0)
+			return false;
+
+		message += std::string(buffer, length);
+	} while (last != 0);
+
+	return true;
+}
+
 void TCP::Initialize(const std::string& _welcome) {
 	welcome = _welcome;
 
@@ -128,11 +148,7 @@ void TCP::Send(const std::string& message) {
 }
 
 std::string TCP::Receive() {
-	char buffer[4096];
-	ZeroMemory(buffer, sizeof(buffer));
-
-	int length = 0;
-	length = recv(targetSocket, buffer, sizeof(buffer), 0);
-
-	return std::string(buffer, length);
+	std::string message;
+	Receive(targetSocket, message);
+	return message;
 }

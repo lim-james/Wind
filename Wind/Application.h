@@ -4,6 +4,7 @@
 // Scenes
 #include "LobbyScene.h"
 #include "ChatRoom.h"
+#include "LoginScene.h"
 
 #include "Window.h"
 #include "InputController.h"

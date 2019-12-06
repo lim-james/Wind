@@ -1,7 +1,5 @@
 #include "Codable.h"
 
-#include <Logger/Logger.h>
-
  std::pair<int, std::string> Codable::Decode(std::string content, const int & start) {
 	int i = start;
 	int power = static_cast<int>(content[i++]);
@@ -25,18 +23,12 @@ void Codable::Split(std::string content, int count, Codable * const...) {
 	va_list ap;
 	va_start(ap, count);
 
-	Console::Warn << "Splitting : " << content << '\n';
-
 	auto index = 0;
 
 	for (int i = 0; i < count; ++i) {
 		auto arg = va_arg(ap, Codable*);
-		Console::Warn << 2 << '\n';
 		const auto result = Decode(content, index);
-
-		Console::Warn << "Decoded (" << result.first << " bytes) " << result.second << '\n';
 		arg->Decode(result.second);
-		Console::Warn << 1 << '\n';
 		index += result.first;
 	}
 	
