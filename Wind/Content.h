@@ -3,6 +3,7 @@
 
 #include "Codable.h"
 
+#define UPDATE_CONTENT	-1
 #define TEXT_CONTENT 0
 #define FILE_CONTENT 1
 #define JOIN_CONTENT 2

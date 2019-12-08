@@ -25,7 +25,6 @@ void ButtonSystem::Update(const float & dt) {
 }
 
 void ButtonSystem::FixedUpdate(const float & dt) {
-	bool newFrame = true;
 	for (auto& cam : cameras) {
 		// world space position
 		const vec2f wsp = GetWorldSpace(cam);
@@ -54,12 +53,6 @@ void ButtonSystem::FixedUpdate(const float & dt) {
 					}
 				} else {
 					if (prevMouseActions[GLFW_MOUSE_BUTTON_LEFT] != GLFW_RELEASE) {
-						if (!newFrame) {
-							Console::Error << "Mouse click called on " << button << '\n';
-						} else {
-							Console::Warn << "Mouse click called on " << button << '\n';
-						}
-						newFrame = false;
 						PerformAction(MOUSE_CLICK, button);
 					}
 

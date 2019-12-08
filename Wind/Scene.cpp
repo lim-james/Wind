@@ -19,8 +19,6 @@ Scene::~Scene() {
 	delete entities;
 	delete components;
 	delete systems;
-
-	Destroy();
 }
 
 void Scene::Awake() {

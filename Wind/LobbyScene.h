@@ -3,8 +3,7 @@
 
 #include "Profile.h"
 #include "ChatManager.h"
-
-#include "Scene.h"
+#include "UIViewController.h"
 
 #include "UITextField.h"
 #include "UIButton.h"
@@ -12,7 +11,7 @@
 
 #include <Events/Event.h>
 
-class LobbyScene : public Scene {
+class LobbyScene : public UIViewController {
 
 	TCP* client;
 	ChatManager* manager;
@@ -27,7 +26,6 @@ public:
 	LobbyScene();
 	~LobbyScene() override;
 
-	void Awake() override;
 	void Start() override;
 
 	void PrepareForSegue(Scene* destination) override;
@@ -36,15 +34,14 @@ public:
 
 private:
 
-	void DidChangeHandler(UITextField* const target);
+	void IPDidChangeHandler(UITextField* const target);
+	void PortDidChangeHandler(UITextField* const target);
 	void ReturnHandler(UITextField* const target);
 
 	void MouseOverHandler(Entity* target);
 	void MouseOutHandler(Entity* target);
 	void MouseOnClick(Entity* target);
 	void Close(Entity* target);
-
-	UITextField* CreateTextField(const std::string& _prompt = "");
 
 	void Connect();
 

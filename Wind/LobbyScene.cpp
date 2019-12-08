@@ -33,40 +33,12 @@
 
 #include <regex>
 
-LobbyScene::LobbyScene() {
-	client = new TCP();
-}
+LobbyScene::LobbyScene() { }
 
-LobbyScene::~LobbyScene() {
-	delete client;
-}
-
-void LobbyScene::Awake() {
-	Scene::Awake();
-
-	components->Subscribe<Transform>(10, 1);
-	components->Subscribe<Animation>(10, 1);
-	components->Subscribe<Render>(10, 1);
-	components->Subscribe<Text>(10, 1);
-	components->Subscribe<Camera>(1, 1);
-	components->Subscribe<Button>(10, 1);
-	components->Subscribe<Script>(1, 1);
-		
-	entities->Subscribe<Sprite>(1, 1);
-	entities->Subscribe<UILabel>(10, 1);
-	entities->Subscribe<UIButton>(10, 1);
-	entities->Subscribe<UITextField>(1, 1);
-	entities->Subscribe<FPSLabel>(1, 1);
-	entities->Subscribe<CameraObject>(1, 1);
-
-	systems->Subscribe<AnimationSystem>();
-	systems->Subscribe<RenderSystem>();
-	systems->Subscribe<ButtonSystem>();
-	systems->Subscribe<ScriptSystem>();
-}
+LobbyScene::~LobbyScene() { }
 
 void LobbyScene::Start() {
-	Scene::Start();
+	UIViewController::Start();
 
 	auto cam = entities->Create<CameraObject>();
 	cam->GetComponent<Camera>()->SetSize(20);
@@ -75,7 +47,7 @@ void LobbyScene::Start() {
 	title->GetComponent<Transform>()->translation.y = 17.f;
 	title->GetComponent<Render>()->tint.Set(0.f);
 	title->GetComponent<Text>()->SetFont(Load::FNT("Files/Fonts/Microsoft.fnt", "Files/Fonts/Microsoft.tga"));
-	title->GetComponent<Text>()->text = "Create";
+	title->GetComponent<Text>()->text = "Join";
 
 	auto close = entities->Create<UIButton>();
 	close->GetComponent<Transform>()->translation.x = -9.f;
@@ -90,12 +62,14 @@ void LobbyScene::Start() {
 	ipField = CreateTextField("IP Address:");
 	ipField->SetCursor(cursor);
 	ipField->Focus();
-	ipField->BindDidChange(&LobbyScene::DidChangeHandler, this);
+	ipField->BindDidChange(&LobbyScene::IPDidChangeHandler, this);
 	ipField->BindDidReturn(&LobbyScene::ReturnHandler, this);	
 
 	portField = CreateTextField("Port:");
 	portField->SetCursor(cursor);
 	portField->GetComponent<Transform>()->translation.y = -2.f;
+	portField->BindDidChange(&LobbyScene::PortDidChangeHandler, this);
+	portField->BindDidReturn(&LobbyScene::ReturnHandler, this);	
 
 	confirm = entities->Create<UIButton>();
 	confirm->GetComponent<Transform>()->translation.y = -10.f;
@@ -124,15 +98,24 @@ void LobbyScene::SetChatManager(ChatManager * const _manager) {
 	manager = _manager;
 }
 
-void LobbyScene::DidChangeHandler(UITextField * const target) {
+void LobbyScene::IPDidChangeHandler(UITextField * const target) {
 	auto text = target->GetComponent<Text>();
 	auto& textColor = text->color;
 
 	const std::regex ipCheck("(\\d{1,3}(\\.\\d{1,3}){3})");
 
+	bool ipValid = false;
+	const bool portValid = !portField->GetComponent<Text>()->text.empty();
+
 	if (std::regex_match(text->text, ipCheck)) {
 		textColor.Set(1.f);
+		ipValid = true;
+	} else {
+		textColor.Set(1.f, 0.f, 0.f, 1.f);
+		ipValid = false;
+	}
 
+	if (ipValid && portValid) {
 		confirm->GetComponent<Button>()->isEnabled = true;
 		confirm->GetComponent<Animation>()->Animate(
 			AnimationBase(false, 0.2f),
@@ -140,8 +123,38 @@ void LobbyScene::DidChangeHandler(UITextField * const target) {
 			vec4f(0.f, 1.f, 1.f, 0.5f)
 		);
 	} else {
-		textColor.Set(1.f, 0.f, 0.f, 1.f);
+		confirm->GetComponent<Button>()->isEnabled = false;
+		confirm->GetComponent<Animation>()->Animate(
+			AnimationBase(false, 0.2f),
+			confirm->GetComponent<Render>()->tint,
+			vec4f(1.f, 0.f, 0.f, 0.5f)
+		);
+	}
+}
 
+void LobbyScene::PortDidChangeHandler(UITextField * const target) {
+	auto text = target->GetComponent<Text>();
+	auto& textColor = text->color;
+
+	bool portValid = false;
+	const bool ipValid = !portField->GetComponent<Text>()->text.empty();
+
+	if (text->text.empty()) {
+		textColor.Set(1.f, 0.f, 0.f, 1.f);
+		portValid = false;
+	} else {
+		textColor.Set(1.f);
+		portValid = true;
+	}
+
+	if (ipValid && portValid) {
+		confirm->GetComponent<Button>()->isEnabled = true;
+		confirm->GetComponent<Animation>()->Animate(
+			AnimationBase(false, 0.2f),
+			confirm->GetComponent<Render>()->tint,
+			vec4f(0.f, 1.f, 1.f, 0.5f)
+		);
+	} else {
 		confirm->GetComponent<Button>()->isEnabled = false;
 		confirm->GetComponent<Animation>()->Animate(
 			AnimationBase(false, 0.2f),
@@ -177,34 +190,6 @@ void LobbyScene::MouseOnClick(Entity * target) {
 
 void LobbyScene::Close(Entity * target) {
 	Events::EventsManager::GetInstance()->Trigger("PRESENT_SCENE", new Events::AnyType<std::string>("ROOMS"));
-}
-
-UITextField * LobbyScene::CreateTextField(const std::string & _prompt) {
-	auto result = entities->Create<UITextField>();
-	result->GetComponent<Transform>()->translation.y = 2.f;
-	result->GetComponent<Transform>()->scale.Set(19.f, 2.f, 0.f);
-	result->GetComponent<Render>()->tint.Set(0.f);
-	result->GetComponent<Text>()->SetFont(Load::FNT("Files/Fonts/Microsoft.fnt", "Files/Fonts/Microsoft.tga"));
-	result->GetComponent<Text>()->color.Set(1.f);
-	result->GetComponent<Text>()->paragraphAlignment = PARAGRAPH_LEFT;
-
-	auto back = entities->Create<UILabel>();
-	back->SetParent(result);
-	back->GetComponent<Transform>()->scale.Set(20.f, 2.f, 0.f);
-	back->GetComponent<Render>()->tint.Set(0.25f);
-
-	auto prompt = entities->Create<UILabel>();
-	prompt->SetParent(result);
-	prompt->GetComponent<Transform>()->translation.y = 2.f;
-	prompt->GetComponent<Transform>()->scale.Set(20.f, 1.f, 0.f);
-	prompt->GetComponent<Render>()->tint.Set(0.f);
-	prompt->GetComponent<Text>()->SetFont(Load::FNT("Files/Fonts/Microsoft.fnt", "Files/Fonts/Microsoft.tga"));
-	prompt->GetComponent<Text>()->color.Set(0.f, 1.f, 1.f, 1.f);
-	prompt->GetComponent<Text>()->scale = 0.5f;
-	prompt->GetComponent<Text>()->text = _prompt;
-	prompt->GetComponent<Text>()->paragraphAlignment = PARAGRAPH_LEFT;
-	
-	return result;
 }
 
 void LobbyScene::Connect() {

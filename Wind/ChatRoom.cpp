@@ -34,14 +34,14 @@ ChatRoom::ChatRoom() {  }
 ChatRoom::~ChatRoom() { }
 
 void ChatRoom::Reset() {
-	Scene::Reset();
+	UIViewController::Reset();
 
 	Events::EventsManager::GetInstance()->Subscribe("DROP_INPUT", &ChatRoom::DropHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("NEW_MESSAGE", &ChatRoom::ReadHandlers, this);
 }
 
 void ChatRoom::Start() {
-	Scene::Start();
+	UIViewController::Start();
 
 	auto cam = entities->Create<CameraObject>();
 	cam->GetComponent<Camera>()->SetSize(20);
@@ -79,7 +79,7 @@ void ChatRoom::Start() {
 }
 
 void ChatRoom::Update(const float & dt) {
-	Scene::Update(dt);
+	UIViewController::Update(dt);
 
 	if (updated) {
 		tableView->ReloadData();
@@ -207,35 +207,6 @@ void ChatRoom::CellForRow(UITableView * tableView, UITableViewCell * cell, unsig
 			1.f
 		);
 	}
-}
-
-UITextField * ChatRoom::CreateTextField(const std::string & _prompt) {
-	auto result = entities->Create<UITextField>();
-	result->GetComponent<Transform>()->translation.z = -10.f;
-	result->GetComponent<Transform>()->translation.y = 2.f;
-	result->GetComponent<Transform>()->scale.Set(19.f, 2.f, 0.f);
-	result->GetComponent<Render>()->tint.Set(0.f);
-	result->GetComponent<Text>()->SetFont(Load::FNT("Files/Fonts/Microsoft.fnt", "Files/Fonts/Microsoft.tga"));
-	result->GetComponent<Text>()->color.Set(1.f);
-	result->GetComponent<Text>()->paragraphAlignment = PARAGRAPH_LEFT;
-
-	auto back = entities->Create<UILabel>();
-	back->SetParent(result);
-	back->GetComponent<Transform>()->scale.Set(20.f, 2.f, 0.f);
-	back->GetComponent<Render>()->tint.Set(0.25f);
-
-	auto prompt = entities->Create<UILabel>();
-	prompt->SetParent(result);
-	prompt->GetComponent<Transform>()->translation.y = 2.f;
-	prompt->GetComponent<Transform>()->scale.Set(19.f, 1.f, 0.f);
-	prompt->GetComponent<Render>()->tint.Set(0.f);
-	prompt->GetComponent<Text>()->SetFont(Load::FNT("Files/Fonts/Microsoft.fnt", "Files/Fonts/Microsoft.tga"));
-	prompt->GetComponent<Text>()->color.Set(0.f, 1.f, 1.f, 1.f);
-	prompt->GetComponent<Text>()->scale = 0.5f;
-	prompt->GetComponent<Text>()->text = _prompt;
-	prompt->GetComponent<Text>()->paragraphAlignment = PARAGRAPH_LEFT;
-
-	return result;
 }
 
 void ChatRoom::CommandHandler(const std::string & command) {

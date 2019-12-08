@@ -14,6 +14,8 @@ struct Room {
 class ChatManager {
 
 	Profile* profile;
+	std::vector<TCP*> server;
+	//std::map<TCP*, Room*> rooms;
 	std::map<TCP*, Room*> rooms;
 
 public:
@@ -31,8 +33,6 @@ public:
 	std::map<TCP*, Room*>& GetRooms();
 
 private:
-
-	void Step();
 
 	void ReceiveHandler(std::string result, TCP* socket);
 

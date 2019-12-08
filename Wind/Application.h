@@ -2,8 +2,9 @@
 #define APPLICATION_H
 
 // Scenes
-#include "LobbyScene.h"
 #include "RoomsScene.h"
+#include "LobbyScene.h"
+#include "CreateScene.h"
 #include "ChatRoom.h"
 #include "LoginScene.h"
 

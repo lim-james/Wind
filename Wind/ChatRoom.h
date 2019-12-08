@@ -3,7 +3,6 @@
 
 #include "Profile.h"
 #include "ChatManager.h"
-
 #include "UIViewController.h"
 
 // messaging helpers
@@ -53,8 +52,6 @@ private:
 
 	unsigned NumberOfRows(UITableView* tableView);
 	void CellForRow(UITableView* tableView, UITableViewCell* cell, unsigned row);
-
-	UITextField* CreateTextField(const std::string& _prompt = "");
 
 	void CommandHandler(const std::string& command);
 

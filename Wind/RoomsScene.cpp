@@ -16,6 +16,7 @@
 
 #include "ChatRoom.h"
 #include "LobbyScene.h"
+#include "CreateScene.h"
 
 #include <Events/EventsManager.h>
 #include <Helpers/String/StringHelpers.h>
@@ -91,6 +92,9 @@ void RoomsScene::PrepareForSegue(Scene * destination) {
 	} else if (dynamic_cast<LobbyScene*>(destination)) {
 		auto dest = static_cast<LobbyScene*>(destination);
 		dest->SetChatManager(manager);
+	} else if (dynamic_cast<CreateScene*>(destination)) {
+		auto dest = static_cast<CreateScene*>(destination);
+		dest->SetChatManager(manager);
 	}
 }
 
@@ -111,6 +115,7 @@ void RoomsScene::MouseOutHandler(Entity* target) {
 }
 
 void RoomsScene::AddHandler(Entity * target) {
+	Events::EventsManager::GetInstance()->Trigger("PRESENT_SCENE", new Events::AnyType<std::string>("CREATE"));
 }
 
 void RoomsScene::JoinHandler(Entity * target) {
@@ -125,8 +130,10 @@ void RoomsScene::CellForRow(UITableView * tableView, UITableViewCell * cell, uns
 	cell->GetComponent<Render>()->tint.Set(0.f, 0.f, 0.f, 1.f);
 	auto sock = sockets[row];
 	auto room = manager->GetRooms()[sock];
-	cell->subtitle->GetComponent<Text>()->text = sock->GetIP() + "::" + Helpers::ToString(sock->GetPort());
-	cell->title->GetComponent<Text>()->text = room->title;
+	cell->subtitle->GetComponent<Text>()->text = Helpers::ToString(sock->GetPort());
+	//cell->title->GetComponent<Text>()->text = room->title;
+	cell->title->GetComponent<Text>()->text = sock->GetIP();
+	cell->image->GetComponent<Render>()->tint.Set(0.f);
 }
 
 void RoomsScene::DidSelectRow(UITableView * tableView, UITableViewCell * cell, unsigned row) {

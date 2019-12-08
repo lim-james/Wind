@@ -156,12 +156,6 @@
     <ClCompile Include="SceneManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LobbyScene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ChatRoom.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="UITableView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -183,13 +177,22 @@
     <ClCompile Include="UIViewController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ChatManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="LoginScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RoomsScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ChatManager.cpp">
+    <ClCompile Include="ChatRoom.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LobbyScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CreateScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -347,12 +350,6 @@
     <ClInclude Include="SceneManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LobbyScene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ChatRoom.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="UITableView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -374,13 +371,22 @@
     <ClInclude Include="UIViewController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ChatManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="LoginScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RoomsScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ChatManager.h">
+    <ClInclude Include="ChatRoom.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LobbyScene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CreateScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

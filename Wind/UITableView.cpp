@@ -99,6 +99,7 @@ void UITableView::ReloadData() {
 			cell->Use();
 
 		cell->GetComponent<Transform>()->scale.x = width;
+		cell->GetComponent<Transform>()->scale.y = 3.5f;
 		cell->GetComponent<Transform>()->translation.y = static_cast<float>(i) * 4.f;
 		cell->GetComponent<Transform>()->translation.z = -10.f;
 

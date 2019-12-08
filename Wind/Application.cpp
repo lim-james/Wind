@@ -48,6 +48,7 @@ void Application::Initialize(const int& width, const int& height, const char* ti
 	sceneManager = new SceneManager;
 	sceneManager->Add("LOGIN", new LoginScene);
 	sceneManager->Add("ROOMS", new RoomsScene);
+	sceneManager->Add("CREATE", new CreateScene);
 	sceneManager->Add("LOBBY", new LobbyScene);
 	sceneManager->Add("CHAT_ROOM", new ChatRoom);
 	sceneManager->SetEntryPoint("LOGIN");

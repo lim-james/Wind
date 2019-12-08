@@ -16,7 +16,9 @@ void Content::Decode(const std::string & _content) {
 		content.erase(content.begin());
 		body = content;
 		break;
+	case UPDATE_CONTENT:
 	case FILE_CONTENT:
+	case JOIN_CONTENT:
 	{
 		int length = static_cast<int>(content.front());
 		title = content.substr(1, length);

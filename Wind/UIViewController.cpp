@@ -19,6 +19,8 @@
 #include "RenderSystem.h"
 #include "ButtonSystem.h"
 #include "ScriptSystem.h"
+// utils
+#include "LoadFNT.h"
 
 UIViewController::UIViewController() { }
 
@@ -47,4 +49,32 @@ void UIViewController::Awake() {
 	systems->Subscribe<RenderSystem>();
 	systems->Subscribe<ButtonSystem>();
 	systems->Subscribe<ScriptSystem>();
+}
+
+UITextField * UIViewController::CreateTextField(const std::string & _prompt) {
+	auto result = entities->Create<UITextField>();
+	result->GetComponent<Transform>()->translation.y = 2.f;
+	result->GetComponent<Transform>()->scale.Set(19.f, 2.f, 0.f);
+	result->GetComponent<Render>()->tint.Set(0.f);
+	result->GetComponent<Text>()->SetFont(Load::FNT("Files/Fonts/Microsoft.fnt", "Files/Fonts/Microsoft.tga"));
+	result->GetComponent<Text>()->color.Set(1.f);
+	result->GetComponent<Text>()->paragraphAlignment = PARAGRAPH_LEFT;
+
+	auto back = entities->Create<UILabel>();
+	back->SetParent(result);
+	back->GetComponent<Transform>()->scale.Set(20.f, 2.f, 0.f);
+	back->GetComponent<Render>()->tint.Set(0.25f);
+
+	auto prompt = entities->Create<UILabel>();
+	prompt->SetParent(result);
+	prompt->GetComponent<Transform>()->translation.y = 2.f;
+	prompt->GetComponent<Transform>()->scale.Set(20.f, 1.f, 0.f);
+	prompt->GetComponent<Render>()->tint.Set(0.f);
+	prompt->GetComponent<Text>()->SetFont(Load::FNT("Files/Fonts/Microsoft.fnt", "Files/Fonts/Microsoft.tga"));
+	prompt->GetComponent<Text>()->color.Set(0.f, 1.f, 1.f, 1.f);
+	prompt->GetComponent<Text>()->scale = 0.5f;
+	prompt->GetComponent<Text>()->text = _prompt;
+	prompt->GetComponent<Text>()->paragraphAlignment = PARAGRAPH_LEFT;
+
+	return result;
 }

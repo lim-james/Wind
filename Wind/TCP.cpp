@@ -1,7 +1,12 @@
 #include "TCP.h"
 
+#include "Codable.h"
+
 #include <Events/EventsManager.h>
 #include <iostream>
+#include <fstream>
+
+std::string TCP::localIP = "";
 
 TCP::TCP() {
 	WSADATA w;
@@ -15,8 +20,33 @@ TCP::TCP() {
 	std::cout << "Winsock Initialised\n";
 }
 
+std::string TCP::GetLocalIP() {
+	if (localIP == "") {
+		std::ifstream ifs;
+		std::string search = "IPv4 Address. . . . . . . . . . . :";
+
+		system("ipconfig > ip.txt");
+		ifs.open("ip.txt");
+
+		if (ifs.is_open()) {
+			while (!ifs.eof()) {
+				std::string line;
+				std::getline(ifs, line);
+
+				if ((line.find(search, 0)) != std::string::npos) {
+					line.erase(0, 39);
+					localIP = line;
+					ifs.close();
+				}
+			}
+		}
+	}
+
+	return localIP;
+}
+
 void TCP::Initialize(const USHORT & _port) {
-	ip = "127.0.0.1";
+	ip = GetLocalIP();
 	port = _port; 
 
 	targetSocket = socket(AF_INET, SOCK_STREAM, 0);
@@ -57,26 +87,23 @@ void TCP::ServerStep() {
 		// new connection
 		if (sock == targetSocket) {
 			SOCKET client = accept(targetSocket, nullptr, nullptr);
-			FD_SET(client, &master);
-		} else {
-			// New message
-			char buffer[4096];
-			ZeroMemory(buffer, sizeof(buffer));
 
-			const int length = recv(sock, buffer, sizeof(buffer), 0);
-			if (length <= 0) {
+			FD_SET(client, &master);
+
+			std::cout << "Connected\n";
+			//send(client, welcome.c_str(), static_cast<int>(welcome.length()), 0);
+		} else {
+			std::string message;
+
+			if (Receive(sock, message)) {
+				SOCKET& ts = targetSocket;
+				Broadcast(message, [&ts](SOCKET outSock) {
+					return outSock != ts;
+				});
+			} else {
 				// disconnected
 				closesocket(sock);
 				FD_CLR(sock, &master);
-			} else {
-				// message
-				const std::string message(buffer, length);
-				std::cout << message << '\n';
-
-				SOCKET& ts = targetSocket;
-				Broadcast(message, [&ts, &sock](SOCKET outSock) {
-					return outSock != ts && outSock != sock;
-				});
 			}
 		}
 	}
@@ -85,7 +112,7 @@ void TCP::ServerStep() {
 void TCP::Broadcast(const std::string& message) {
 	for (unsigned i = 0; i < master.fd_count; ++i) {
 		SOCKET outSock = master.fd_array[i];
-		send(outSock, message.c_str(), static_cast<unsigned>(message.length()), 0);
+		Send(message, outSock);
 	}
 }
 
@@ -93,9 +120,14 @@ void TCP::Broadcast(const std::string & message, std::function<bool(SOCKET)> inc
 	for (unsigned i = 0; i < master.fd_count; ++i) {
 		SOCKET outSock = master.fd_array[i];
 		if (include(outSock)) {
-			send(outSock, message.c_str(), static_cast<unsigned>(message.length()), 0);
+			Send(message, outSock);
 		}
 	}
+}
+
+void TCP::Send(const std::string & message, const SOCKET & socket) {
+	const std::string encoded = Codable::Encode(message);
+	send(socket, encoded.c_str(), static_cast<unsigned>(encoded.size()), 0);
 }
 
 bool TCP::Connect(const std::string & _ip, const USHORT & _port, std::function<void(TCP*)> completed) {
@@ -129,7 +161,8 @@ void TCP::ClientStep() {
 }
 
 void TCP::Send(const std::string& message) {
-	send(targetSocket, message.c_str(), static_cast<unsigned>(message.length()), 0);
+	const std::string encoded = Codable::Encode(message);
+	send(targetSocket, encoded.c_str(), static_cast<unsigned>(encoded.size()), 0);
 }
 
 const std::string & TCP::GetIP() const {
@@ -146,7 +179,23 @@ bool TCP::Receive(SOCKET & sock, std::string & message) {
 	int length = 0;
 	int last = 0;
 
-	do {
+	int maxSize = 0;
+	int size = 0;
+
+	ZeroMemory(buffer, sizeof(buffer));
+	length = recv(sock, buffer, sizeof(buffer), 0);
+	last = static_cast<int>(buffer[length]);
+
+	if (length <= 0)
+		return false;
+
+	message += std::string(buffer, length);
+	const auto result = Codable::Decode(message, 0, maxSize);
+	message = result.second;
+
+	size += message.size();
+
+	while (size < maxSize) {
 		ZeroMemory(buffer, sizeof(buffer));
 		length = recv(sock, buffer, sizeof(buffer), 0);
 		last = static_cast<int>(buffer[length]);
@@ -155,13 +204,14 @@ bool TCP::Receive(SOCKET & sock, std::string & message) {
 			return false;
 
 		message += std::string(buffer, length);
-	} while (last != 0);
+		size += length;
+	}
 
 	return true;
 }
 
 std::string TCP::Receive() {
 	std::string message;
-	Receive(targetSocket, message);
+ 	auto result = Receive(targetSocket, message);
 	return message;
 }

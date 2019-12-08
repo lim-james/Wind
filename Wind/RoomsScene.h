@@ -2,7 +2,9 @@
 #define ROOMS_SCENE_H
 
 #include "ChatManager.h"
-#include "ChatRoom.h"
+#include "UIViewController.h"
+
+#include "UITableView.h"
 
 class RoomsScene : public UIViewController {
 

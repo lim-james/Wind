@@ -19,6 +19,8 @@
 #include "LoadFNT.h"
 // events
 #include "InputEvents.h"
+// scenes
+#include "RoomsScene.h"
 
 #include <Helpers/String/StringHelpers.h>
 #include <Helpers/File/FileHelpers.h>
@@ -29,6 +31,7 @@
 
 LoginScene::LoginScene() {
 	profile = new Profile;
+	profile->ip = TCP::GetLocalIP();
 }
 
 LoginScene::~LoginScene() {
@@ -36,13 +39,13 @@ LoginScene::~LoginScene() {
 }
 
 void LoginScene::Reset() {
-	Scene::Reset();
+	UIViewController::Reset();
 
 	Events::EventsManager::GetInstance()->Subscribe("DROP_INPUT", &LoginScene::DropHandler, this);
 }
 
 void LoginScene::Start() {
-	Scene::Start();
+	UIViewController::Start();
 
 	auto cam = entities->Create<CameraObject>();
 	cam->GetComponent<Camera>()->SetSize(20);

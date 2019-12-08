@@ -6,6 +6,7 @@
 struct Profile : Codable {
 
 	std::string name;
+	std::string ip;
 	std::string picture;
 	std::string status;
 

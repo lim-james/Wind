@@ -11,7 +11,7 @@ std::string Helpers::GetFileName(const std::string & filepath) {
 }
 
 std::string Helpers::ReadFile(const std::string& filepath) {
-	std::ifstream ifs(filepath, std::ios::binary);
+	std::ifstream ifs(filepath);
 
 	if (!ifs.is_open()) {
 		Console::Warn << filepath << " not valid.\n";

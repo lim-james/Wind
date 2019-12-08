@@ -1,6 +1,6 @@
 #include "Codable.h"
 
- std::pair<int, std::string> Codable::Decode(std::string content, const int & start) {
+std::pair<int, std::string> Codable::Decode(std::string content, const int & start) {
 	int i = start;
 	int power = static_cast<int>(content[i++]);
 
@@ -10,7 +10,7 @@
 
 	int length = 0;
 	for (; power >= 0; --power) {
-		length += static_cast<int>(content[i++] * pow(256, power));
+		length += static_cast<int>(content[i++] * pow(CODABLE_BASE, power));
 	}
  
 	result.first += length + 1;
@@ -18,6 +18,24 @@
 	
 	return result;
 }
+
+std::pair<int, std::string> Codable::Decode(std::string content, const int & start, int & length) {
+	int i = start;
+	int power = static_cast<int>(content[i++]);
+
+	std::pair<int, std::string> result;
+	result.first = power;
+	--power;
+
+	length = 0;
+	for (; power >= 0; --power) {
+		length += static_cast<int>(content[i++] * pow(CODABLE_BASE, power));
+	}
+ 
+	result.first += length + 1;
+	result.second = content.substr(i, length);
+	
+	return result;}
 
 void Codable::Split(std::string content, int count, Codable * const...) {
 	va_list ap;
@@ -52,15 +70,15 @@ void Codable::Split(std::string content, int count, std::string* const ...) {
 }
 
 std::string Codable::Encode(const std::string & result) {
-	int length = result.length();
+	int length = result.size();
 	std::string prefix = "";
 
 	while (length > 0) {
-		prefix.insert(prefix.begin(), static_cast<char>(length % 256));
-		length /= 256;
+		prefix.insert(prefix.begin(), static_cast<char>(length % CODABLE_BASE));
+		length /= CODABLE_BASE;
 	}
 
-	prefix.insert(prefix.begin(), static_cast<char>(prefix.length() % 256));
+	prefix.insert(prefix.begin(), static_cast<char>(prefix.size() % CODABLE_BASE));
 
 	return prefix + result;
 }

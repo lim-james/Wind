@@ -5,12 +5,15 @@
 #include <vector>
 #include <stdarg.h>
 
+#define CODABLE_BASE 128
+
 struct Codable {
 
 	virtual void Decode(const std::string& _content) = 0;
 	virtual std::string Encode() const = 0;
 
 	static std::pair<int, std::string> Decode(std::string content, const int& start);
+	static std::pair<int, std::string> Decode(std::string content, const int& start, int& length);
 	static void Split(std::string content, int count, Codable* const ...);
 	static void Split(std::string content, int count, std::string* const ...);
 

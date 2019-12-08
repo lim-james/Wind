@@ -11,15 +11,26 @@ ChatManager::ChatManager() {
 }
 
 ChatManager::~ChatManager() {
+	for (auto& s : server)
+		delete s;
+	server.clear();
+
+	for (auto& pair : rooms)
+		delete pair.first, pair.second;
+	rooms.clear();
 }
 
 void ChatManager::Host(const USHORT & port, const std::string & title) {
 	TCP* socket = new TCP;
 	socket->Initialize(port);
+	server.push_back(socket);
 
-	Room* room = new Room;
-	room->title = title;
-	rooms[socket] = room;
+	std::thread read([socket]() {
+		while (true) {
+			socket->ServerStep();
+		}
+	});
+	read.detach();
 }
 
 TCP* ChatManager::Join(const std::string & ip, const USHORT & port, std::function<void(TCP*)> completion) {
@@ -62,11 +73,25 @@ std::map<TCP*, Room*>& ChatManager::GetRooms() {
 void ChatManager::ReceiveHandler(std::string result, TCP* socket) {
 	Message message;
 	message.Decode(result);
-	rooms[socket]->messages.push_back(message);
+	if (message.content.type != UPDATE_CONTENT) {
+		rooms[socket]->messages.push_back(message);
+	}
 
 	if (message.content.type != TEXT_CONTENT) {
-		if (message.profile.name != profile->name) {
+		if (message.profile.ip != profile->ip || message.profile.name != profile->name) {
 			Helpers::WriteFile(message.content.title, message.content.body);
+			if (message.content.type == JOIN_CONTENT) {
+				if (!profile->picture.empty()) {
+					std::cout << "new user.... UPdating profil\n";
+					Events::EventsManager::GetInstance()->Trigger("NEW_MESSAGE", new Events::AnyType<TCP*>(socket));
+					Content content;
+					content.type = UPDATE_CONTENT;
+					content.title = Helpers::GetFileName(profile->picture);
+					content.body = Helpers::ReadFile(profile->picture);
+					socket->Send(Codable::Join(2, profile, &content));
+					return;
+				}
+			}
 		}
 	}
 

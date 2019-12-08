@@ -15,6 +15,8 @@ struct TCPData {
 
 class TCP {
 
+	static std::string localIP;
+
 	SOCKET targetSocket;
 	fd_set master;
 
@@ -27,12 +29,15 @@ public:
 
 	TCP();
 
+	static std::string GetLocalIP();
+
 	// server methods
 
 	void Initialize(const USHORT & _port);
 	void ServerStep();
 	void Broadcast(const std::string& message);
 	void Broadcast(const std::string& message, std::function<bool(SOCKET)> include);
+	void Send(const std::string& message, const SOCKET& socket);
 
 	// client methods
 
