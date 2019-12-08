@@ -3,8 +3,11 @@
 #include <Helpers/File/FileHelpers.h>
 #include <Events/EventsManager.h>
 
+#include <thread>
+
 ChatManager::ChatManager() {
 	rooms = {};
+	//Events::EventsManager::GetInstance()->Subscribe("T_STEP", &ChatManager::Step, this);
 }
 
 ChatManager::~ChatManager() {
@@ -26,6 +29,13 @@ TCP* ChatManager::Join(const std::string & ip, const USHORT & port, std::functio
 
 		Room* room = new Room;
 		rooms[socket] = room;
+
+		std::thread read([socket]() {
+			while (true) {
+				socket->ClientStep();
+			}
+		});
+		read.detach();
 		return socket;
 	}
 
@@ -50,7 +60,6 @@ std::map<TCP*, Room*>& ChatManager::GetRooms() {
 }
 
 void ChatManager::ReceiveHandler(std::string result, TCP* socket) {
-	Events::EventsManager::GetInstance()->Trigger("NEW_MESSAGE", new Events::AnyType<TCP*>(socket));
 	Message message;
 	message.Decode(result);
 	rooms[socket]->messages.push_back(message);
@@ -60,4 +69,6 @@ void ChatManager::ReceiveHandler(std::string result, TCP* socket) {
 			Helpers::WriteFile(message.content.title, message.content.body);
 		}
 	}
+
+	Events::EventsManager::GetInstance()->Trigger("NEW_MESSAGE", new Events::AnyType<TCP*>(socket));
 }

@@ -32,6 +32,8 @@ public:
 
 private:
 
+	void Step();
+
 	void ReceiveHandler(std::string result, TCP* socket);
 
 };

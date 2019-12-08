@@ -67,13 +67,6 @@ void Application::Run() {
 
 	float t = 0.f;
 
-	std::thread thread1([this]() {
-		while (!context->ShouldClose()) {
-			Events::EventsManager::GetInstance()->Trigger("T_STEP");
-		}
-	});
-	thread1.detach();
-
 	while (!context->ShouldClose()) {
 		glfwPollEvents();
 

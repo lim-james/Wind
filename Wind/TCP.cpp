@@ -44,8 +44,6 @@ void TCP::Initialize(const USHORT & _port) {
 
 	FD_ZERO(&master);
 	FD_SET(targetSocket, &master);
-
-	Events::EventsManager::GetInstance()->Subscribe("T_STEP", &TCP::ServerStep, this);
 }
 
 void TCP::ServerStep() {
@@ -121,8 +119,6 @@ bool TCP::Connect(const std::string & _ip, const USHORT & _port, std::function<v
 	
 	if (completed)
 		completed(this);
-
-	Events::EventsManager::GetInstance()->Subscribe("T_STEP", &TCP::ClientStep, this);
 
 	return true;
 }
