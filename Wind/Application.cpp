@@ -9,6 +9,7 @@
 #include <GLFW/glfw3.h>
 // standard
 #include <iostream>
+#include <thread>
 
 Application::Application()
 	: context(nullptr) {}
@@ -46,6 +47,7 @@ void Application::Initialize(const int& width, const int& height, const char* ti
 
 	sceneManager = new SceneManager;
 	sceneManager->Add("LOGIN", new LoginScene);
+	sceneManager->Add("ROOMS", new RoomsScene);
 	sceneManager->Add("LOBBY", new LobbyScene);
 	sceneManager->Add("CHAT_ROOM", new ChatRoom);
 	sceneManager->SetEntryPoint("LOGIN");
@@ -65,6 +67,13 @@ void Application::Run() {
 
 	float t = 0.f;
 
+	std::thread thread1([this]() {
+		while (!context->ShouldClose()) {
+			Events::EventsManager::GetInstance()->Trigger("T_STEP");
+		}
+	});
+	thread1.detach();
+
 	while (!context->ShouldClose()) {
 		glfwPollEvents();
 
@@ -72,6 +81,7 @@ void Application::Run() {
 		const float dt = static_cast<float>(timer.GetDeltaTime());
 
 		auto current = sceneManager->GetSource();
+
 
 		t += dt;
 		if (t >= FRAMERATE) {
@@ -81,11 +91,11 @@ void Application::Run() {
 
 		current->Update(dt);
 
+		em->TriggerQueued();
+
 		sceneManager->Segue();
 		context->SwapBuffers();
 		timer.Update();
-
-		em->TriggerQueued();
 	}
 }
 

@@ -31,6 +31,7 @@ Window::Window(const int& width, const int& height, const char* title, const boo
 	glfwSetWindowSizeCallback(window, Window::Resize);
 
 	Events::EventsManager::GetInstance()->Subscribe("WINDOW_RESIZE", &Window::ResizeHandler, this);
+	Events::EventsManager::GetInstance()->Subscribe("BROADCAST_SIZE", &Window::BroadcastSize, this);
 	Events::EventsManager::GetInstance()->Subscribe("GET_WINDOW_SIZE", &Window::GetSizeHandler, this);
 }
 

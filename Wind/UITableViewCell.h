@@ -6,12 +6,17 @@
 
 class UITableViewCell : public Sprite {
 
+	unsigned row;
+
 public:
 
+	Sprite* image;
 	UILabel* title;
 	UILabel* subtitle;
 
 	virtual void Build();
+
+	friend class UITableView;
 
 };
 

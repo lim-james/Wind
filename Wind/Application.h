@@ -3,6 +3,7 @@
 
 // Scenes
 #include "LobbyScene.h"
+#include "RoomsScene.h"
 #include "ChatRoom.h"
 #include "LoginScene.h"
 

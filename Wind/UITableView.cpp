@@ -2,6 +2,7 @@
 
 #include "Transform.h"
 #include "Render.h"
+#include "Button.h"
 #include "Text.h"
 #include "EntityEvents.h"
 #include "InputEvents.h"
@@ -14,21 +15,23 @@ UITableView::UITableView() {
 }
 
 void UITableView::Build() {
-	Sprite::Build();
+	AddComponent<Transform>();
+	AddComponent<Render>();
 }
 
-void UITableView::Intialize() {
-	Sprite::Initialize();
+void UITableView::Initialize() {
+	Entity::Initialize();
 	cells.clear();
 	numberOfRows = nullptr;
 	cellForRow = nullptr;
+	didSelectRow = nullptr;
 }
 
 void UITableView::ReloadData() {
 	const unsigned numRows = numberOfRows(this);
 
 	auto transform = GetComponent<Transform>();
-	const float width = transform->scale.x;
+	const float width = transform->scale.x - 2.5f;
 
 	while (cells.size() < numRows) {
 		auto event = new Events::CreateAnyEntity<UITableViewCell>();
@@ -36,6 +39,9 @@ void UITableView::ReloadData() {
 		Events::EventsManager::GetInstance()->Trigger("CREATE_ENTITY", event);
 
 		cell->SetParent(this);
+		cell->SetTag("Cell");
+		cell->row = cells.size();
+		cell->GetComponent<Button>()->BindHandler(&UITableView::ClickHandler, this, MOUSE_CLICK);
 		cells.push_back(cell);
 
 		{
@@ -72,6 +78,19 @@ void UITableView::ReloadData() {
 			cell->subtitle = label;
 			label->SetParent(cell);
 		}
+
+		{
+			auto event = new Events::CreateAnyEntity<Sprite>();
+			auto sprite = static_cast<UILabel*>(event->entity);
+			Events::EventsManager::GetInstance()->Trigger("CREATE_ENTITY", event);
+				
+			sprite->GetComponent<Transform>()->translation.y = -0.125f;
+			sprite->GetComponent<Transform>()->translation.x = -(width * 0.5f) - 1.25f;
+			sprite->GetComponent<Transform>()->scale.Set(1.25f);
+
+			cell->image = sprite;
+			sprite->SetParent(cell);
+		}
 	}
 
 	for (unsigned i = 0; i < numRows; ++i) {
@@ -86,9 +105,9 @@ void UITableView::ReloadData() {
 		cellForRow(this, cell, i);
 	}
 
-	for (unsigned i = numRows; i < cells.size(); ++i) {
-		cells[i]->Destroy();
-	}
+	//for (unsigned i = numRows; i < cells.size(); ++i) {
+	//	cells[i]->Destroy();
+	//}
 }
 
 void UITableView::ScrollHandler(Events::Event * event) {
@@ -96,5 +115,12 @@ void UITableView::ScrollHandler(Events::Event * event) {
 
 	for (auto& row : cells) {
 		row->GetComponent<Transform>()->translation.y -= offset;
+	}
+}
+
+void UITableView::ClickHandler(Entity * target) {
+	if (didSelectRow) {
+		auto cell = static_cast<UITableViewCell*>(target);
+		didSelectRow(this, cell, cell->row);
 	}
 }

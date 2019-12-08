@@ -38,12 +38,15 @@ void SceneManager::Segue() {
 
 		if (s) {
 			s->PrepareForSegue(d);
-			s->Stop();
 			s->Destroy();
+			Events::EventsManager::GetInstance()->TriggerQueued();
+			s->Stop();
 		}
 
 		d->Reset();
 		d->Start();
+
+		Events::EventsManager::GetInstance()->Trigger("BROADCAST_SIZE");
 		
 		source = destination;
 		destination = "";

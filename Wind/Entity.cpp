@@ -22,9 +22,11 @@ void Entity::Initialize() {
 
 void Entity::Destroy() {
 	used = false;
-	ClearChildren();
-	if (parent)
-		parent->RemoveChild(this);
+	//ClearChildren();
+	children.clear();
+	parent = nullptr;
+	//if (parent)
+	//	parent->RemoveChild(this);
 	SetActive(false);
 
 	Events::EventsManager::GetInstance()->Trigger("ENTITY_DESTROY", new Events::AnyType<Entity*>(this));
@@ -67,7 +69,9 @@ void Entity::AddChild(Entity* const entity) {
 }
 
 void Entity::RemoveChild(Entity* const entity) {
-	children.erase(vfind(children, entity));
+	auto position = vfind(children, entity);
+	if (position == children.end()) return;
+	children.erase(position);
 }
 
 void Entity::ClearChildren() {

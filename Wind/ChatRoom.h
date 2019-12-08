@@ -2,7 +2,7 @@
 #define CHAT_ROOM_H
 
 #include "Profile.h"
-#include "TCP.h"
+#include "ChatManager.h"
 
 #include "UIViewController.h"
 
@@ -17,12 +17,12 @@ class ChatRoom : public UIViewController {
 
 	Profile* profile;
 	TCP* client;
+	Room* room;
 
 	UITextField* textField;
 	UITableView* tableView;
 
 	bool updated;
-	std::vector<Message> messages;
 
 public:
 
@@ -36,12 +36,12 @@ public:
 
 	void SetProfile(Profile* const _profile);
 	void SetClient(TCP* const _client);
+	void SetRoom(Room* const _room);
 
 private:
 
 	void DropHandler(Events::Event* event);
-
-	void ReadThread();
+	void ReadHandlers(Events::Event* event);
 
 	void ChangeHandler(UITextField* const target);
 	void ReturnHandler(UITextField* const target);
@@ -49,6 +49,7 @@ private:
 	void MouseOverHandler(Entity* target);
 	void MouseOutHandler(Entity* target);
 	void MouseOnClick(Entity* target);
+	void Close(Entity* target);
 
 	unsigned NumberOfRows(UITableView* tableView);
 	void CellForRow(UITableView* tableView, UITableViewCell* cell, unsigned row);

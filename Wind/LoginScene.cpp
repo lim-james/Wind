@@ -21,6 +21,7 @@
 #include "InputEvents.h"
 
 #include <Helpers/String/StringHelpers.h>
+#include <Helpers/File/FileHelpers.h>
 #include <Events/EventsManager.h>
 #include <GLFW/glfw3.h>
 
@@ -66,8 +67,8 @@ void LoginScene::Start() {
 	statusField->BindDidReturn(&LoginScene::ReturnHandler, this);	
 
 	confirm = entities->Create<UIButton>();
-	confirm->GetComponent<Transform>()->translation.y = -10.f;
-	confirm->GetComponent<Transform>()->scale.Set(5.f, 1.5f, 0.f);
+	confirm->GetComponent<Transform>()->translation.y = -18.5f;
+	confirm->GetComponent<Transform>()->scale.Set(23.f, 3.f, 0.f);
 	confirm->GetComponent<Render>()->tint.Set(0.f, 1.f, 1.f, 0.5f);
 	confirm->GetComponent<Text>()->SetFont(Load::FNT("Files/Fonts/Microsoft.fnt", "Files/Fonts/Microsoft.tga"));
 	confirm->GetComponent<Text>()->color.Set(0.f, 0.f, 0.f, 1.f);
@@ -76,21 +77,27 @@ void LoginScene::Start() {
 	confirm->GetComponent<Button>()->BindHandler(&LoginScene::MouseOverHandler, this, MOUSE_OVER);
 	confirm->GetComponent<Button>()->BindHandler(&LoginScene::MouseOutHandler, this, MOUSE_OUT);
 	confirm->GetComponent<Button>()->BindHandler(&LoginScene::MouseOnClick, this, MOUSE_CLICK);
-
 }
 
 void LoginScene::PrepareForSegue(Scene * destination) {
-	auto dest = static_cast<LobbyScene*>(destination);
+	auto dest = static_cast<RoomsScene*>(destination);
 	dest->SetProfile(profile);
 }
 
 void LoginScene::DropHandler(Events::Event * event) {
 	auto drop = static_cast<Events::DropInput*>(event);
-	Console::Log << "Dragged in " << drop->paths[0] << '\n';
-	imageView->GetComponent<Render>()->SetTexture(Load::TGA(drop->paths[0]));
 
 	for (int i = 0; i < drop->count; ++i) {
-			
+		const auto path = drop->paths[i];
+		const unsigned tex = Load::TGA(path);
+		if (tex > 0) {
+			const auto content = Helpers::ReadFile(path);
+			const auto newPath = "Files/Textures/" + Helpers::GetFileName(path);
+			Helpers::WriteFile(newPath, content);
+			profile->picture = newPath;
+			imageView->GetComponent<Render>()->SetTexture(tex);
+			break;
+		}
 	}
 }
 
@@ -155,7 +162,7 @@ void LoginScene::Login() {
 	if (!name.empty()) {
 		profile->name = name;
 		profile->status = status;
-		Events::EventsManager::GetInstance()->Trigger("PRESENT_SCENE", new Events::AnyType<std::string>("LOBBY"));
+		Events::EventsManager::GetInstance()->Trigger("PRESENT_SCENE", new Events::AnyType<std::string>("ROOMS"));
 	}
 }
 

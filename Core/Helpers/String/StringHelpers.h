@@ -11,6 +11,9 @@ namespace Helpers {
 	template<typename T>
 	T Parse(const std::string& content);
 
+	template<typename T>
+	std::string ToString(const T& content);
+
 	std::vector<std::string> Split(const std::string& content, const char& delimiter);
 
 	std::vector<std::string> Group(const std::string& content, const unsigned& size);
@@ -46,6 +49,13 @@ T Helpers::Parse(const std::string& content) {
 	T result;
 	iss >> result;
 	return result;
+}
+
+template<typename T>
+std::string Helpers::ToString(const T & content) {
+	std::ostringstream oss;
+	oss << content;
+	return oss.str();
 }
 
 template<typename T>

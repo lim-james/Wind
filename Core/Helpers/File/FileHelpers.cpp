@@ -1,11 +1,16 @@
 #include "FileHelpers.h"
 
 #include "../../Logger/Logger.h"
+#include "../String/StringHelpers.h"	
 
 #include <fstream>
 #include <streambuf>
 
-std::string Helpers::LoadFile(const std::string& filepath) {
+std::string Helpers::GetFileName(const std::string & filepath) {
+	return Helpers::Split(filepath, '\\').back();
+}
+
+std::string Helpers::ReadFile(const std::string& filepath) {
 	std::ifstream ifs(filepath, std::ios::binary);
 
 	if (!ifs.is_open()) {

@@ -61,7 +61,9 @@ void Scene::Stop() {
 	Events::EventsManager::GetInstance()->UnsubscribeContext(this);
 }
 
-void Scene::Destroy() {}
+void Scene::Destroy() {
+	entities->Destroy();
+}
 
 void Scene::PrepareForSegue(Scene * destination) { }
 

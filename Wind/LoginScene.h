@@ -1,7 +1,7 @@
 #ifndef LOGIN_SCENE_H
 #define LOGIN_SCENE_H
 
-#include "LobbyScene.h"
+#include "RoomsScene.h"
 #include "UIViewController.h"
 
 #include "UITextField.h"

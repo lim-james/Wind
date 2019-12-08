@@ -14,17 +14,18 @@ ButtonSystem::~ButtonSystem() {
 }
 
 void ButtonSystem::Start() {
+	Events::EventsManager::GetInstance()->Subscribe("CURSOR_POSITION_INPUT", &ButtonSystem::CursorPositionHandler, this);
+	Events::EventsManager::GetInstance()->Subscribe("MOUSE_BUTTON_INPUT", &ButtonSystem::MouseButtonHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("CAMERA_ACTIVE", &ButtonSystem::CameraActiveHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("BUTTON_ACTIVE", &ButtonSystem::ButtonActiveHandler, this);
 	Events::EventsManager::GetInstance()->Subscribe("WINDOW_RESIZE", &ButtonSystem::ResizeHandler, this);
-	Events::EventsManager::GetInstance()->Subscribe("CURSOR_POSITION_INPUT", &ButtonSystem::CursorPositionHandler, this);
-	Events::EventsManager::GetInstance()->Subscribe("MOUSE_BUTTON_INPUT", &ButtonSystem::MouseButtonHandler, this);
 }
 
 void ButtonSystem::Update(const float & dt) {
 }
 
 void ButtonSystem::FixedUpdate(const float & dt) {
+	bool newFrame = true;
 	for (auto& cam : cameras) {
 		// world space position
 		const vec2f wsp = GetWorldSpace(cam);
@@ -53,6 +54,12 @@ void ButtonSystem::FixedUpdate(const float & dt) {
 					}
 				} else {
 					if (prevMouseActions[GLFW_MOUSE_BUTTON_LEFT] != GLFW_RELEASE) {
+						if (!newFrame) {
+							Console::Error << "Mouse click called on " << button << '\n';
+						} else {
+							Console::Warn << "Mouse click called on " << button << '\n';
+						}
+						newFrame = false;
 						PerformAction(MOUSE_CLICK, button);
 					}
 
@@ -65,6 +72,7 @@ void ButtonSystem::FixedUpdate(const float & dt) {
 				}
 			}
 		}
+		break;
 	}
 
 	for (auto& action : mouseActions) {
@@ -120,8 +128,7 @@ vec2f ButtonSystem::GetWorldSpace(Camera * const camera) {
 	return result;
 }
 
-void ButtonSystem::PerformAction(const unsigned& index, Button * const self)
-{
+void ButtonSystem::PerformAction(const unsigned& index, Button * const self) {
 	auto& callback = self->handlers[index];
 	if (callback) callback(self->GetParent());
 }

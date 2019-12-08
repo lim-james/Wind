@@ -37,6 +37,10 @@ void UITextField::Initialize() {
 
 	GetComponent<Script>()->fixedUpdate = std::bind(&UITextField::FixedUpdate, this, std::placeholders::_1);
 	GetComponent<Button>()->BindHandler(&UITextField::MouseOnClick, this, MOUSE_CLICK);
+
+	cursorPosition = GetComponent<Text>()->text.length();
+
+	didChangeCallback = didReturnCallback = nullptr;
 }
 
 void UITextField::Focus() {
@@ -130,7 +134,7 @@ void UITextField::MouseOnClick(Entity * target) {
 
 void UITextField::UpdateCursorOffset() {
 	auto transform = GetComponent<Transform>();
-	auto text =GetComponent<Text>();
+	auto text = GetComponent<Text>();
 	auto font = text->GetFont();
 
 	const float scale = text->scale;

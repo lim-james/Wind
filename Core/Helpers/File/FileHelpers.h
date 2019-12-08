@@ -5,7 +5,8 @@
 
 namespace Helpers {
 
-	std::string LoadFile(const std::string& filepath);
+	std::string GetFileName(const std::string& filepath);
+	std::string ReadFile(const std::string& filepath);
 	void WriteFile(const std::string& filepath, const std::string& content, const int& mode = std::ios::binary);
 
 }

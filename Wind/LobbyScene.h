@@ -2,7 +2,7 @@
 #define LOBBY_SCENE_H
 
 #include "Profile.h"
-#include "TCP.h"
+#include "ChatManager.h"
 
 #include "Scene.h"
 
@@ -14,8 +14,8 @@
 
 class LobbyScene : public Scene {
 
-	Profile* profile;
 	TCP* client;
+	ChatManager* manager;
 
 	UIButton* confirm;
 
@@ -32,7 +32,7 @@ public:
 
 	void PrepareForSegue(Scene* destination) override;
 
-	void SetProfile(Profile* const _profile);
+	void SetChatManager(ChatManager* const _manager);
 
 private:
 
@@ -42,8 +42,11 @@ private:
 	void MouseOverHandler(Entity* target);
 	void MouseOutHandler(Entity* target);
 	void MouseOnClick(Entity* target);
+	void Close(Entity* target);
 
 	UITextField* CreateTextField(const std::string& _prompt = "");
+
+	void Connect();
 
 };
 

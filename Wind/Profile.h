@@ -6,6 +6,7 @@
 struct Profile : Codable {
 
 	std::string name;
+	std::string picture;
 	std::string status;
 
 	void Decode(const std::string& _content) override;

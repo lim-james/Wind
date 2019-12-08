@@ -120,8 +120,9 @@ namespace Events {
 
 		for (auto& pair : events) {
 			auto& list = eventCallbacks[pair.first];
-
-			for (unsigned i = 0; i < list.size(); ++i) {
+			
+			unsigned i = 0;
+			for (; i < list.size(); ++i) {
 				if (&list[i] == pair.second) {
 					list.erase(list.begin() + i);
 					break;

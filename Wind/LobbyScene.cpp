@@ -27,12 +27,14 @@
 #include "ChatRoom.h"
 
 #include <Events/EventsManager.h>
+#include <Helpers/File/FileHelpers.h>
+#include <Helpers/String/StringHelpers.h>
 #include <GLFW/glfw3.h>
 
 #include <regex>
 
 LobbyScene::LobbyScene() {
-	client = new TCP(8230);
+	client = new TCP();
 }
 
 LobbyScene::~LobbyScene() {
@@ -69,6 +71,18 @@ void LobbyScene::Start() {
 	auto cam = entities->Create<CameraObject>();
 	cam->GetComponent<Camera>()->SetSize(20);
 
+	auto title = entities->Create<UILabel>();
+	title->GetComponent<Transform>()->translation.y = 17.f;
+	title->GetComponent<Render>()->tint.Set(0.f);
+	title->GetComponent<Text>()->SetFont(Load::FNT("Files/Fonts/Microsoft.fnt", "Files/Fonts/Microsoft.tga"));
+	title->GetComponent<Text>()->text = "Create";
+
+	auto close = entities->Create<UIButton>();
+	close->GetComponent<Transform>()->translation.x = -9.f;
+	close->GetComponent<Transform>()->translation.y = 17.f;
+	close->GetComponent<Render>()->SetTexture(Load::TGA("Files/Textures/close.tga"));
+	close->GetComponent<Button>()->BindHandler(&LobbyScene::Close, this, MOUSE_CLICK);
+
 	auto cursor = entities->Create<Sprite>();
 	cursor->GetComponent<Transform>()->scale.Set(0.1f, 1.f, 1.f);
 	cursor->GetComponent<Render>()->tint.Set(0.f, 1.f, 1.f, 1.f);
@@ -95,17 +109,19 @@ void LobbyScene::Start() {
 	confirm->GetComponent<Button>()->BindHandler(&LobbyScene::MouseOverHandler, this, MOUSE_OVER);
 	confirm->GetComponent<Button>()->BindHandler(&LobbyScene::MouseOutHandler, this, MOUSE_OUT);
 	confirm->GetComponent<Button>()->BindHandler(&LobbyScene::MouseOnClick, this, MOUSE_CLICK);
-
 }
 
 void LobbyScene::PrepareForSegue(Scene * destination) {
-	auto dest = static_cast<ChatRoom*>(destination);
-	dest->SetProfile(profile);
-	dest->SetClient(client);
+	if (dynamic_cast<ChatRoom*>(destination)) {
+		auto dest = static_cast<ChatRoom*>(destination);
+		dest->SetProfile(manager->GetProfile());
+		dest->SetClient(client);
+		dest->SetRoom(manager->GetRoom(client));
+	}
 }
 
-void LobbyScene::SetProfile(Profile * const _profile) {
-	profile = _profile;
+void LobbyScene::SetChatManager(ChatManager * const _manager) {
+	manager = _manager;
 }
 
 void LobbyScene::DidChangeHandler(UITextField * const target) {
@@ -136,9 +152,7 @@ void LobbyScene::DidChangeHandler(UITextField * const target) {
 }
 
 void LobbyScene::ReturnHandler(UITextField* const target) {
-	client->Connect(ipField->GetComponent<Text>()->text, []() {
-		Events::EventsManager::GetInstance()->Trigger("PRESENT_SCENE", new Events::AnyType<std::string>("CHAT_ROOM"));
-	});
+	Connect();
 }
 
 void LobbyScene::MouseOverHandler(Entity* target) {
@@ -158,9 +172,11 @@ void LobbyScene::MouseOutHandler(Entity* target) {
 }
 
 void LobbyScene::MouseOnClick(Entity * target) {
-	client->Connect(ipField->GetComponent<Text>()->text, []() {
-		Events::EventsManager::GetInstance()->Trigger("PRESENT_SCENE", new Events::AnyType<std::string>("CHAT_ROOM"));
-	});
+	Connect();
+}
+
+void LobbyScene::Close(Entity * target) {
+	Events::EventsManager::GetInstance()->Trigger("PRESENT_SCENE", new Events::AnyType<std::string>("ROOMS"));
 }
 
 UITextField * LobbyScene::CreateTextField(const std::string & _prompt) {
@@ -189,4 +205,25 @@ UITextField * LobbyScene::CreateTextField(const std::string & _prompt) {
 	prompt->GetComponent<Text>()->paragraphAlignment = PARAGRAPH_LEFT;
 	
 	return result;
+}
+
+void LobbyScene::Connect() {
+	if (!confirm->GetComponent<Button>()->isEnabled) return;
+
+	auto& ip = ipField->GetComponent<Text>()->text;
+	auto port = Helpers::Parse<USHORT>(portField->GetComponent<Text>()->text);
+	Console::Warn << "connecting to " << ip << "::" << port << '\n';
+
+	client = manager->Join(ip, port, [this](TCP* _client) {
+		Content message;
+		message.type = JOIN_CONTENT;
+		auto profile = manager->GetProfile();
+		if (!profile->picture.empty()) {
+			message.title = Helpers::GetFileName(profile->picture);
+			message.body = Helpers::ReadFile(profile->picture);
+		}
+		_client->Send(Codable::Join(2, profile, &message));
+
+		Events::EventsManager::GetInstance()->Trigger("PRESENT_SCENE", new Events::AnyType<std::string>("CHAT_ROOM"));
+	});
 }
