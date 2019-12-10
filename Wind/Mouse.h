@@ -33,10 +33,12 @@ public:
 	
 	Mouse();
 
-	void Init(const vec2i& _position, Maze* const maze);
+	void Build() override;
+
 	void Explore();
 	void Goto(const vec2i& target);
 
+	void SetMaze(Maze* const _maze);
 	vec2i GetMapPosition();
 	void SetMapPosition(const vec2i& position);
 

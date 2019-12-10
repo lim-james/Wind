@@ -1,6 +1,7 @@
 #include "Mouse.h"
 
 #include "Transform.h"
+#include "Render.h"
 
 #include <Events/EventsManager.h>
 
@@ -25,16 +26,19 @@ Mouse::Mouse() {
 	directions[3] = vec2i(0, -1);
 }
 
-void Mouse::Init(const vec2i & _position, Maze* const maze) {
-	position = _position;
-	vision.resize(maze->GetSize() * maze->GetSize(), FOG);
+void Mouse::Build() {
+	AddComponent<Transform>();
+	AddComponent<Render>();
 }
 
 void Mouse::Explore() {
 	Scan(GetMapPosition());
+	return;
 }
 
 void Mouse::Goto(const vec2i & target) {
+	const auto position = GetMapPosition();
+
 	std::vector<DNode*> opened;
 	std::vector<DNode*> closed;
 
@@ -105,6 +109,11 @@ void Mouse::Goto(const vec2i & target) {
 		}
 	}
 
+}
+
+void Mouse::SetMaze(Maze * const _maze) {
+	maze = _maze;
+	vision.resize(maze->GetSize() * maze->GetSize(), FOG);
 }
 
 vec2i Mouse::GetMapPosition() {

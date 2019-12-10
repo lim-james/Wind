@@ -52,6 +52,7 @@ void PathFinding::Awake() {
 	entities->Subscribe<FPSLabel>(1, 1);
 	entities->Subscribe<CameraObject>(1, 1);
 	entities->Subscribe<UILabel>(10, 1);
+	entities->Subscribe<Mouse>(4, 1);
 
 	systems->Subscribe<AnimationSystem>();
 	systems->Subscribe<RenderSystem>();
@@ -91,7 +92,12 @@ void PathFinding::Start() {
 	// float grid size
 	const float fgs = static_cast<float>(gridSize) * 0.5f;
 	maze.Generate(0, gridSize, vec2i(0), 0.3f);
-	mouse.Init(vec2i(0), gridSize);
+
+	mouse = entities->Create<Mouse>();
+	mouse->SetMaze(&maze);
+	mouse->SetMapPosition(0.f);
+	mouse->GetComponent<Transform>()->scale.Set(1.f);
+	mouse->GetComponent<Render>()->tint.Set(0.01f);
 
 	for (float x = -fgs; x < fgs; ++x) {
 		for (float y = -fgs; y < fgs; ++y) {
@@ -126,12 +132,12 @@ void PathFinding::Start() {
 		}
 	}
 
-	mouse.Explore(&maze);
+	mouse->Explore();
 }
 
 void PathFinding::UpdateVision() {
-	auto vision = mouse.GetVision();
-	auto index = maze.GetMapIndex(mouse.GetMapPosition());
+	auto vision = mouse->GetVision();
+	auto index = maze.GetMapIndex(mouse->GetMapPosition());
 
 	for (unsigned i = 0; i < vision.size(); ++i) {
 		if (i == index) {
@@ -217,6 +223,6 @@ void PathFinding::OnClick(Entity * entity) {
 
 	if (index < 0) return;
 
-	mouse.Goto(mapPosition);
+	mouse->Goto(mapPosition);
 }
 

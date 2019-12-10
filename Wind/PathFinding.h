@@ -15,7 +15,7 @@ class PathFinding : public Scene {
 	int iterations;
 
 	Maze maze;
-	Mouse mouse;
+	Mouse* mouse;
 	std::vector<Entity*> grid;
 
 public:
